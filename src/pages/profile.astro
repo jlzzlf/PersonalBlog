@@ -1,0 +1,103 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const pageTitle = `个人简介 | ${SITE_TITLE}`;
+
+const sections = [
+	{
+		title: '个人介绍',
+		text: '这里后面可以写更完整的自我介绍，比如目前在学什么、喜欢什么方向、以及为什么会想做这个个人站。',
+	},
+	{
+		title: '兴趣方向',
+		text: '你可以在这里单独整理技术兴趣、内容创作方向、正在长期投入的主题，让访客更快认识你。',
+	},
+	{
+		title: '联系入口',
+		text: '之后还可以继续补 Bilibili、GitHub、力扣和其他联系方式，作为主页之外的独立信息页。',
+	},
+];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description="个人简介页，占位用于后续整理个人介绍与联系信息。" />
+	</head>
+	<body>
+		<Header />
+		<main class="feature-page">
+			<section class="surface-card feature-hero">
+				<p class="eyebrow">Profile</p>
+				<h1>个人简介</h1>
+				<p>
+					这里可以作为更正式的个人介绍页。后面你可以慢慢把经历、兴趣、正在做的事和想分享的内容整理成一页完整简介。
+				</p>
+				<div class="feature-actions">
+					<a class="button" href="/">返回首页</a>
+					<a class="button secondary" href="/about">查看关于</a>
+				</div>
+			</section>
+
+			<section class="feature-grid">
+				{
+					sections.map((section) => (
+						<article class="surface-card feature-card">
+							<h2>{section.title}</h2>
+							<p>{section.text}</p>
+						</article>
+					))
+				}
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.feature-page {
+		display: grid;
+		gap: 1.4rem;
+	}
+
+	.feature-hero,
+	.feature-card {
+		padding: clamp(1.5rem, 2vw, 2rem);
+	}
+
+	.feature-hero {
+		max-width: 62rem;
+	}
+
+	.feature-hero p:last-of-type,
+	.feature-card p:last-child {
+		margin-bottom: 0;
+		color: rgb(var(--gray));
+	}
+
+	.feature-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+		margin-top: 1.4rem;
+	}
+
+	.feature-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.feature-card h2 {
+		font-size: 1.45rem;
+	}
+
+	@media (max-width: 860px) {
+		.feature-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

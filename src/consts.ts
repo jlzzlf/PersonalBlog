@@ -1,5 +1,5 @@
 // Place any global data in this file.
 // You can import this data from anywhere in your site by using the `import` keyword.
 
-export const SITE_TITLE = '章立夫 Blog';
-export const SITE_DESCRIPTION = 'Welcome to my website!';
+export const SITE_TITLE = '章立夫的个人站';
+export const SITE_DESCRIPTION = '记录学习、项目实践与生活灵感的个人博客。';

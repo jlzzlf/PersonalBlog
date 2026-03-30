@@ -1,10 +1,17 @@
 ---
 title: '第一篇博客'
-description: 'Lorem ipsum dolor sit amet'
+description: '这是博客正式开张前的第一条记录。'
 pubDate: '2026-3-30'
 heroImage: '../../assets/blog-placeholder-3.jpg'
 ---
 
 这是我的第一篇博客。
 
-这里以后会记录我的 Unity 学习、项目开发和踩坑笔记。
+接下来这里会陆续记录：
+
+- Astro 建站过程
+- Unity 学习与项目开发
+- 一些踩坑、修复与复盘
+- 偶尔也会写生活灵感和随手想法
+
+这个博客现在还在持续搭建中，但它已经开始变成一个真正属于我的空间了。

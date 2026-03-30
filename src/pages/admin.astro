@@ -68,7 +68,7 @@ const pageTitle = '博客后台';
 			<div class="panel">
 				<h1>{pageTitle}</h1>
 				<p>正在加载写作后台并校验运行时配置。</p>
-				<p id="cms-status" class="status">如果这里停留太久，请检查 Cloudflare Pages 的环境变量和 Access 配置。</p>
+				<p id="cms-status" class="status">如果这里停留太久，请检查 Cloudflare Pages 的环境变量、后台访问密码和 GitHub OAuth 配置。</p>
 			</div>
 		</div>
 
@@ -86,6 +86,12 @@ const pageTitle = '博客后台';
 					const payload = await response.json().catch(() => ({}));
 
 					if (!response.ok) {
+						if (response.status === 401) {
+							throw new Error(
+								'后台接口已启用密码保护。请刷新页面，并在浏览器弹出的登录框里输入 CMS_ADMIN_USERNAME 和 CMS_ADMIN_PASSWORD。',
+							);
+						}
+
 						if (response.status === 404) {
 							throw new Error(
 								'你现在运行的是 Astro 本地开发服务器，/api/cms 这组 Cloudflare Pages Functions 还没有启动。请直接访问 /admin 看入口；如果要测试登录，请先 npm run build，再运行 npx wrangler pages dev dist。',

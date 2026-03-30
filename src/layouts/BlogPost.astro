@@ -1,5 +1,4 @@
 ---
-import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
@@ -10,6 +9,15 @@ type Props = CollectionEntry<'blog'>['data'];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 const usesPublicHeroImage = typeof heroImage === 'string';
+const resolvedHeroImage =
+	heroImage &&
+	(usesPublicHeroImage
+		? { src: heroImage }
+		: {
+				src: heroImage.src,
+				width: heroImage.width,
+				height: heroImage.height,
+			});
 ---
 
 <html lang="en">
@@ -62,12 +70,16 @@ const usesPublicHeroImage = typeof heroImage === 'string';
 			<article>
 				<div class="hero-image">
 					{
-						heroImage &&
-							(usesPublicHeroImage ? (
-								<img src={heroImage} alt="" loading="eager" />
-							) : (
-								<Image width={1020} height={510} src={heroImage} alt="" />
-							))
+						resolvedHeroImage && (
+							<img
+								src={resolvedHeroImage.src}
+								width={resolvedHeroImage.width}
+								height={resolvedHeroImage.height}
+								alt=""
+								loading="eager"
+								decoding="async"
+							/>
+						)
 					}
 				</div>
 				<div class="prose">

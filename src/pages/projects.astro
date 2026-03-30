@@ -1,0 +1,103 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+
+const pageTitle = `项目展示 | ${SITE_TITLE}`;
+
+const sections = [
+	{
+		title: '当前项目',
+		text: '这里后面可以集中放正在做的个人项目、课程作品、实验性质的小工具，方便首页之外单独整理展示。',
+	},
+	{
+		title: '展示方式',
+		text: '之后可以继续补项目封面、技术栈、上线地址、仓库链接和阶段截图，让这里更像正式作品页。',
+	},
+	{
+		title: '后续扩展',
+		text: '如果项目越来越多，也可以在这里继续拆分分类、筛选和时间线，把它做成完整的作品集入口。',
+	},
+];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description="项目展示页，占位用于后续整理个人项目与作品。" />
+	</head>
+	<body>
+		<Header />
+		<main class="feature-page">
+			<section class="surface-card feature-hero">
+				<p class="eyebrow">Projects</p>
+				<h1>项目展示</h1>
+				<p>
+					这里会慢慢整理成你的个人项目页。后面无论是课程作业、练手工具、完整作品还是长期计划，都可以统一放在这里。
+				</p>
+				<div class="feature-actions">
+					<a class="button" href="/">返回首页</a>
+					<a class="button secondary" href="/blog">查看博客</a>
+				</div>
+			</section>
+
+			<section class="feature-grid">
+				{
+					sections.map((section) => (
+						<article class="surface-card feature-card">
+							<h2>{section.title}</h2>
+							<p>{section.text}</p>
+						</article>
+					))
+				}
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.feature-page {
+		display: grid;
+		gap: 1.4rem;
+	}
+
+	.feature-hero,
+	.feature-card {
+		padding: clamp(1.5rem, 2vw, 2rem);
+	}
+
+	.feature-hero {
+		max-width: 62rem;
+	}
+
+	.feature-hero p:last-of-type,
+	.feature-card p:last-child {
+		margin-bottom: 0;
+		color: rgb(var(--gray));
+	}
+
+	.feature-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+		margin-top: 1.4rem;
+	}
+
+	.feature-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.feature-card h2 {
+		font-size: 1.45rem;
+	}
+
+	@media (max-width: 860px) {
+		.feature-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

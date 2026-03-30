@@ -43,7 +43,9 @@
 - `CMS_GITHUB_REPO=你的GitHub用户名/你的仓库名`
 - `CMS_GITHUB_BRANCH=main`
 - `CMS_ALLOWED_GITHUB_LOGINS=你的GitHub用户名`
-- `CMS_GITHUB_AUTH_SCOPE=public_repo`
+- `CMS_GITHUB_AUTH_SCOPE=repo`
+- `CMS_ADMIN_USERNAME=你自定义的后台用户名`
+- `CMS_ADMIN_PASSWORD=一段足够长的随机密码`
 - `PUBLIC_SITE_URL=https://你的域名`
 - `PUBLIC_DISPLAY_URL=https://你的域名`
 - `GITHUB_OAUTH_CLIENT_ID=你的Client ID`
@@ -52,27 +54,24 @@
 变量说明：
 
 - `CMS_ALLOWED_GITHUB_LOGINS`：推荐必填。只有这里列出的 GitHub 用户名才能完成登录。
-- `CMS_GITHUB_AUTH_SCOPE`：
-  - 如果仓库是公开的，用 `public_repo`
-  - 如果仓库是私有的，用 `repo`
+- `CMS_GITHUB_AUTH_SCOPE`：建议直接用 `repo`。当前后台启用了 `editorial_workflow`，这样兼容性最稳；如果你的仓库是公开的、又想缩小权限范围，可以再尝试改成 `public_repo`。
+- `CMS_ADMIN_USERNAME`：浏览器进入 `/admin` 和 `/api/cms/*` 时要输入的后台用户名。
+- `CMS_ADMIN_PASSWORD`：浏览器进入后台时要输入的密码，建议放到 Cloudflare Pages 的 `Secret` 里。
 - `PUBLIC_DISPLAY_URL` 可选；不填时会回退到 `PUBLIC_SITE_URL`
 
-### 3. 用 Cloudflare Access 保护后台
+### 3. 用站点内置密码保护后台
 
-为了让陌生人连后台页面都进不去，建议在 Cloudflare Zero Trust / Access 里给下面两类路径加保护：
+这个项目现在不再依赖 Cloudflare Access，而是直接用 Cloudflare Pages Functions 给下面两类路径加浏览器登录保护：
 
 - `/admin*`
 - `/api/cms*`
 
-推荐策略：
-
-- 只允许你的邮箱登录
-- 或只允许你的 GitHub 身份登录
-
 这样会形成两层保护：
 
-1. Cloudflare Access 先挡住后台入口
+1. 浏览器先要求输入 `CMS_ADMIN_USERNAME / CMS_ADMIN_PASSWORD`
 2. 进入后台后还要通过 GitHub OAuth，并且 GitHub 用户名要在白名单里
+
+这套方案不需要绑定 Cloudflare Access，也不需要额外付费方式。
 
 ### 4. 重新部署
 
@@ -133,7 +132,7 @@
 如果你要连同 `/api/cms/*` 这些 Functions 一起测试，请先准备本地密钥文件：
 
 1. 复制 `.dev.vars.example` 为 `.dev.vars`
-2. 填入你自己的 GitHub OAuth 和仓库配置
+2. 填入你自己的 GitHub OAuth、仓库配置和后台用户名密码
 
 然后执行：
 
