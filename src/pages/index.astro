@@ -51,9 +51,25 @@ const HOME_HERO_TITLE = '章立夫的个人主页';
 const HOME_HERO_SUBTITLE = '欢迎访问';
 const avatarImageSrc = encodeURI('/images/爱言叶5-裁切.jpg');
 const profileActionButtons = [
-	{ label: 'Bilibili', imageSrc: '/images/bilibili-fill.png', alt: 'Bilibili 图标' },
-	{ label: 'GitHub', imageSrc: '/images/github.png', alt: 'GitHub 图标' },
-	{ label: '力扣', imageSrc: '/images/LeetCode.png', alt: '力扣图标', iconClass: 'is-leetcode' },
+	{
+		label: 'Bilibili',
+		imageSrc: '/images/bilibili-fill.png',
+		alt: 'Bilibili 图标',
+		href: 'https://space.bilibili.com/13105791?spm_id_from=333.1007.0.0',
+	},
+	{
+		label: 'GitHub',
+		imageSrc: '/images/github.png',
+		alt: 'GitHub 图标',
+		href: 'https://github.com/jlzzlf',
+	},
+	{
+		label: '力扣',
+		imageSrc: '/images/LeetCode.png',
+		alt: '力扣图标',
+		iconClass: 'is-leetcode',
+		href: 'https://leetcode.cn/u/fdrksk6o8H/',
+	},
 ];
 
 const musicDirectory = join(process.cwd(), 'public', 'music');
@@ -164,14 +180,31 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 						<div class="profile-actions" aria-label="个人主页与联系方式入口">
 							{
 								profileActionButtons.map((item) => (
-									<button class="profile-action" type="button" aria-label={item.label}>
-										<img
-											src={item.imageSrc}
-											alt={item.alt}
-											class:list={['profile-action-image', item.iconClass]}
-										/>
-										<span>{item.label}</span>
-									</button>
+									item.href ? (
+										<a
+											class="profile-action"
+											href={item.href}
+											target="_blank"
+											rel="noreferrer"
+											aria-label={item.label}
+										>
+											<img
+												src={item.imageSrc}
+												alt={item.alt}
+												class:list={['profile-action-image', item.iconClass]}
+											/>
+											<span>{item.label}</span>
+										</a>
+									) : (
+										<button class="profile-action" type="button" aria-label={item.label}>
+											<img
+												src={item.imageSrc}
+												alt={item.alt}
+												class:list={['profile-action-image', item.iconClass]}
+											/>
+											<span>{item.label}</span>
+										</button>
+									)
 								))
 							}
 						</div>
@@ -696,6 +729,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		border-radius: 20px;
 		background: rgba(255, 255, 255, 0.5);
 		color: rgb(var(--black));
+		text-decoration: none;
 		cursor: pointer;
 		transition:
 			transform 180ms ease,
