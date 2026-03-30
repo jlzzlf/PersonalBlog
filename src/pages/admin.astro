@@ -1,0 +1,110 @@
+---
+const pageTitle = '博客后台';
+---
+
+<!doctype html>
+<html lang="zh-Hant">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex,nofollow,noarchive" />
+		<title>{pageTitle}</title>
+		<style>
+			:root {
+				color-scheme: light;
+				font-family:
+					"Atkinson",
+					system-ui,
+					sans-serif;
+				background:
+					radial-gradient(circle at top, #f4ede4 0, #f7f4ee 28%, #efe9de 100%);
+				color: #1d1a16;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+			}
+
+			.shell {
+				box-sizing: border-box;
+				display: grid;
+				place-items: center;
+				min-height: 100vh;
+				padding: 2rem;
+			}
+
+			.panel {
+				width: min(36rem, 100%);
+				border: 1px solid rgba(29, 26, 22, 0.12);
+				border-radius: 24px;
+				background: rgba(255, 252, 246, 0.86);
+				box-shadow: 0 24px 60px rgba(48, 36, 24, 0.12);
+				backdrop-filter: blur(18px);
+				padding: 2rem;
+			}
+
+			h1 {
+				margin: 0 0 0.75rem;
+				font-size: clamp(1.8rem, 4vw, 2.5rem);
+				line-height: 1;
+			}
+
+			p {
+				margin: 0;
+				line-height: 1.65;
+				color: rgba(29, 26, 22, 0.8);
+			}
+
+			.status {
+				margin-top: 1.25rem;
+				padding-top: 1.25rem;
+				border-top: 1px solid rgba(29, 26, 22, 0.1);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="cms-shell" class="shell">
+			<div class="panel">
+				<h1>{pageTitle}</h1>
+				<p>正在加载写作后台并校验运行时配置。</p>
+				<p id="cms-status" class="status">如果这里停留太久，请检查 Cloudflare Pages 的环境变量和 Access 配置。</p>
+			</div>
+		</div>
+
+		<script>
+			import CMS from 'decap-cms-app';
+
+			const shell = document.getElementById('cms-shell');
+			const status = document.getElementById('cms-status');
+
+			async function initCms() {
+				try {
+					const response = await fetch('/api/cms/config', {
+						headers: { Accept: 'application/json' },
+					});
+					const payload = await response.json().catch(() => ({}));
+
+					if (!response.ok) {
+						if (response.status === 404) {
+							throw new Error(
+								'你现在运行的是 Astro 本地开发服务器，/api/cms 这组 Cloudflare Pages Functions 还没有启动。请直接访问 /admin 看入口；如果要测试登录，请先 npm run build，再运行 npx wrangler pages dev dist。',
+							);
+						}
+
+						throw new Error(payload.message ?? '无法读取 CMS 配置。');
+					}
+
+					CMS.init({ config: payload });
+					shell?.remove();
+				} catch (error) {
+					if (status) {
+						status.textContent = error instanceof Error ? error.message : '后台加载失败。';
+					}
+				}
+			}
+
+			void initCms();
+		</script>
+	</body>
+</html>
