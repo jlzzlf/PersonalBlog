@@ -5,6 +5,7 @@ const pathname = Astro.url.pathname.replace(import.meta.env.BASE_URL, '');
 const currentSection = pathname.match(/[^\/]+/g)?.[0];
 const navItems = [
 	{ href: '/', label: '首页' },
+	{ href: '/projects', label: '项目' },
 	{ href: '/blog', label: '博客' },
 	{ href: '/about', label: '关于' },
 ];

@@ -28,6 +28,27 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 	<div class="floating-music-player__panel" data-player-panel aria-hidden="true" hidden>
 		<audio data-player-audio preload="metadata" hidden></audio>
 
+		<div class="floating-music-player__meta">
+			<span class="floating-music-player__current" data-player-current>...</span>
+			<button
+				type="button"
+				class="floating-music-player__volume"
+				data-player-volume
+				aria-label="音量 15%"
+			>
+				<svg viewBox="0 0 24 24" aria-hidden="true">
+					<path
+						d="M10.2 6.75a.75.75 0 0 1 1.3.52v9.46a.75.75 0 0 1-1.3.52L6.9 13.5H4.75A1.75 1.75 0 0 1 3 11.75v-.5C3 10.28 3.78 9.5 4.75 9.5H6.9l3.3-3.75Z"
+						fill="currentColor"
+					/>
+					<path
+						d="M14.86 9.14a.75.75 0 0 1 1.06 0 4.03 4.03 0 0 1 0 5.72.75.75 0 1 1-1.06-1.06 2.53 2.53 0 0 0 0-3.6.75.75 0 0 1 0-1.06Z"
+						fill="currentColor"
+					/>
+				</svg>
+			</button>
+		</div>
+
 		<div class="floating-music-player__controls">
 			<button type="button" class="floating-music-player__control" data-player-previous aria-label="上一曲">
 				<svg viewBox="0 0 24 24" aria-hidden="true">
@@ -58,8 +79,6 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 				</svg>
 			</button>
 		</div>
-
-		<div class="floating-music-player__playlist" data-player-playlist></div>
 	</div>
 </aside>
 
@@ -72,32 +91,46 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		const toggleButton = root.querySelector('[data-player-toggle]');
 		const panel = root.querySelector('[data-player-panel]');
 		const audio = root.querySelector('[data-player-audio]');
+		const currentLabel = root.querySelector('[data-player-current]');
+		const volumeButton = root.querySelector('[data-player-volume]');
 		const previousButton = root.querySelector('[data-player-previous]');
 		const playButton = root.querySelector('[data-player-play]');
 		const nextButton = root.querySelector('[data-player-next]');
-		const playlist = root.querySelector('[data-player-playlist]');
 
 		if (
 			!(toggleButton instanceof HTMLButtonElement) ||
 			!(panel instanceof HTMLElement) ||
 			!(audio instanceof HTMLAudioElement) ||
+			!(currentLabel instanceof HTMLElement) ||
+			!(volumeButton instanceof HTMLButtonElement) ||
 			!(previousButton instanceof HTMLButtonElement) ||
 			!(playButton instanceof HTMLButtonElement) ||
-			!(nextButton instanceof HTMLButtonElement) ||
-			!(playlist instanceof HTMLElement)
+			!(nextButton instanceof HTMLButtonElement)
 		) {
 			return;
 		}
 
 		const STORAGE_KEY = 'joylife-floating-music-player';
+		const DEFAULT_VOLUME = 0.15;
+		const VOLUME_STEPS = [0, 0.15, 0.35, 0.6];
 		const PLAY_ICON =
 			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.75 6.78c0-.83.92-1.33 1.62-.88l7.1 4.72a1.06 1.06 0 0 1 0 1.76l-7.1 4.72a1.06 1.06 0 0 1-1.62-.88V6.78Z" fill="currentColor" /></svg>';
 		const PAUSE_ICON =
 			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6.5a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0v-9a1 1 0 0 1 1-1Zm7 0a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0v-9a1 1 0 0 1 1-1Z" fill="currentColor" /></svg>';
-		let musicTrackButtons = [];
+		const VOLUME_ICONS = {
+			muted:
+				'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 6.75a.75.75 0 0 1 1.3.52v2.98l2.12 2.12a.74.74 0 0 1-.12.14l-3.3 3.74a.75.75 0 0 1-1.3-.52V13.5H6.9l-.94-.94A1.74 1.74 0 0 1 4 11.75v-.5c0-.6.3-1.14.76-1.46L10.2 6.75Zm6.08 2.19a.75.75 0 0 1 1.06 0L19 10.6l1.66-1.66a.75.75 0 1 1 1.06 1.06L20.06 11.66l1.66 1.66a.75.75 0 1 1-1.06 1.06L19 12.72l-1.66 1.66a.75.75 0 1 1-1.06-1.06l1.66-1.66-1.66-1.66a.75.75 0 0 1 0-1.06Z" fill="currentColor" /></svg>',
+			low:
+				'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 6.75a.75.75 0 0 1 1.3.52v9.46a.75.75 0 0 1-1.3.52L6.9 13.5H4.75A1.75 1.75 0 0 1 3 11.75v-.5C3 10.28 3.78 9.5 4.75 9.5H6.9l3.3-3.75Z" fill="currentColor" /><path d="M14.86 9.14a.75.75 0 0 1 1.06 0 4.03 4.03 0 0 1 0 5.72.75.75 0 1 1-1.06-1.06 2.53 2.53 0 0 0 0-3.6.75.75 0 0 1 0-1.06Z" fill="currentColor" /></svg>',
+			high:
+				'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.2 6.75a.75.75 0 0 1 1.3.52v9.46a.75.75 0 0 1-1.3.52L6.9 13.5H4.75A1.75 1.75 0 0 1 3 11.75v-.5C3 10.28 3.78 9.5 4.75 9.5H6.9l3.3-3.75Z" fill="currentColor" /><path d="M14.86 8.35a.75.75 0 0 1 1.06 0 5.15 5.15 0 0 1 0 7.3.75.75 0 1 1-1.06-1.06 3.65 3.65 0 0 0 0-5.18.75.75 0 0 1 0-1.06Z" fill="currentColor" /><path d="M17.69 6.21a.75.75 0 0 1 1.06 0 8.17 8.17 0 0 1 0 11.58.75.75 0 1 1-1.06-1.06 6.67 6.67 0 0 0 0-9.46.75.75 0 0 1 0-1.06Z" fill="currentColor" /></svg>',
+		};
+
+		let musicTracks = [];
 		let activeMusicTrackIndex = 0;
 		let pendingRestoreTime = 0;
 		let pendingAutoplay = false;
+		let pendingAutoplayRetry = false;
 		let lastPersistAt = 0;
 
 		const readStoredState = () => {
@@ -112,19 +145,22 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		};
 
 		const persistPlayerState = () => {
-			if (!musicTrackButtons.length) return;
-			const activeButton = musicTrackButtons[activeMusicTrackIndex];
-			if (!(activeButton instanceof HTMLElement)) return;
+			if (!musicTracks.length) return;
+			const activeTrack = musicTracks[activeMusicTrackIndex];
+			if (!activeTrack || typeof activeTrack !== 'object') return;
 
 			try {
 				window.localStorage.setItem(
 					STORAGE_KEY,
 					JSON.stringify({
+						hasVisited: true,
 						index: activeMusicTrackIndex,
-						src: activeButton.dataset.trackSrc || '',
+						src: activeTrack.src || '',
+						label: activeTrack.label || '',
 						currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
 						paused: audio.paused,
 						expanded: root.dataset.expanded === 'true',
+						volume: Number.isFinite(audio.volume) ? audio.volume : DEFAULT_VOLUME,
 					}),
 				);
 			} catch {
@@ -133,6 +169,7 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		};
 
 		const setControlsDisabled = (disabled) => {
+			volumeButton.disabled = disabled;
 			previousButton.disabled = disabled;
 			playButton.disabled = disabled;
 			nextButton.disabled = disabled;
@@ -144,8 +181,24 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 			root.dataset.playing = isPlaying ? 'true' : 'false';
 		};
 
+		const setVolumeButtonState = (volume) => {
+			const safeVolume = Math.max(0, Math.min(volume, 1));
+			const icon = safeVolume <= 0 ? VOLUME_ICONS.muted : safeVolume <= 0.2 ? VOLUME_ICONS.low : VOLUME_ICONS.high;
+			volumeButton.innerHTML = icon;
+			volumeButton.setAttribute('aria-label', `音量 ${Math.round(safeVolume * 100)}%`);
+		};
+
+		const applyVolume = (volume, { persist = true } = {}) => {
+			const safeVolume = Math.max(0, Math.min(volume, 1));
+			audio.volume = safeVolume;
+			setVolumeButtonState(safeVolume);
+			if (persist) {
+				persistPlayerState();
+			}
+		};
+
 		const setExpanded = (expanded, { persist = true } = {}) => {
-			const nextExpanded = expanded && musicTrackButtons.length > 0;
+			const nextExpanded = expanded && musicTracks.length > 0;
 			root.dataset.expanded = nextExpanded ? 'true' : 'false';
 			toggleButton.setAttribute('aria-expanded', String(nextExpanded));
 			panel.setAttribute('aria-hidden', String(!nextExpanded));
@@ -155,49 +208,40 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 			}
 		};
 
-		const createMusicTrackButton = (track, index) => {
-			const button = document.createElement('button');
-			button.type = 'button';
-			button.className = 'floating-music-player__track';
-			button.dataset.trackIndex = String(index);
-			button.dataset.trackSrc = track.src;
-			button.dataset.trackLabel = track.label;
-			button.title = track.label;
+		const scheduleAutoplayRetry = () => {
+			if (pendingAutoplayRetry) return;
+			pendingAutoplayRetry = true;
 
-			const label = document.createElement('span');
-			label.className = 'floating-music-player__track-label';
-			label.textContent = track.label;
+			const resumePlayback = () => {
+				pendingAutoplayRetry = false;
+				window.removeEventListener('pointerdown', resumePlayback);
+				window.removeEventListener('keydown', resumePlayback);
 
-			button.append(label);
-			button.addEventListener('click', () => {
-				setActiveMusicTrack(index, { autoplay: true });
-			});
-			return button;
+				if (!audio.getAttribute('src')) return;
+				audio.play().catch(() => {
+					// Ignore repeated autoplay blocks.
+				});
+			};
+
+			window.addEventListener('pointerdown', resumePlayback, { once: true, passive: true });
+			window.addEventListener('keydown', resumePlayback, { once: true });
 		};
 
 		const setActiveMusicTrack = (index, { autoplay = false, restoreTime = 0 } = {}) => {
-			if (!musicTrackButtons.length || index < 0 || index >= musicTrackButtons.length) return;
+			if (!musicTracks.length || index < 0 || index >= musicTracks.length) return;
 
-			const nextButton = musicTrackButtons[index];
-			if (!(nextButton instanceof HTMLElement)) return;
-
-			const nextSrc = nextButton.dataset.trackSrc || '';
-			if (!nextSrc) return;
-
-			musicTrackButtons.forEach((button, buttonIndex) => {
-				if (!(button instanceof HTMLElement)) return;
-				const isActive = buttonIndex === index;
-				button.classList.toggle('active', isActive);
-				button.setAttribute('aria-pressed', String(isActive));
-			});
+			const nextTrack = musicTracks[index];
+			if (!nextTrack || typeof nextTrack.src !== 'string' || !nextTrack.src) return;
 
 			activeMusicTrackIndex = index;
+			currentLabel.textContent = nextTrack.label || '未命名音乐';
+			currentLabel.title = nextTrack.label || '未命名音乐';
 			pendingRestoreTime = Math.max(restoreTime, 0);
 			pendingAutoplay = autoplay;
 			setPlayButtonState(false);
 
-			if (audio.getAttribute('src') !== nextSrc) {
-				audio.src = nextSrc;
+			if (audio.getAttribute('src') !== nextTrack.src) {
+				audio.src = nextTrack.src;
 				audio.load();
 			} else {
 				if (pendingRestoreTime > 0) {
@@ -209,6 +253,7 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 					audio.play().catch(() => {
 						pendingAutoplay = false;
 						setPlayButtonState(false);
+						scheduleAutoplayRetry();
 					});
 				}
 			}
@@ -217,10 +262,16 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		};
 
 		const playAdjacentTrack = (offset) => {
-			if (!musicTrackButtons.length) return;
-			const nextIndex =
-				(activeMusicTrackIndex + offset + musicTrackButtons.length) % musicTrackButtons.length;
+			if (!musicTracks.length) return;
+			const nextIndex = (activeMusicTrackIndex + offset + musicTracks.length) % musicTracks.length;
 			setActiveMusicTrack(nextIndex, { autoplay: true });
+		};
+
+		const cycleVolume = () => {
+			const currentVolume = Number.isFinite(audio.volume) ? audio.volume : DEFAULT_VOLUME;
+			const currentIndex = VOLUME_STEPS.findIndex((step) => Math.abs(step - currentVolume) < 0.02);
+			const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % VOLUME_STEPS.length : 1;
+			applyVolume(VOLUME_STEPS[nextIndex]);
 		};
 
 		const loadMusicTracks = async () => {
@@ -234,18 +285,17 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 				const tracks = Array.isArray(data && data.tracks) ? data.tracks : [];
 				if (!tracks.length) {
 					root.dataset.ready = 'false';
+					currentLabel.textContent = '暂无音乐';
+					currentLabel.title = '暂无音乐';
 					setExpanded(false, { persist: false });
 					setControlsDisabled(true);
 					return;
 				}
 
 				const storedState = readStoredState();
-				playlist.textContent = '';
-				musicTrackButtons = tracks.map((track, index) => createMusicTrackButton(track, index));
-				musicTrackButtons.forEach((button) => {
-					playlist.append(button);
-				});
+				const isFirstVisit = !storedState || storedState.hasVisited !== true;
 
+				musicTracks = tracks;
 				root.dataset.ready = 'true';
 				panel.hidden = false;
 				setControlsDisabled(false);
@@ -260,10 +310,13 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 						: storedState && Number.isInteger(storedState.index)
 							? Math.min(Math.max(storedState.index, 0), tracks.length - 1)
 							: 0;
+				const initialVolume =
+					storedState && typeof storedState.volume === 'number' ? storedState.volume : DEFAULT_VOLUME;
 
+				applyVolume(initialVolume, { persist: false });
 				setExpanded(Boolean(storedState && storedState.expanded), { persist: false });
 				setActiveMusicTrack(initialIndex, {
-					autoplay: Boolean(storedState && storedState.paused === false),
+					autoplay: isFirstVisit || Boolean(storedState && storedState.paused === false),
 					restoreTime:
 						storedState && typeof storedState.currentTime === 'number'
 							? storedState.currentTime
@@ -271,6 +324,8 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 				});
 			} catch {
 				root.dataset.ready = 'false';
+				currentLabel.textContent = '音乐加载失败';
+				currentLabel.title = '音乐加载失败';
 				setExpanded(false, { persist: false });
 				setControlsDisabled(true);
 			}
@@ -278,10 +333,16 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 
 		setControlsDisabled(true);
 		setPlayButtonState(false);
+		setVolumeButtonState(DEFAULT_VOLUME);
 
 		toggleButton.addEventListener('click', () => {
 			if (root.dataset.ready !== 'true') return;
 			setExpanded(root.dataset.expanded !== 'true');
+		});
+
+		volumeButton.addEventListener('click', () => {
+			if (root.dataset.ready !== 'true') return;
+			cycleVolume();
 		});
 
 		previousButton.addEventListener('click', () => {
@@ -321,6 +382,7 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 				audio.play().catch(() => {
 					pendingAutoplay = false;
 					setPlayButtonState(false);
+					scheduleAutoplayRetry();
 				});
 			} else {
 				setPlayButtonState(false);
@@ -340,6 +402,11 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 
 		audio.addEventListener('ended', () => {
 			playAdjacentTrack(1);
+		});
+
+		audio.addEventListener('volumechange', () => {
+			setVolumeButtonState(audio.volume);
+			persistPlayerState();
 		});
 
 		audio.addEventListener('timeupdate', () => {
@@ -365,7 +432,7 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 
 	.floating-music-player__launcher,
 	.floating-music-player__control,
-	.floating-music-player__track {
+	.floating-music-player__volume {
 		border: 0;
 		font: inherit;
 	}
@@ -424,9 +491,9 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		right: 0;
 		bottom: calc(100% + 0.75rem);
 		display: grid;
-		gap: 0.8rem;
-		width: min(17.5rem, calc(100vw - 1rem));
-		padding: 0.85rem;
+		gap: 0.72rem;
+		width: min(15.5rem, calc(100vw - 1rem));
+		padding: 0.8rem;
 		border-radius: 24px;
 		background: linear-gradient(180deg, rgba(255, 251, 244, 0.96) 0%, rgba(244, 236, 223, 0.94) 100%);
 		backdrop-filter: blur(18px);
@@ -446,12 +513,28 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		pointer-events: auto;
 	}
 
-	.floating-music-player__controls {
+	.floating-music-player__meta {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: minmax(0, 1fr) auto;
 		gap: 0.6rem;
+		align-items: center;
 	}
 
+	.floating-music-player__current {
+		display: block;
+		min-width: 0;
+		padding: 0.74rem 0.85rem;
+		border-radius: 16px;
+		background: rgba(255, 255, 255, 0.68);
+		color: rgb(var(--black));
+		font-size: 0.9rem;
+		line-height: 1.2;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.floating-music-player__volume,
 	.floating-music-player__control {
 		display: inline-flex;
 		align-items: center;
@@ -468,15 +551,27 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 			opacity 180ms ease;
 	}
 
+	.floating-music-player__volume {
+		width: 2.85rem;
+	}
+
+	.floating-music-player__volume:hover:not(:disabled),
 	.floating-music-player__control:hover:not(:disabled) {
 		transform: translateY(-1px);
 		background: rgba(255, 255, 255, 0.94);
 		box-shadow: 0 10px 20px rgba(39, 43, 37, 0.08);
 	}
 
+	.floating-music-player__volume:disabled,
 	.floating-music-player__control:disabled {
 		cursor: default;
 		opacity: 0.5;
+	}
+
+	.floating-music-player__controls {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0.6rem;
 	}
 
 	.floating-music-player__control--primary {
@@ -488,51 +583,10 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		background: linear-gradient(180deg, rgba(24, 108, 81, 0.98) 0%, rgba(17, 88, 66, 0.96) 100%);
 	}
 
+	.floating-music-player__volume svg,
 	.floating-music-player__control svg {
 		width: 1.15rem;
 		height: 1.15rem;
-	}
-
-	.floating-music-player__playlist {
-		display: grid;
-		gap: 0.45rem;
-		max-height: min(13rem, 34vh);
-		overflow: auto;
-		padding-right: 0.15rem;
-	}
-
-	.floating-music-player__track {
-		width: 100%;
-		padding: 0.72rem 0.85rem;
-		border-radius: 16px;
-		background: rgba(255, 255, 255, 0.68);
-		color: rgb(var(--black));
-		text-align: left;
-		cursor: pointer;
-		transition:
-			transform 180ms ease,
-			background-color 180ms ease,
-			box-shadow 180ms ease;
-	}
-
-	.floating-music-player__track:hover {
-		transform: translateY(-1px);
-		background: rgba(255, 255, 255, 0.92);
-		box-shadow: 0 10px 20px rgba(39, 43, 37, 0.08);
-	}
-
-	.floating-music-player__track.active {
-		background: rgba(22, 98, 74, 0.13);
-		box-shadow: inset 0 0 0 1px rgba(22, 98, 74, 0.18);
-		color: var(--accent-dark);
-	}
-
-	.floating-music-player__track-label {
-		display: block;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		font-size: 0.9rem;
 	}
 
 	@keyframes floating-player-pulse {
@@ -565,8 +619,8 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		}
 
 		.floating-music-player__panel {
-			width: min(16rem, calc(100vw - 1rem));
-			padding: 0.78rem;
+			width: min(14.8rem, calc(100vw - 1rem));
+			padding: 0.75rem;
 		}
 
 		.floating-music-player__launcher {
