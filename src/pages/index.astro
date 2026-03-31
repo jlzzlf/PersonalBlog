@@ -275,7 +275,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 								<p class="eyebrow">Latest Uploads</p>
 								<h2>网站最新上传</h2>
 								<p class="uploads-filter-note" data-uploads-filter-note>
-									点击右侧日历按日期筛选，再点一次同一天可恢复默认列表。
+									点击日历按日期筛选，再点一次同一天可恢复默认列表。
 								</p>
 							</div>
 							<span class="uploads-count" data-uploads-count>{latestPosts.length} 条内容</span>
@@ -1282,12 +1282,61 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 
 		.dashboard-grid {
 			grid-template-columns: minmax(0, 1fr);
-			grid-template-areas: 'center';
+			grid-template-areas: 'stack';
+			gap: 0.95rem;
+			width: min(42rem, calc(100% - 1rem));
 		}
 
 		.left-column,
+		.center-column,
 		.right-column {
-			display: none;
+			display: contents;
+		}
+
+		.panel,
+		.uploads-panel,
+		.archive-panel {
+			padding: 1.15rem;
+		}
+
+		.profile-card {
+			order: 10;
+		}
+
+		.links-card {
+			order: 20;
+		}
+
+		.clock-card {
+			order: 30;
+		}
+
+		.uploads-panel {
+			order: 40;
+		}
+
+		.calendar-card {
+			order: 50;
+		}
+
+		.archive-panel {
+			order: 60;
+		}
+
+		.notice-card {
+			order: 70;
+		}
+
+		.music-card {
+			order: 80;
+		}
+
+		.planner-card {
+			order: 90;
+		}
+
+		.links-clock {
+			min-height: 0;
 		}
 	}
 
@@ -1529,7 +1578,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 						? `已筛选 ${selectedDate} 的上传内容，再点一次同一天可恢复默认列表。`
 						: `${selectedDate} 还没有上传内容，再点一次同一天可恢复默认列表。`;
 			} else {
-				uploadsFilterNote.textContent = '点击右侧日历按日期筛选，再点一次同一天可恢复默认列表。';
+				uploadsFilterNote.textContent = '点击日历按日期筛选，再点一次同一天可恢复默认列表。';
 			}
 
 			if (!filteredItems.length) {
