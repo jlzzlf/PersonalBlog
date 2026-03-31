@@ -49,9 +49,9 @@ const archiveGroups = Array.from(
 
 const HOME_HERO_TITLE = '章立夫的个人主页';
 const HOME_HERO_SUBTITLE = '欢迎访问';
-const DEFAULT_STAGE_VIDEO_SRC = 'https://pub-c822d24319af435d89295bee4f959173.r2.dev/miku.mp4';
-const MAINLAND_CHINA_STAGE_VIDEO_SRC =
+const PRIMARY_STAGE_VIDEO_SRC =
 	'https://personal-blog-1409254078.cos.ap-nanjing.myqcloud.com';
+const FALLBACK_STAGE_VIDEO_SRC = 'https://pub-c822d24319af435d89295bee4f959173.r2.dev/miku.mp4';
 const avatarImageSrc = encodeURI('/images/爱言叶5-裁切.jpg');
 const profileActionButtons = [
 	{
@@ -152,11 +152,6 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<script is:inline>
-			window.__homeRegionPromise = fetch('/api/region', { cache: 'no-store' })
-				.then((response) => (response.ok ? response.json() : null))
-				.catch(() => null);
-		</script>
 	</head>
 	<body>
 		<Header />
@@ -165,8 +160,8 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 				<video
 					class="stage-video"
 					data-stage-video
-					data-default-src={DEFAULT_STAGE_VIDEO_SRC}
-					data-cn-src={MAINLAND_CHINA_STAGE_VIDEO_SRC}
+					data-primary-src={PRIMARY_STAGE_VIDEO_SRC}
+					data-fallback-src={FALLBACK_STAGE_VIDEO_SRC}
 					autoplay
 					muted
 					loop
@@ -174,7 +169,11 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 					preload="metadata"
 					aria-hidden="true"
 				>
-					<source data-stage-video-source type="video/mp4" />
+					<source
+						data-stage-video-source
+						src={PRIMARY_STAGE_VIDEO_SRC}
+						type="video/mp4"
+					/>
 				</video>
 				<div class="stage-overlay" aria-hidden="true"></div>
 			</div>
@@ -1385,6 +1384,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const clamp = (min, value, max) => Math.min(Math.max(value, min), max);
 		const readRem = () =>
 			parseFloat(getComputedStyle(document.documentElement).fontSize || '16') || 16;
+		let hasSwitchedStageVideoToFallback = false;
 
 		const setStageVideoSource = (src) => {
 			if (
@@ -1409,36 +1409,33 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 			}
 		};
 
-		const readHomeRegion = async () => {
-			const regionPromise =
-				window.__homeRegionPromise && typeof window.__homeRegionPromise.then === 'function'
-					? window.__homeRegionPromise
-					: fetch('/api/region', { cache: 'no-store' })
-							.then((response) => (response.ok ? response.json() : null))
-							.catch(() => null);
-
-			try {
-				return await regionPromise;
-			} catch (_error) {
-				return null;
+		const switchStageVideoToFallback = () => {
+			if (
+				hasSwitchedStageVideoToFallback ||
+				!(stageVideo instanceof HTMLVideoElement)
+			) {
+				return;
 			}
+
+			const fallbackSrc = stageVideo.dataset.fallbackSrc || '';
+			if (!fallbackSrc || stageVideo.dataset.activeSrc === fallbackSrc) return;
+
+			hasSwitchedStageVideoToFallback = true;
+			setStageVideoSource(fallbackSrc);
 		};
 
-		const initializeStageVideo = async () => {
+		const initializeStageVideo = () => {
 			if (!(stageVideo instanceof HTMLVideoElement)) return;
 
-			const defaultSrc = stageVideo.dataset.defaultSrc || '';
-			const mainlandChinaSrc = stageVideo.dataset.cnSrc || '';
-			if (!defaultSrc && !mainlandChinaSrc) return;
+			const primarySrc = stageVideo.dataset.primarySrc || '';
+			if (!primarySrc) return;
 
-			let preferredSrc = defaultSrc || mainlandChinaSrc;
-
-			const region = await readHomeRegion();
-			if (region && region.isMainlandChina && mainlandChinaSrc) {
-				preferredSrc = mainlandChinaSrc;
+			stageVideo.addEventListener('error', switchStageVideoToFallback);
+			if (stageVideoSource instanceof HTMLSourceElement) {
+				stageVideoSource.addEventListener('error', switchStageVideoToFallback);
 			}
 
-			setStageVideoSource(preferredSrc);
+			setStageVideoSource(primarySrc);
 		};
 
 		let postFeedItems = [];
