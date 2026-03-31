@@ -63,6 +63,18 @@ body {
 	min-height: 100vh;
 }
 
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.01ms !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root),
+[data-astro-transition-scope] {
+	animation: none !important;
+}
+
 main {
 	width: min(1360px, calc(100% - 2rem));
 	margin: 0 auto;

@@ -132,7 +132,7 @@ const mountHomePage = () => {
 		const { heroHeight, heroOverlap, surfaceOverlap } = getLayoutValues();
 		const surfaceShift = reducedMotion.matches
 			? 0
-			: clamp(heroHeight * -0.24, scrollY * -0.18, 0);
+			: clamp(heroHeight * -1, scrollY * -0.6, 0);
 
 		videoLayer.style.height = `${heroHeight}px`;
 		stage.style.height = `${heroHeight}px`;
