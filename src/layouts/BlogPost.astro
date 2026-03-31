@@ -7,16 +7,17 @@ import Header from '../components/Header.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
-const usesPublicHeroImage = typeof heroImage === 'string';
+const { title, description, pubDate, updatedDate, coverImage } = Astro.props;
+const usesPublicCoverImage = typeof coverImage === 'string';
+const tags = Astro.props.tags ?? [];
 const resolvedHeroImage =
-	heroImage &&
-	(usesPublicHeroImage
-		? { src: heroImage }
+	coverImage &&
+	(usesPublicCoverImage
+		? { src: coverImage }
 		: {
-				src: heroImage.src,
-				width: heroImage.width,
-				height: heroImage.height,
+				src: coverImage.src,
+				width: coverImage.width,
+				height: coverImage.height,
 			});
 ---
 
@@ -58,10 +59,28 @@ const resolvedHeroImage =
 				margin-bottom: 0.5em;
 				color: rgb(var(--gray));
 			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
+				.last-updated-on {
+					font-style: italic;
+				}
+				.tags {
+					display: flex;
+					flex-wrap: wrap;
+					justify-content: center;
+					gap: 0.5rem;
+					margin: 1rem 0 0;
+				}
+				.tag {
+					display: inline-flex;
+					align-items: center;
+					padding: 0.36rem 0.72rem;
+					border-radius: 999px;
+					background: rgba(22, 98, 74, 0.1);
+					color: var(--accent-dark);
+					font-size: 0.85rem;
+					font-weight: 700;
+					line-height: 1.2;
+				}
+			</style>
 	</head>
 
 	<body>
@@ -95,6 +114,17 @@ const resolvedHeroImage =
 							}
 						</div>
 						<h1>{title}</h1>
+						{
+							tags.length > 0 && (
+								<div class="tags" aria-label="文章标签">
+									{
+										tags.map((tag) => (
+											<span class="tag">{tag}</span>
+										))
+									}
+								</div>
+							)
+						}
 						<hr />
 					</div>
 					<slot />

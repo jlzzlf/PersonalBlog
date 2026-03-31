@@ -4,133 +4,506 @@ import BaseHead from '../../components/BaseHead.astro';
 import Footer from '../../components/Footer.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import PlaceholderCover from '../../assets/blog-placeholder-2.jpg';
+import { SITE_TITLE } from '../../consts';
 
+const BLOG_CATEGORIES = ['全部', '学习记录', '技术笔记', '面试整理', '随想随笔'] as const;
+const pageTitle = `技术博客 | ${SITE_TITLE}`;
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-
-const getHeroImageAttrs = (heroImage: (typeof posts)[number]['data']['heroImage']) => {
-	if (!heroImage) {
-		return null;
+const tagCountMap = posts.reduce((map, post) => {
+	for (const tag of post.data.tags ?? []) {
+		map.set(tag, (map.get(tag) ?? 0) + 1);
 	}
 
-	if (typeof heroImage === 'string') {
-		return { src: heroImage };
+	return map;
+}, new Map<string, number>());
+const allTags = Array.from(tagCountMap.entries())
+	.sort((first, second) => second[1] - first[1] || first[0].localeCompare(second[0], 'zh-CN'))
+	.map(([tag, count]) => ({ tag, count }));
+
+const getCoverImageAttrs = (coverImage: (typeof posts)[number]['data']['coverImage']) => {
+	if (!coverImage) {
+		return {
+			src: PlaceholderCover.src,
+			width: PlaceholderCover.width,
+			height: PlaceholderCover.height,
+		};
+	}
+
+	if (typeof coverImage === 'string') {
+		return { src: coverImage };
 	}
 
 	return {
-		src: heroImage.src,
-		width: heroImage.width,
-		height: heroImage.height,
+		src: coverImage.src,
+		width: coverImage.width,
+		height: coverImage.height,
 	};
 };
+
+const getTagColorStyle = (tag: string) => {
+	let hash = 0;
+	for (const character of tag) {
+		hash = (hash * 33 + character.charCodeAt(0)) >>> 0;
+	}
+
+	const hue = hash % 360;
+	return `--tag-bg: hsla(${hue}, 82%, 93%, 0.96); --tag-border: hsla(${hue}, 48%, 46%, 0.24); --tag-color: hsl(${hue}, 45%, 28%);`;
+};
+
+const postCards = posts.map((post) => ({
+	post,
+	coverImage: getCoverImageAttrs(post.data.coverImage),
+	tagsAttr: JSON.stringify(post.data.tags ?? []),
+}));
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
+		<BaseHead title={pageTitle} description="按分类浏览学习记录、技术笔记、面试整理和随想随笔。" />
 	</head>
 	<body>
 		<Header />
-		<main>
-			<section>
-				<ul>
+		<main class="blog-page" data-blog-index>
+			<section class="surface-card blog-hero">
+				<p class="eyebrow">Tech Blog</p>
+				<h1>技术博客</h1>
+				<p class="blog-intro">
+					这里会持续整理学习过程中的记录、技术笔记、面试相关内容，以及一些阶段性的随想与复盘。
+				</p>
+				<div class="blog-filter-bar" aria-label="博客分类栏">
 					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{getHeroImageAttrs(post.data.heroImage) && (
-										<img
-											src={getHeroImageAttrs(post.data.heroImage)!.src}
-											width={getHeroImageAttrs(post.data.heroImage)!.width}
-											height={getHeroImageAttrs(post.data.heroImage)!.height}
-											alt={post.data.title}
-											loading="lazy"
-											decoding="async"
-										/>
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
+						BLOG_CATEGORIES.map((category, index) => (
+							<button
+								type="button"
+								class:list={['blog-filter-chip', { active: index === 0 }]}
+								data-blog-category
+								data-category={category}
+								aria-pressed={index === 0 ? 'true' : 'false'}
+							>
+								{category}
+							</button>
 						))
 					}
-				</ul>
+				</div>
+				{
+					allTags.length > 0 && (
+						<section class="blog-tag-filter" data-blog-tag-filter aria-label="博客标签筛选">
+							<div class="blog-tag-filter__toolbar">
+								<button
+									type="button"
+									class="blog-tag-filter__toggle"
+									data-blog-tag-toggle
+									aria-expanded="false"
+									aria-controls="blog-tag-picker"
+								>
+									<span>标签筛选</span>
+									<span class="blog-tag-filter__summary" data-blog-tag-summary>未选择</span>
+								</button>
+								<button
+									type="button"
+									class="blog-tag-filter__clear"
+									data-blog-tag-clear
+									hidden
+								>
+									清空
+								</button>
+							</div>
+							<div class="blog-tag-filter__selected" data-blog-selected-tags hidden></div>
+							<div
+								class="blog-tag-picker"
+								id="blog-tag-picker"
+								data-blog-tag-picker
+								hidden
+							>
+								<div class="blog-tag-picker__list" data-blog-tag-options>
+									{
+										allTags.map(({ tag, count }) => (
+											<label
+												class="blog-tag-option"
+												data-blog-tag-option
+												data-tag-option={tag}
+												style={getTagColorStyle(tag)}
+											>
+												<input
+													type="checkbox"
+													value={tag}
+													data-blog-tag-checkbox
+												/>
+												<span class="blog-tag-option__swatch" aria-hidden="true"></span>
+												<span class="blog-tag-option__name">{tag}</span>
+												<span class="blog-tag-option__count">{count}</span>
+											</label>
+										))
+									}
+								</div>
+							</div>
+						</section>
+					)
+				}
+				<p class="blog-filter-status" data-blog-filter-status>当前显示全部文章。</p>
 			</section>
+
+			<section class="blog-list" data-blog-grid>
+				{
+					postCards.map(({ post, coverImage, tagsAttr }) => (
+						<article
+							class="surface-card blog-card"
+							data-blog-card
+							data-category={post.data.category}
+							data-tags={tagsAttr}
+						>
+							<a class="blog-card__link" href={`/blog/${post.id}/`}>
+								<img
+									class="blog-card__image"
+									src={coverImage.src}
+									width={coverImage.width}
+									height={coverImage.height}
+									alt=""
+									loading="lazy"
+									decoding="async"
+								/>
+								<div class="blog-card__content">
+									<div class="blog-card__meta">
+										<span class="blog-card__category">{post.data.category}</span>
+										<p class="blog-card__date">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+									</div>
+									<h2>{post.data.title}</h2>
+									<p class="blog-card__description">{post.data.description}</p>
+									{
+										post.data.tags.length > 0 && (
+											<div class="blog-card__tags" aria-label="文章标签">
+												{
+													post.data.tags.map((tag) => (
+														<span class="blog-card__tag" style={getTagColorStyle(tag)}>
+															{tag}
+														</span>
+													))
+												}
+											</div>
+										)
+									}
+								</div>
+							</a>
+						</article>
+					))
+				}
+			</section>
+
+			<p class="blog-empty" data-blog-empty hidden>这个分类下还没有文章。</p>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<script is:inline>
+	(() => {
+		const BLOG_INDEX_STATE_KEY = '__joylifeBlogIndexState';
+		const state = (window[BLOG_INDEX_STATE_KEY] ??= {
+			bound: false,
+			cleanup: null,
+			activeCategory: '全部',
+			activeTags: [],
+		});
+
+		const mountBlogIndex = () => {
+			if (typeof state.cleanup === 'function') {
+				state.cleanup();
+				state.cleanup = null;
+			}
+
+			const root = document.querySelector('[data-blog-index]');
+			if (!(root instanceof HTMLElement)) return;
+
+			const categoryButtons = Array.from(root.querySelectorAll('[data-blog-category]'));
+			const tagToggle = root.querySelector('[data-blog-tag-toggle]');
+			const tagClearButton = root.querySelector('[data-blog-tag-clear]');
+			const tagPicker = root.querySelector('[data-blog-tag-picker]');
+			const tagOptions = Array.from(root.querySelectorAll('[data-blog-tag-option]'));
+			const tagCheckboxes = Array.from(root.querySelectorAll('[data-blog-tag-checkbox]'));
+			const selectedTags = root.querySelector('[data-blog-selected-tags]');
+			const tagSummary = root.querySelector('[data-blog-tag-summary]');
+			const cards = Array.from(root.querySelectorAll('[data-blog-card]'));
+			const status = root.querySelector('[data-blog-filter-status]');
+			const emptyState = root.querySelector('[data-blog-empty]');
+
+			if (!(status instanceof HTMLElement) || !(emptyState instanceof HTMLElement)) {
+				return;
+			}
+
+			const getTagColorStyleValue = (tag) => {
+				let hash = 0;
+				for (const character of tag) {
+					hash = (hash * 33 + character.charCodeAt(0)) >>> 0;
+				}
+
+				const hue = hash % 360;
+				return `--tag-bg: hsla(${hue}, 82%, 93%, 0.96); --tag-border: hsla(${hue}, 48%, 46%, 0.24); --tag-color: hsl(${hue}, 45%, 28%);`;
+			};
+			const availableTags = new Set(
+				tagCheckboxes
+					.map((checkbox) => (checkbox instanceof HTMLInputElement ? checkbox.value : ''))
+					.filter(Boolean),
+			);
+			let activeCategory = state.activeCategory || '全部';
+			let activeTags = new Set(
+				Array.isArray(state.activeTags)
+					? state.activeTags.filter((tag) => typeof tag === 'string' && availableTags.has(tag))
+					: [],
+			);
+			let tagPickerOpen = false;
+
+			const readCardTags = (card) => {
+				if (!(card instanceof HTMLElement)) return [];
+				try {
+					const parsed = JSON.parse(card.dataset.tags || '[]');
+					return Array.isArray(parsed) ? parsed : [];
+				} catch {
+					return [];
+				}
+			};
+
+			const syncState = () => {
+				state.activeCategory = activeCategory;
+				state.activeTags = Array.from(activeTags);
+			};
+
+			const setTagPickerOpen = (nextValue) => {
+				tagPickerOpen = nextValue;
+				if (tagToggle instanceof HTMLButtonElement) {
+					tagToggle.setAttribute('aria-expanded', String(tagPickerOpen));
+				}
+				if (tagPicker instanceof HTMLElement) {
+					tagPicker.hidden = !tagPickerOpen;
+				}
+				syncState();
+			};
+
+			const renderSelectedTags = () => {
+				if (!(selectedTags instanceof HTMLElement)) return;
+				selectedTags.replaceChildren();
+
+				const selectedList = Array.from(activeTags);
+				selectedTags.hidden = selectedList.length === 0;
+
+				for (const tag of selectedList) {
+					const button = document.createElement('button');
+					button.type = 'button';
+					button.className = 'blog-selected-tag';
+					button.dataset.removeTag = tag;
+					button.style.cssText = getTagColorStyleValue(tag);
+					button.setAttribute('aria-label', `移除标签 ${tag}`);
+					button.textContent = tag;
+
+					const close = document.createElement('span');
+					close.className = 'blog-selected-tag__remove';
+					close.setAttribute('aria-hidden', 'true');
+					close.textContent = '×';
+					button.append(close);
+
+					selectedTags.append(button);
+				}
+			};
+
+			const applyFilter = () => {
+				categoryButtons.forEach((button) => {
+					if (!(button instanceof HTMLButtonElement)) return;
+					const isActive = button.dataset.category === activeCategory;
+					button.classList.toggle('active', isActive);
+					button.setAttribute('aria-pressed', String(isActive));
+				});
+
+				tagCheckboxes.forEach((checkbox) => {
+					if (!(checkbox instanceof HTMLInputElement)) return;
+					checkbox.checked = activeTags.has(checkbox.value);
+					const option = checkbox.closest('[data-blog-tag-option]');
+					if (option instanceof HTMLElement) {
+						option.classList.toggle('active', checkbox.checked);
+					}
+				});
+
+				let visibleCount = 0;
+				cards.forEach((card) => {
+					if (!(card instanceof HTMLElement)) return;
+					const cardTags = readCardTags(card);
+					const matchesCategory =
+						activeCategory === '全部' || card.dataset.category === activeCategory;
+					const matchesTag =
+						activeTags.size === 0 ||
+						Array.from(activeTags).every((tag) => cardTags.includes(tag));
+					const matches = matchesCategory && matchesTag;
+					card.hidden = !matches;
+					if (matches) {
+						visibleCount += 1;
+					}
+				});
+
+				const selectedTagList = Array.from(activeTags);
+				if (tagSummary instanceof HTMLElement) {
+					tagSummary.textContent =
+						selectedTagList.length === 0
+							? '未选择'
+							: `已选 ${selectedTagList.length} 个`;
+				}
+				if (tagClearButton instanceof HTMLButtonElement) {
+					tagClearButton.hidden = selectedTagList.length === 0;
+				}
+
+				renderSelectedTags();
+				tagOptions.forEach((option) => {
+					if (option instanceof HTMLElement) {
+						option.hidden = false;
+					}
+				});
+
+				const categoryText =
+					activeCategory === '全部' ? '全部分类' : `“${activeCategory}”分类`;
+				const tagText =
+					selectedTagList.length === 0
+						? ''
+						: `，同时包含 ${selectedTagList.map((tag) => `“${tag}”`).join(' / ')}`;
+				status.textContent =
+					activeCategory === '全部' && selectedTagList.length === 0
+						? '当前显示全部文章。'
+						: `当前显示${categoryText}${tagText}，共 ${visibleCount} 篇文章。`;
+				emptyState.textContent =
+					activeCategory === '全部' && selectedTagList.length === 0
+						? '这里还没有发布文章。'
+						: '当前筛选条件下还没有文章。';
+				emptyState.hidden = visibleCount > 0;
+				syncState();
+			};
+
+			const handleCategoryClick = (event) => {
+				const button = event.currentTarget;
+				if (!(button instanceof HTMLButtonElement)) return;
+				const nextCategory = button.dataset.category || '全部';
+				if (nextCategory === activeCategory) return;
+				activeCategory = nextCategory;
+				applyFilter();
+			};
+
+			const handleTagToggle = () => {
+				setTagPickerOpen(!tagPickerOpen);
+			};
+
+			const handleTagChange = (event) => {
+				const checkbox = event.currentTarget;
+				if (!(checkbox instanceof HTMLInputElement)) return;
+				if (checkbox.checked) {
+					activeTags.add(checkbox.value);
+				} else {
+					activeTags.delete(checkbox.value);
+				}
+				applyFilter();
+			};
+
+			const handleClearTags = () => {
+				if (activeTags.size === 0) return;
+				activeTags.clear();
+				applyFilter();
+			};
+
+			const handleSelectedTagClick = (event) => {
+				const target = event.target;
+				if (!(target instanceof HTMLElement)) return;
+				const removeButton = target.closest('[data-remove-tag]');
+				if (!(removeButton instanceof HTMLButtonElement)) return;
+				const tag = removeButton.dataset.removeTag;
+				if (!tag || !activeTags.has(tag)) return;
+				activeTags.delete(tag);
+				applyFilter();
+			};
+
+			const handleDocumentClick = (event) => {
+				if (!tagPickerOpen) return;
+				const target = event.target;
+				if (!(target instanceof Node)) return;
+				const tagFilter = root.querySelector('[data-blog-tag-filter]');
+				if (!(tagFilter instanceof HTMLElement)) return;
+				if (!tagFilter.contains(target)) {
+					setTagPickerOpen(false);
+				}
+			};
+
+			const handleEscape = (event) => {
+				if (event.key === 'Escape' && tagPickerOpen) {
+					setTagPickerOpen(false);
+				}
+			};
+
+			categoryButtons.forEach((button) => {
+				if (!(button instanceof HTMLButtonElement)) return;
+				button.addEventListener('click', handleCategoryClick);
+			});
+
+			if (tagToggle instanceof HTMLButtonElement) {
+				tagToggle.addEventListener('click', handleTagToggle);
+			}
+
+			if (tagClearButton instanceof HTMLButtonElement) {
+				tagClearButton.addEventListener('click', handleClearTags);
+			}
+
+			if (selectedTags instanceof HTMLElement) {
+				selectedTags.addEventListener('click', handleSelectedTagClick);
+			}
+
+			tagCheckboxes.forEach((checkbox) => {
+				if (!(checkbox instanceof HTMLInputElement)) return;
+				checkbox.addEventListener('change', handleTagChange);
+			});
+
+			document.addEventListener('click', handleDocumentClick);
+			document.addEventListener('keydown', handleEscape);
+
+			setTagPickerOpen(false);
+			applyFilter();
+
+			state.cleanup = () => {
+				categoryButtons.forEach((button) => {
+					if (!(button instanceof HTMLButtonElement)) return;
+					button.removeEventListener('click', handleCategoryClick);
+				});
+
+				if (tagToggle instanceof HTMLButtonElement) {
+					tagToggle.removeEventListener('click', handleTagToggle);
+				}
+
+				if (tagClearButton instanceof HTMLButtonElement) {
+					tagClearButton.removeEventListener('click', handleClearTags);
+				}
+
+				if (selectedTags instanceof HTMLElement) {
+					selectedTags.removeEventListener('click', handleSelectedTagClick);
+				}
+
+				tagCheckboxes.forEach((checkbox) => {
+					if (!(checkbox instanceof HTMLInputElement)) return;
+					checkbox.removeEventListener('change', handleTagChange);
+				});
+
+				document.removeEventListener('click', handleDocumentClick);
+				document.removeEventListener('keydown', handleEscape);
+			};
+		};
+
+		if (!state.bound) {
+			state.bound = true;
+			document.addEventListener('astro:page-load', mountBlogIndex);
+			document.addEventListener('astro:before-swap', () => {
+				if (typeof state.cleanup === 'function') {
+					state.cleanup();
+					state.cleanup = null;
+				}
+			});
+		}
+
+		mountBlogIndex();
+	})();
+</script>
