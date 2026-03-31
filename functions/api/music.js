@@ -52,7 +52,7 @@ export async function onRequest(context) {
 	if (!bucket || typeof bucket.list !== 'function') {
 		return Response.json(
 			{
-				message: 'Missing MUSIC_BUCKET binding in Cloudflare Pages.',
+				message: 'Missing MUSIC_BUCKET binding to the blog-video bucket in Cloudflare Pages.',
 				tracks: [],
 			},
 			{

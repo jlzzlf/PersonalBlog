@@ -1735,7 +1735,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 			} catch (_error) {
 				renderMusicState(
 					'音乐列表暂时不可用。',
-					'请确认 Cloudflare Pages 已绑定 `MUSIC_BUCKET`，并且音乐文件位于 R2 的 `music/` 目录。',
+					'请确认 Cloudflare Pages 已将 `MUSIC_BUCKET` 绑定到 `blog-video`，并且音乐文件位于该桶的 `music/` 目录。',
 				);
 			}
 		};
@@ -1844,5 +1844,3 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		}
 	})();
 </script>
-
-
