@@ -1,7 +1,5 @@
 ﻿---
 import { getCollection } from 'astro:content';
-import { existsSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -72,20 +70,6 @@ const profileActionButtons = [
 		href: 'https://leetcode.cn/u/fdrksk6o8H/',
 	},
 ];
-
-const musicDirectory = join(process.cwd(), 'public', 'music');
-const musicTracks = existsSync(musicDirectory)
-	? readdirSync(musicDirectory)
-			.filter((fileName) => /\.mp3$/i.test(fileName))
-			.sort((left, right) =>
-				left.localeCompare(right, 'zh-CN', { numeric: true, sensitivity: 'base' }),
-			)
-			.map((fileName, index) => ({
-				index,
-				label: fileName.replace(/\.mp3$/i, ''),
-				src: encodeURI(`/music/${fileName}`),
-			}))
-	: [];
 
 const siteLinks = [
 	{ label: '项目展示', href: '/projects', note: '集中展示正在做的项目、作品和阶段计划' },
@@ -226,45 +210,19 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 					<article class="surface-card panel music-card">
 						<p class="eyebrow">Music</p>
 						<h2>音乐播放器</h2>
-						{
-							musicTracks.length > 0 ? (
-								<>
-									<p class="music-current" data-music-current>{musicTracks[0].label}</p>
-									<audio
-										class="music-audio"
-										data-music-audio
-										controls
-										preload="metadata"
-										src={musicTracks[0].src}
-									></audio>
-									<div class="music-playlist" aria-label="音乐播放列表">
-										{
-											musicTracks.map((track, index) => (
-												<button
-													type="button"
-													class:list={['music-track', { active: index === 0 }]}
-													data-music-track
-													data-track-index={String(index)}
-													data-track-src={track.src}
-													data-track-label={track.label}
-													aria-pressed={index === 0 ? 'true' : 'false'}
-												>
-													<span class="music-track-order">
-														{String(index + 1).padStart(2, '0')}
-													</span>
-													<span class="music-track-label">{track.label}</span>
-												</button>
-											))
-										}
-									</div>
-								</>
-							) : (
-								<div class="empty-music">
-									<h3>还没有找到可播放的音乐。</h3>
-									<p>把 `.mp3` 文件放进 `public/music` 文件夹后，这里会自动生成播放列表。</p>
-								</div>
-							)
-						}
+						<div class="empty-music" data-music-state>
+							<h3>正在加载音乐列表。</h3>
+							<p>音乐会从 R2 对象存储读取并生成播放列表。</p>
+						</div>
+						<p class="music-current" data-music-current hidden></p>
+						<audio
+							class="music-audio"
+							data-music-audio
+							controls
+							preload="metadata"
+							hidden
+						></audio>
+						<div class="music-playlist" data-music-playlist aria-label="音乐播放列表" hidden></div>
 					</article>
 				</aside>
 
@@ -1396,7 +1354,8 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const calendarDayButtons = Array.from(home.querySelectorAll('[data-calendar-day]'));
 		const musicAudio = home.querySelector('[data-music-audio]');
 		const musicCurrent = home.querySelector('[data-music-current]');
-		const musicTrackButtons = Array.from(home.querySelectorAll('[data-music-track]'));
+		const musicState = home.querySelector('[data-music-state]');
+		const musicPlaylist = home.querySelector('[data-music-playlist]');
 		const videoLayer = home.querySelector('.home-video-layer');
 		const surfaceLayer = home.querySelector('.home-surface-layer');
 		const stage = home.querySelector('.home-stage');
@@ -1414,6 +1373,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const clamp = (min, value, max) => Math.min(Math.max(value, min), max);
 		const readRem = () =>
 			parseFloat(getComputedStyle(document.documentElement).fontSize || '16') || 16;
+		let musicTrackButtons = [];
 
 		let postFeedItems = [];
 		try {
@@ -1425,10 +1385,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		let selectedDayKey = '';
 		let hasCalendarInteracted = false;
-		let activeMusicTrackIndex = Math.max(
-			musicTrackButtons.findIndex((button) => button.classList.contains('active')),
-			0,
-		);
+		let activeMusicTrackIndex = 0;
 		let layoutFrame = 0;
 		let subtitleFrame = 0;
 		let surfaceFrame = 0;
@@ -1638,6 +1595,64 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 			}).format(new Date());
 		};
 
+		const renderMusicState = (title, description) => {
+			if (!(musicState instanceof HTMLElement)) return;
+
+			musicState.textContent = '';
+
+			const heading = document.createElement('h3');
+			heading.textContent = title;
+
+			const copy = document.createElement('p');
+			copy.textContent = description;
+
+			musicState.append(heading, copy);
+			musicState.hidden = false;
+
+			if (musicCurrent instanceof HTMLElement) {
+				musicCurrent.hidden = true;
+				musicCurrent.textContent = '';
+			}
+
+			if (musicAudio instanceof HTMLAudioElement) {
+				musicAudio.hidden = true;
+				musicAudio.removeAttribute('src');
+				musicAudio.load();
+			}
+
+			if (musicPlaylist instanceof HTMLElement) {
+				musicPlaylist.hidden = true;
+				musicPlaylist.textContent = '';
+			}
+
+			musicTrackButtons = [];
+			activeMusicTrackIndex = 0;
+		};
+
+		const createMusicTrackButton = (track, index) => {
+			const button = document.createElement('button');
+			button.type = 'button';
+			button.className = 'music-track';
+			button.dataset.trackIndex = String(index);
+			button.dataset.trackSrc = track.src;
+			button.dataset.trackLabel = track.label;
+			button.setAttribute('aria-pressed', 'false');
+
+			const order = document.createElement('span');
+			order.className = 'music-track-order';
+			order.textContent = String(index + 1).padStart(2, '0');
+
+			const label = document.createElement('span');
+			label.className = 'music-track-label';
+			label.textContent = track.label;
+
+			button.append(order, label);
+			button.addEventListener('click', () => {
+				setActiveMusicTrack(index, { autoplay: true });
+			});
+			return button;
+		};
+
 		const setActiveMusicTrack = (index, { autoplay = false } = {}) => {
 			if (
 				!(musicAudio instanceof HTMLAudioElement) ||
@@ -1674,6 +1689,54 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 				musicAudio.play().catch(() => {
 					// Ignore autoplay interruptions triggered by the browser.
 				});
+			}
+		};
+
+		const loadMusicTracks = async () => {
+			if (
+				!(musicState instanceof HTMLElement) ||
+				!(musicCurrent instanceof HTMLElement) ||
+				!(musicAudio instanceof HTMLAudioElement) ||
+				!(musicPlaylist instanceof HTMLElement)
+			) {
+				return;
+			}
+
+			renderMusicState('正在加载音乐列表。', '音乐会从 R2 对象存储读取并生成播放列表。');
+
+			try {
+				const response = await fetch('/api/music', { cache: 'no-store' });
+				const data = await response.json().catch(() => null);
+				if (!response.ok) {
+					throw new Error(data && typeof data.message === 'string' ? data.message : '');
+				}
+
+				const tracks = Array.isArray(data && data.tracks) ? data.tracks : [];
+				if (!tracks.length) {
+					renderMusicState(
+						'还没有找到可播放的音乐。',
+						'把 `.mp3` 文件上传到 R2 的 `music/` 目录后，这里会自动生成播放列表。',
+					);
+					return;
+				}
+
+				musicPlaylist.textContent = '';
+				musicTrackButtons = tracks.map((track, index) => createMusicTrackButton(track, index));
+				musicTrackButtons.forEach((button) => {
+					musicPlaylist.append(button);
+				});
+
+				musicState.hidden = true;
+				musicCurrent.hidden = false;
+				musicAudio.hidden = false;
+				musicPlaylist.hidden = false;
+				activeMusicTrackIndex = 0;
+				setActiveMusicTrack(0);
+			} catch (_error) {
+				renderMusicState(
+					'音乐列表暂时不可用。',
+					'请确认 Cloudflare Pages 已绑定 `MUSIC_BUCKET`，并且音乐文件位于 R2 的 `music/` 目录。',
+				);
 			}
 		};
 
@@ -1749,17 +1812,13 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		window.setInterval(updateClock, 1000);
 		syncCalendarSelection();
 		renderUploadItems();
+		loadMusicTracks();
 		requestLayoutUpdate();
 		surfaceFrame = window.requestAnimationFrame(tickSurfaceMotion);
 
-		if (musicTrackButtons.length && musicAudio instanceof HTMLAudioElement) {
-			setActiveMusicTrack(activeMusicTrackIndex);
-			musicTrackButtons.forEach((button, index) => {
-				button.addEventListener('click', () => {
-					setActiveMusicTrack(index, { autoplay: true });
-				});
-			});
+		if (musicAudio instanceof HTMLAudioElement) {
 			musicAudio.addEventListener('ended', () => {
+				if (!musicTrackButtons.length) return;
 				const nextIndex = (activeMusicTrackIndex + 1) % musicTrackButtons.length;
 				setActiveMusicTrack(nextIndex, { autoplay: true });
 			});
