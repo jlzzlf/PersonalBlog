@@ -49,9 +49,7 @@ const archiveGroups = Array.from(
 
 const HOME_HERO_TITLE = '章立夫的个人主页';
 const HOME_HERO_SUBTITLE = '欢迎访问';
-const PRIMARY_STAGE_VIDEO_SRC =
-	'https://personal-blog-1409254078.cos.ap-nanjing.myqcloud.com/miku.mp4';
-const FALLBACK_STAGE_VIDEO_SRC = 'https://pub-c822d24319af435d89295bee4f959173.r2.dev/miku.mp4';
+const STAGE_VIDEO_SRC = 'https://pub-c822d24319af435d89295bee4f959173.r2.dev/miku_3mb.mp4';
 const avatarImageSrc = encodeURI('/images/爱言叶5-裁切.jpg');
 const profileActionButtons = [
 	{
@@ -157,23 +155,8 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		<Header />
 		<main class="home" data-parallax-home>
 			<div class="home-video-layer" aria-hidden="true">
-				<video
-					class="stage-video"
-					data-stage-video
-					data-primary-src={PRIMARY_STAGE_VIDEO_SRC}
-					data-fallback-src={FALLBACK_STAGE_VIDEO_SRC}
-					autoplay
-					muted
-					loop
-					playsinline
-					preload="metadata"
-					aria-hidden="true"
-				>
-					<source
-						data-stage-video-source
-						src={PRIMARY_STAGE_VIDEO_SRC}
-						type="video/mp4"
-					/>
+				<video class="stage-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+					<source src={STAGE_VIDEO_SRC} type="video/mp4" />
 				</video>
 				<div class="stage-overlay" aria-hidden="true"></div>
 			</div>
@@ -1365,8 +1348,6 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const musicAudio = home.querySelector('[data-music-audio]');
 		const musicCurrent = home.querySelector('[data-music-current]');
 		const musicTrackButtons = Array.from(home.querySelectorAll('[data-music-track]'));
-		const stageVideo = home.querySelector('[data-stage-video]');
-		const stageVideoSource = home.querySelector('[data-stage-video-source]');
 		const videoLayer = home.querySelector('.home-video-layer');
 		const surfaceLayer = home.querySelector('.home-surface-layer');
 		const stage = home.querySelector('.home-stage');
@@ -1384,59 +1365,6 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const clamp = (min, value, max) => Math.min(Math.max(value, min), max);
 		const readRem = () =>
 			parseFloat(getComputedStyle(document.documentElement).fontSize || '16') || 16;
-		let hasSwitchedStageVideoToFallback = false;
-
-		const setStageVideoSource = (src) => {
-			if (
-				!(stageVideo instanceof HTMLVideoElement) ||
-				!(stageVideoSource instanceof HTMLSourceElement) ||
-				!src
-			) {
-				return;
-			}
-
-			if (stageVideo.dataset.activeSrc === src) return;
-
-			stageVideoSource.setAttribute('src', src);
-			stageVideo.dataset.activeSrc = src;
-			stageVideo.load();
-
-			const playAttempt = stageVideo.play();
-			if (playAttempt && typeof playAttempt.catch === 'function') {
-				playAttempt.catch(() => {
-					// Ignore autoplay interruptions triggered by the browser.
-				});
-			}
-		};
-
-		const switchStageVideoToFallback = () => {
-			if (
-				hasSwitchedStageVideoToFallback ||
-				!(stageVideo instanceof HTMLVideoElement)
-			) {
-				return;
-			}
-
-			const fallbackSrc = stageVideo.dataset.fallbackSrc || '';
-			if (!fallbackSrc || stageVideo.dataset.activeSrc === fallbackSrc) return;
-
-			hasSwitchedStageVideoToFallback = true;
-			setStageVideoSource(fallbackSrc);
-		};
-
-		const initializeStageVideo = () => {
-			if (!(stageVideo instanceof HTMLVideoElement)) return;
-
-			const primarySrc = stageVideo.dataset.primarySrc || '';
-			if (!primarySrc) return;
-
-			stageVideo.addEventListener('error', switchStageVideoToFallback);
-			if (stageVideoSource instanceof HTMLSourceElement) {
-				stageVideoSource.addEventListener('error', switchStageVideoToFallback);
-			}
-
-			setStageVideoSource(primarySrc);
-		};
 
 		let postFeedItems = [];
 		try {
@@ -1767,7 +1695,6 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		};
 
 		applyRandomHeroSubtitle();
-		initializeStageVideo();
 		requestSubtitleFit();
 		updateClock();
 		window.setInterval(updateClock, 1000);
