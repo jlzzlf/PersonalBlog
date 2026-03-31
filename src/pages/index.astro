@@ -49,6 +49,9 @@ const archiveGroups = Array.from(
 
 const HOME_HERO_TITLE = '章立夫的个人主页';
 const HOME_HERO_SUBTITLE = '欢迎访问';
+const DEFAULT_STAGE_VIDEO_SRC = 'https://pub-c822d24319af435d89295bee4f959173.r2.dev/miku.mp4';
+const MAINLAND_CHINA_STAGE_VIDEO_SRC =
+	'https://personal-blog-1409254078.cos.ap-nanjing.myqcloud.com';
 const avatarImageSrc = encodeURI('/images/爱言叶5-裁切.jpg');
 const profileActionButtons = [
 	{
@@ -149,13 +152,29 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<script is:inline>
+			window.__homeRegionPromise = fetch('/api/region', { cache: 'no-store' })
+				.then((response) => (response.ok ? response.json() : null))
+				.catch(() => null);
+		</script>
 	</head>
 	<body>
 		<Header />
 		<main class="home" data-parallax-home>
 			<div class="home-video-layer" aria-hidden="true">
-				<video class="stage-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
-					<source src="https://pub-c822d24319af435d89295bee4f959173.r2.dev/miku.mp4" type="video/mp4"  />
+				<video
+					class="stage-video"
+					data-stage-video
+					data-default-src={DEFAULT_STAGE_VIDEO_SRC}
+					data-cn-src={MAINLAND_CHINA_STAGE_VIDEO_SRC}
+					autoplay
+					muted
+					loop
+					playsinline
+					preload="metadata"
+					aria-hidden="true"
+				>
+					<source data-stage-video-source type="video/mp4" />
 				</video>
 				<div class="stage-overlay" aria-hidden="true"></div>
 			</div>
@@ -1347,6 +1366,8 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const musicAudio = home.querySelector('[data-music-audio]');
 		const musicCurrent = home.querySelector('[data-music-current]');
 		const musicTrackButtons = Array.from(home.querySelectorAll('[data-music-track]'));
+		const stageVideo = home.querySelector('[data-stage-video]');
+		const stageVideoSource = home.querySelector('[data-stage-video-source]');
 		const videoLayer = home.querySelector('.home-video-layer');
 		const surfaceLayer = home.querySelector('.home-surface-layer');
 		const stage = home.querySelector('.home-stage');
@@ -1364,6 +1385,61 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		const clamp = (min, value, max) => Math.min(Math.max(value, min), max);
 		const readRem = () =>
 			parseFloat(getComputedStyle(document.documentElement).fontSize || '16') || 16;
+
+		const setStageVideoSource = (src) => {
+			if (
+				!(stageVideo instanceof HTMLVideoElement) ||
+				!(stageVideoSource instanceof HTMLSourceElement) ||
+				!src
+			) {
+				return;
+			}
+
+			if (stageVideo.dataset.activeSrc === src) return;
+
+			stageVideoSource.setAttribute('src', src);
+			stageVideo.dataset.activeSrc = src;
+			stageVideo.load();
+
+			const playAttempt = stageVideo.play();
+			if (playAttempt && typeof playAttempt.catch === 'function') {
+				playAttempt.catch(() => {
+					// Ignore autoplay interruptions triggered by the browser.
+				});
+			}
+		};
+
+		const readHomeRegion = async () => {
+			const regionPromise =
+				window.__homeRegionPromise && typeof window.__homeRegionPromise.then === 'function'
+					? window.__homeRegionPromise
+					: fetch('/api/region', { cache: 'no-store' })
+							.then((response) => (response.ok ? response.json() : null))
+							.catch(() => null);
+
+			try {
+				return await regionPromise;
+			} catch (_error) {
+				return null;
+			}
+		};
+
+		const initializeStageVideo = async () => {
+			if (!(stageVideo instanceof HTMLVideoElement)) return;
+
+			const defaultSrc = stageVideo.dataset.defaultSrc || '';
+			const mainlandChinaSrc = stageVideo.dataset.cnSrc || '';
+			if (!defaultSrc && !mainlandChinaSrc) return;
+
+			let preferredSrc = defaultSrc || mainlandChinaSrc;
+
+			const region = await readHomeRegion();
+			if (region && region.isMainlandChina && mainlandChinaSrc) {
+				preferredSrc = mainlandChinaSrc;
+			}
+
+			setStageVideoSource(preferredSrc);
+		};
 
 		let postFeedItems = [];
 		try {
@@ -1694,6 +1770,7 @@ const archiveDateFormatter = new Intl.DateTimeFormat('zh-CN', {
 		};
 
 		applyRandomHeroSubtitle();
+		initializeStageVideo();
 		requestSubtitleFit();
 		updateClock();
 		window.setInterval(updateClock, 1000);
