@@ -1,5 +1,6 @@
-const DEFAULT_MUSIC_PREFIX = 'music/';
+﻿const DEFAULT_MUSIC_PREFIX = 'music/';
 const DEFAULT_MUSIC_PUBLIC_BASE_URL = 'https://cdn.joylife-zhang.site';
+const API_CACHE_CONTROL = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
 
 function getString(value) {
 	return typeof value === 'string' ? value.trim() : '';
@@ -58,7 +59,7 @@ export async function onRequest(context) {
 			{
 				status: 500,
 				headers: {
-					'Cache-Control': 'no-store',
+					'Cache-Control': API_CACHE_CONTROL,
 				},
 			},
 		);
@@ -90,7 +91,7 @@ export async function onRequest(context) {
 			{ tracks },
 			{
 				headers: {
-					'Cache-Control': 'no-store',
+					'Cache-Control': API_CACHE_CONTROL,
 				},
 			},
 		);
@@ -103,9 +104,10 @@ export async function onRequest(context) {
 			{
 				status: 500,
 				headers: {
-					'Cache-Control': 'no-store',
+					'Cache-Control': API_CACHE_CONTROL,
 				},
 			},
 		);
 	}
 }
+

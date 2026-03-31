@@ -6,6 +6,7 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 	class="floating-music-player"
 	data-floating-music-player
 	data-expanded="false"
+	data-loading="false"
 	data-playing="false"
 	data-ready="false"
 	transition:persist={PLAYER_PERSIST_NAME}
@@ -26,7 +27,7 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 	</button>
 
 	<div class="floating-music-player__panel" data-player-panel aria-hidden="true" hidden>
-		<audio data-player-audio preload="metadata" hidden></audio>
+		<audio data-player-audio preload="none" hidden></audio>
 
 		<div class="floating-music-player__meta">
 			<span class="floating-music-player__current" data-player-current>...</span>
@@ -75,327 +76,8 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 	</div>
 </aside>
 
-<script is:inline>
-	(() => {
-		const root = document.querySelector('[data-floating-music-player]');
-		if (!(root instanceof HTMLElement) || root.dataset.initialized === 'true') return;
-		root.dataset.initialized = 'true';
-
-		const toggleButton = root.querySelector('[data-player-toggle]');
-		const panel = root.querySelector('[data-player-panel]');
-		const audio = root.querySelector('[data-player-audio]');
-		const currentLabel = root.querySelector('[data-player-current]');
-		const volumeSlider = root.querySelector('[data-player-volume]');
-		const previousButton = root.querySelector('[data-player-previous]');
-		const playButton = root.querySelector('[data-player-play]');
-		const nextButton = root.querySelector('[data-player-next]');
-
-		if (
-			!(toggleButton instanceof HTMLButtonElement) ||
-			!(panel instanceof HTMLElement) ||
-			!(audio instanceof HTMLAudioElement) ||
-			!(currentLabel instanceof HTMLElement) ||
-			!(volumeSlider instanceof HTMLInputElement) ||
-			!(previousButton instanceof HTMLButtonElement) ||
-			!(playButton instanceof HTMLButtonElement) ||
-			!(nextButton instanceof HTMLButtonElement)
-		) {
-			return;
-		}
-
-		const STORAGE_KEY = 'joylife-floating-music-player';
-		const DEFAULT_VOLUME = 0.15;
-		const PLAY_ICON =
-			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.75 6.78c0-.83.92-1.33 1.62-.88l7.1 4.72a1.06 1.06 0 0 1 0 1.76l-7.1 4.72a1.06 1.06 0 0 1-1.62-.88V6.78Z" fill="currentColor" /></svg>';
-		const PAUSE_ICON =
-			'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 6.5a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0v-9a1 1 0 0 1 1-1Zm7 0a1 1 0 0 1 1 1v9a1 1 0 1 1-2 0v-9a1 1 0 0 1 1-1Z" fill="currentColor" /></svg>';
-
-		let musicTracks = [];
-		let activeMusicTrackIndex = 0;
-		let pendingRestoreTime = 0;
-		let pendingAutoplay = false;
-		let pendingAutoplayRetry = false;
-		let lastPersistAt = 0;
-
-		const readStoredState = () => {
-			try {
-				const raw = window.localStorage.getItem(STORAGE_KEY);
-				if (!raw) return null;
-				const parsed = JSON.parse(raw);
-				return parsed && typeof parsed === 'object' ? parsed : null;
-			} catch {
-				return null;
-			}
-		};
-
-		const persistPlayerState = () => {
-			if (!musicTracks.length) return;
-			const activeTrack = musicTracks[activeMusicTrackIndex];
-			if (!activeTrack || typeof activeTrack !== 'object') return;
-
-			try {
-				window.localStorage.setItem(
-					STORAGE_KEY,
-					JSON.stringify({
-						hasVisited: true,
-						index: activeMusicTrackIndex,
-						src: activeTrack.src || '',
-						label: activeTrack.label || '',
-						currentTime: Number.isFinite(audio.currentTime) ? audio.currentTime : 0,
-						paused: audio.paused,
-						expanded: root.dataset.expanded === 'true',
-						volume: Number.isFinite(audio.volume) ? audio.volume : DEFAULT_VOLUME,
-					}),
-				);
-			} catch {
-				// Ignore storage issues.
-			}
-		};
-
-		const setControlsDisabled = (disabled) => {
-			volumeSlider.disabled = disabled;
-			previousButton.disabled = disabled;
-			playButton.disabled = disabled;
-			nextButton.disabled = disabled;
-		};
-
-		const setPlayButtonState = (isPlaying) => {
-			playButton.innerHTML = isPlaying ? PAUSE_ICON : PLAY_ICON;
-			playButton.setAttribute('aria-label', isPlaying ? '暂停' : '播放');
-			root.dataset.playing = isPlaying ? 'true' : 'false';
-		};
-
-		const setVolumeSliderState = (volume) => {
-			const safeVolume = Math.max(0, Math.min(volume, 1));
-			volumeSlider.value = String(Math.round(safeVolume * 100));
-			volumeSlider.setAttribute('aria-label', `音量 ${Math.round(safeVolume * 100)}%`);
-		};
-
-		const applyVolume = (volume, { persist = true } = {}) => {
-			const safeVolume = Math.max(0, Math.min(volume, 1));
-			audio.volume = safeVolume;
-			setVolumeSliderState(safeVolume);
-			if (persist) {
-				persistPlayerState();
-			}
-		};
-
-		const setExpanded = (expanded, { persist = true } = {}) => {
-			const nextExpanded = expanded && musicTracks.length > 0;
-			root.dataset.expanded = nextExpanded ? 'true' : 'false';
-			toggleButton.setAttribute('aria-expanded', String(nextExpanded));
-			panel.setAttribute('aria-hidden', String(!nextExpanded));
-
-			if (persist) {
-				persistPlayerState();
-			}
-		};
-
-		const scheduleAutoplayRetry = () => {
-			if (pendingAutoplayRetry) return;
-			pendingAutoplayRetry = true;
-
-			const resumePlayback = () => {
-				pendingAutoplayRetry = false;
-				window.removeEventListener('pointerdown', resumePlayback);
-				window.removeEventListener('keydown', resumePlayback);
-
-				if (!audio.getAttribute('src')) return;
-				audio.play().catch(() => {
-					// Ignore repeated autoplay blocks.
-				});
-			};
-
-			window.addEventListener('pointerdown', resumePlayback, { once: true, passive: true });
-			window.addEventListener('keydown', resumePlayback, { once: true });
-		};
-
-		const setActiveMusicTrack = (index, { autoplay = false, restoreTime = 0 } = {}) => {
-			if (!musicTracks.length || index < 0 || index >= musicTracks.length) return;
-
-			const nextTrack = musicTracks[index];
-			if (!nextTrack || typeof nextTrack.src !== 'string' || !nextTrack.src) return;
-
-			activeMusicTrackIndex = index;
-			currentLabel.textContent = nextTrack.label || '未命名音乐';
-			currentLabel.title = nextTrack.label || '未命名音乐';
-			pendingRestoreTime = Math.max(restoreTime, 0);
-			pendingAutoplay = autoplay;
-			setPlayButtonState(false);
-
-			if (audio.getAttribute('src') !== nextTrack.src) {
-				audio.src = nextTrack.src;
-				audio.load();
-			} else {
-				if (pendingRestoreTime > 0) {
-					audio.currentTime = pendingRestoreTime;
-					pendingRestoreTime = 0;
-				}
-
-				if (pendingAutoplay) {
-					audio.play().catch(() => {
-						pendingAutoplay = false;
-						setPlayButtonState(false);
-						scheduleAutoplayRetry();
-					});
-				}
-			}
-
-			persistPlayerState();
-		};
-
-		const playAdjacentTrack = (offset) => {
-			if (!musicTracks.length) return;
-			const nextIndex = (activeMusicTrackIndex + offset + musicTracks.length) % musicTracks.length;
-			setActiveMusicTrack(nextIndex, { autoplay: true });
-		};
-
-		const loadMusicTracks = async () => {
-			try {
-				const response = await fetch('/api/music', { cache: 'no-store' });
-				const data = await response.json().catch(() => null);
-				if (!response.ok) {
-					throw new Error(data && typeof data.message === 'string' ? data.message : '');
-				}
-
-				const tracks = Array.isArray(data && data.tracks) ? data.tracks : [];
-				if (!tracks.length) {
-					root.dataset.ready = 'false';
-					currentLabel.textContent = '暂无音乐';
-					currentLabel.title = '暂无音乐';
-					setExpanded(false, { persist: false });
-					setControlsDisabled(true);
-					return;
-				}
-
-				const storedState = readStoredState();
-				const isFirstVisit = !storedState || storedState.hasVisited !== true;
-
-				musicTracks = tracks;
-				root.dataset.ready = 'true';
-				panel.hidden = false;
-				setControlsDisabled(false);
-
-				const storedIndexBySrc =
-					storedState && typeof storedState.src === 'string'
-						? tracks.findIndex((track) => track.src === storedState.src)
-						: -1;
-				const initialIndex =
-					storedIndexBySrc >= 0
-						? storedIndexBySrc
-						: storedState && Number.isInteger(storedState.index)
-							? Math.min(Math.max(storedState.index, 0), tracks.length - 1)
-							: 0;
-				const initialVolume =
-					storedState && typeof storedState.volume === 'number' ? storedState.volume : DEFAULT_VOLUME;
-
-				applyVolume(initialVolume, { persist: false });
-				setExpanded(Boolean(storedState && storedState.expanded), { persist: false });
-				setActiveMusicTrack(initialIndex, {
-					autoplay: isFirstVisit || Boolean(storedState && storedState.paused === false),
-					restoreTime:
-						storedState && typeof storedState.currentTime === 'number'
-							? storedState.currentTime
-							: 0,
-				});
-			} catch {
-				root.dataset.ready = 'false';
-				currentLabel.textContent = '音乐加载失败';
-				currentLabel.title = '音乐加载失败';
-				setExpanded(false, { persist: false });
-				setControlsDisabled(true);
-			}
-		};
-
-		setControlsDisabled(true);
-		setPlayButtonState(false);
-		setVolumeSliderState(DEFAULT_VOLUME);
-
-		toggleButton.addEventListener('click', () => {
-			if (root.dataset.ready !== 'true') return;
-			setExpanded(root.dataset.expanded !== 'true');
-		});
-
-		volumeSlider.addEventListener('input', () => {
-			const nextVolume = Number(volumeSlider.value) / 100;
-			applyVolume(nextVolume);
-		});
-
-		previousButton.addEventListener('click', () => {
-			playAdjacentTrack(-1);
-		});
-
-		playButton.addEventListener('click', () => {
-			if (!audio.getAttribute('src')) return;
-			if (audio.paused) {
-				audio.play().catch(() => {
-					setPlayButtonState(false);
-				});
-				return;
-			}
-
-			audio.pause();
-		});
-
-		nextButton.addEventListener('click', () => {
-			playAdjacentTrack(1);
-		});
-
-		document.addEventListener('pointerdown', (event) => {
-			if (root.dataset.expanded !== 'true') return;
-			if (!(event.target instanceof Node)) return;
-			if (root.contains(event.target)) return;
-			setExpanded(false);
-		});
-
-		audio.addEventListener('loadedmetadata', () => {
-			if (pendingRestoreTime > 0) {
-				audio.currentTime = Math.min(pendingRestoreTime, audio.duration || pendingRestoreTime);
-				pendingRestoreTime = 0;
-			}
-
-			if (pendingAutoplay) {
-				audio.play().catch(() => {
-					pendingAutoplay = false;
-					setPlayButtonState(false);
-					scheduleAutoplayRetry();
-				});
-			} else {
-				setPlayButtonState(false);
-			}
-		});
-
-		audio.addEventListener('play', () => {
-			pendingAutoplay = false;
-			setPlayButtonState(true);
-			persistPlayerState();
-		});
-
-		audio.addEventListener('pause', () => {
-			setPlayButtonState(false);
-			persistPlayerState();
-		});
-
-		audio.addEventListener('ended', () => {
-			playAdjacentTrack(1);
-		});
-
-		audio.addEventListener('volumechange', () => {
-			setVolumeSliderState(audio.volume);
-			persistPlayerState();
-		});
-
-		audio.addEventListener('timeupdate', () => {
-			const now = Date.now();
-			if (now - lastPersistAt < 2000) return;
-			lastPersistAt = now;
-			persistPlayerState();
-		});
-
-		window.addEventListener('pagehide', persistPlayerState);
-
-		loadMusicTracks();
-	})();
+<script>
+	import '../scripts/floating-music-player.ts';
 </script>
 
 <style>
@@ -472,7 +154,6 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		padding: 0.8rem;
 		border-radius: 24px;
 		background: linear-gradient(180deg, rgba(255, 251, 244, 0.96) 0%, rgba(244, 236, 223, 0.94) 100%);
-		backdrop-filter: blur(18px);
 		box-shadow: 0 22px 52px rgba(39, 43, 37, 0.16);
 		opacity: 0;
 		transform: translateY(0.5rem) scale(0.97);
@@ -640,11 +321,29 @@ const PLAYER_PERSIST_NAME = 'site-music-player';
 		.floating-music-player__panel {
 			width: min(14.8rem, calc(100vw - 1rem));
 			padding: 0.75rem;
+			background: rgba(255, 251, 244, 0.98);
 		}
 
 		.floating-music-player__launcher {
 			width: 3.35rem;
 			height: 3.35rem;
+		}
+
+		.floating-music-player[data-playing='true'] .floating-music-player__launcher {
+			animation: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.floating-music-player__launcher,
+		.floating-music-player__panel,
+		.floating-music-player__volume-slider,
+		.floating-music-player__control {
+			transition: none;
+		}
+
+		.floating-music-player[data-playing='true'] .floating-music-player__launcher {
+			animation: none;
 		}
 	}
 </style>
