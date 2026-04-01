@@ -49,8 +49,30 @@ const getTagColorStyle = (tag: string) => {
 		hash = (hash * 33 + character.charCodeAt(0)) >>> 0;
 	}
 
-	const hue = hash % 360;
-	return `--tag-bg: hsla(${hue}, 82%, 93%, 0.96); --tag-border: hsla(${hue}, 48%, 46%, 0.24); --tag-color: hsl(${hue}, 45%, 28%);`;
+	const variants = [
+		{
+			bg: 'rgba(230, 250, 255, 0.9)',
+			border: 'rgba(153, 230, 255, 0.56)',
+			color: 'var(--color-link-hover)',
+		},
+		{
+			bg: 'rgba(255, 214, 232, 0.62)',
+			border: 'rgba(255, 214, 232, 0.92)',
+			color: '#7a4961',
+		},
+		{
+			bg: 'rgba(255, 244, 204, 0.72)',
+			border: 'rgba(255, 244, 204, 0.94)',
+			color: '#7a6212',
+		},
+		{
+			bg: 'rgba(204, 255, 255, 0.82)',
+			border: 'rgba(153, 230, 255, 0.72)',
+			color: 'var(--color-link-hover)',
+		},
+	];
+	const variant = variants[hash % variants.length];
+	return `--tag-bg: ${variant.bg}; --tag-border: ${variant.border}; --tag-color: ${variant.color};`;
 };
 
 const postCards = posts.map((post) => ({
@@ -242,8 +264,30 @@ const postCards = posts.map((post) => ({
 					hash = (hash * 33 + character.charCodeAt(0)) >>> 0;
 				}
 
-				const hue = hash % 360;
-				return `--tag-bg: hsla(${hue}, 82%, 93%, 0.96); --tag-border: hsla(${hue}, 48%, 46%, 0.24); --tag-color: hsl(${hue}, 45%, 28%);`;
+				const variants = [
+					{
+						bg: 'rgba(230, 250, 255, 0.9)',
+						border: 'rgba(153, 230, 255, 0.56)',
+						color: 'var(--color-link-hover)',
+					},
+					{
+						bg: 'rgba(255, 214, 232, 0.62)',
+						border: 'rgba(255, 214, 232, 0.92)',
+						color: '#7a4961',
+					},
+					{
+						bg: 'rgba(255, 244, 204, 0.72)',
+						border: 'rgba(255, 244, 204, 0.94)',
+						color: '#7a6212',
+					},
+					{
+						bg: 'rgba(204, 255, 255, 0.82)',
+						border: 'rgba(153, 230, 255, 0.72)',
+						color: 'var(--color-link-hover)',
+					},
+				];
+				const variant = variants[hash % variants.length];
+				return `--tag-bg: ${variant.bg}; --tag-border: ${variant.border}; --tag-color: ${variant.color};`;
 			};
 			const availableTags = new Set(
 				tagCheckboxes

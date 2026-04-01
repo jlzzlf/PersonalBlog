@@ -1,0 +1,41 @@
+---
+import { quickNavItems } from '../../data/home/links';
+---
+
+<article class="surface-card panel quick-nav-card">
+	<p class="eyebrow">Quick Nav</p>
+	<h2>快捷导航</h2>
+	<p class="quick-nav-copy">常用网站会以矩形模块的方式铺开，窗口变宽时会自动多排一点。</p>
+	<div class="quick-nav-grid" aria-label="快捷导航">
+		{
+			quickNavItems.map((item) => (
+				<a
+					class:list={['quick-nav-tile', item.thumbTheme, { 'is-more': item.kind === 'more' }]}
+					href={item.href}
+					aria-label={item.label}
+					target={item.kind === 'site' ? '_blank' : undefined}
+					rel={item.kind === 'site' ? 'noreferrer' : undefined}
+				>
+					<div class="quick-nav-tile__top">
+						<div class:list={['quick-nav-thumb', item.thumbSrc ? 'has-image' : 'is-placeholder', item.thumbTheme]}>
+							{
+								item.thumbSrc ? (
+									<img src={item.thumbSrc} alt={item.thumbAlt} loading="lazy" />
+								) : (
+									<span>{item.thumbText}</span>
+								)
+							}
+						</div>
+						<div class="quick-nav-tile__head">
+							<strong>{item.label}</strong>
+							{item.meta && <small>{item.meta}</small>}
+						</div>
+					</div>
+					<div class="quick-nav-tile__body">
+						<p>{item.description}</p>
+					</div>
+				</a>
+			))
+		}
+	</div>
+</article>

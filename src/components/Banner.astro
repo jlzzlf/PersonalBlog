@@ -1,0 +1,254 @@
+---
+import { BANNER_WAVE_PATH } from '../data/banner-images.js';
+
+type Props = {
+	mode?: 'background' | 'banner';
+};
+
+const { mode = 'banner' } = Astro.props as Props;
+const isBackgroundMode = mode === 'background';
+const bannerVideoSrc = 'https://cdn.joylife-zhang.site/miku_3mb.mp4';
+
+---
+
+<section class="banner" data-banner data-banner-mode={mode}>
+	<div class="banner__inner">
+		<video
+			class="banner__media"
+			data-banner-video
+			autoplay
+			muted
+			loop
+			playsinline
+			preload="auto"
+			aria-hidden="true"
+		>
+			<source src={bannerVideoSrc} type="video/mp4" />
+		</video>
+		<div class="banner__overlay" aria-hidden="true"></div>
+		{
+			isBackgroundMode ? (
+				<div class="banner__surface" aria-hidden="true">
+					<div class="banner__surface-fill"></div>
+					<div class="banner__waves">
+						<svg
+							class="banner__waves-svg"
+							xmlns="http://www.w3.org/2000/svg"
+							xmlns:xlink="http://www.w3.org/1999/xlink"
+							viewBox="0 24 150 28"
+							preserveAspectRatio="none"
+							shape-rendering="auto"
+						>
+							<defs>
+								<path id="banner-wave" d={BANNER_WAVE_PATH}></path>
+							</defs>
+							<g class="banner__waves-parallax">
+								<use href="#banner-wave" x="48" y="0" class="banner__wave-layer banner__wave-layer--1"></use>
+								<use href="#banner-wave" x="48" y="3" class="banner__wave-layer banner__wave-layer--2"></use>
+								<use href="#banner-wave" x="48" y="5" class="banner__wave-layer banner__wave-layer--3"></use>
+								<use href="#banner-wave" x="48" y="7" class="banner__wave-layer banner__wave-layer--4"></use>
+							</g>
+						</svg>
+					</div>
+				</div>
+			) : (
+				<div class="banner__waves" aria-hidden="true">
+					<svg
+						class="banner__waves-svg"
+						xmlns="http://www.w3.org/2000/svg"
+						xmlns:xlink="http://www.w3.org/1999/xlink"
+						viewBox="0 24 150 28"
+						preserveAspectRatio="none"
+						shape-rendering="auto"
+					>
+						<defs>
+							<path id="banner-wave" d={BANNER_WAVE_PATH}></path>
+						</defs>
+						<g class="banner__waves-parallax">
+							<use href="#banner-wave" x="48" y="0" class="banner__wave-layer banner__wave-layer--1"></use>
+							<use href="#banner-wave" x="48" y="3" class="banner__wave-layer banner__wave-layer--2"></use>
+							<use href="#banner-wave" x="48" y="5" class="banner__wave-layer banner__wave-layer--3"></use>
+							<use href="#banner-wave" x="48" y="7" class="banner__wave-layer banner__wave-layer--4"></use>
+						</g>
+					</svg>
+				</div>
+			)
+		}
+	</div>
+</section>
+
+<style>
+	.banner {
+		--banner-height: clamp(30rem, 50vh, 42rem);
+		--banner-wave-bg: var(--color-bg);
+		--banner-wave-height: clamp(6rem, 11vw, 8.8rem);
+		--banner-cover-speed: 0.38;
+		--banner-cover-reveal: 0px;
+		--banner-media-shift: 0px;
+		--banner-video-filter: none;
+		--banner-fill-drop: 1px;
+		--banner-overlay-start: rgba(248, 254, 255, 0.08);
+		--banner-overlay-end: rgba(248, 254, 255, 0.68);
+		position: relative;
+		width: 100%;
+		min-height: var(--banner-height);
+		margin: 0;
+		overflow: hidden;
+		isolation: isolate;
+		border-radius: 0 0 32px 32px;
+		background: linear-gradient(180deg, rgba(204, 255, 255, 0.84) 0%, rgba(248, 254, 255, 0.98) 58%, rgba(230, 250, 255, 0.98) 100%);
+		box-shadow: 0 20px 42px rgba(112, 159, 176, 0.12);
+	}
+
+	.banner[data-banner-mode='background'] {
+		--banner-fill-drop: 25rem;
+		--banner-media-shift: 5rem;
+		--banner-video-filter: brightness(0.72) saturate(0.9) contrast(1.05);
+	}
+
+	.banner__inner {
+		position: relative;
+		width: 100%;
+		min-height: var(--banner-height);
+		overflow: hidden;
+	}
+
+	.banner__media {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center calc(50% + var(--banner-media-shift));
+		transform: scale(1.01);
+		transform-origin: center center;
+		filter: var(--banner-video-filter);
+		background: linear-gradient(180deg, rgba(204, 255, 255, 0.64) 0%, rgba(248, 254, 255, 0.94) 60%, rgba(230, 250, 255, 0.98) 100%);
+		pointer-events: none;
+	}
+
+	.banner__media::-webkit-media-controls {
+		display: none !important;
+	}
+
+	.banner__overlay {
+		position: absolute;
+		inset: 0;
+		z-index: 2;
+		background:
+			linear-gradient(180deg, var(--banner-overlay-start) 0%, rgba(248, 254, 255, 0.12) 58%, var(--banner-overlay-end) 100%),
+			radial-gradient(circle at 18% 18%, rgba(255, 214, 232, 0.18), transparent 24%),
+			radial-gradient(circle at 82% 12%, rgba(255, 244, 204, 0.2), transparent 18%);
+	}
+
+	.banner[data-banner-mode='background'] .banner__overlay {
+		background:
+			linear-gradient(180deg, rgba(204, 255, 255, 0.05) 0%, rgba(248, 254, 255, 0.08) 58%, rgba(230, 250, 255, 0.28) 100%),
+			radial-gradient(circle at 18% 18%, rgba(255, 214, 232, 0.08), transparent 24%),
+			radial-gradient(circle at 82% 12%, rgba(255, 244, 204, 0.1), transparent 18%);
+	}
+
+	.banner__waves {
+		position: absolute;
+		right: 0;
+		bottom: -1px;
+		left: 0;
+		z-index: 4;
+		width: 100%;
+		height: var(--banner-wave-height);
+		overflow: visible;
+		pointer-events: none;
+	}
+
+	.banner__surface {
+		position: absolute;
+		top: calc(var(--banner-fill-drop) - var(--banner-cover-reveal));
+		right: 0;
+		bottom: 0;
+		left: 0;
+		z-index: 3;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.banner__surface-fill {
+		position: absolute;
+		inset: var(--banner-wave-height) 0 0 0;
+		background: var(--banner-wave-bg);
+	}
+
+	.banner[data-banner-mode='background'] .banner__waves {
+		top: 0;
+		right: 0;
+		bottom: auto;
+		left: 0;
+		z-index: 4;
+	}
+
+	.banner__waves-svg {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.banner__wave-layer {
+		fill: var(--banner-wave-bg);
+		animation-name: banner-wave;
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		transform-origin: center bottom;
+		will-change: transform;
+	}
+
+	.banner__wave-layer--1 {
+		opacity: 0.24;
+		animation-duration: 7s;
+	}
+
+	.banner__wave-layer--2 {
+		opacity: 0.42;
+		animation-duration: 10s;
+		animation-delay: -1s;
+	}
+
+	.banner__wave-layer--3 {
+		opacity: 0.68;
+		animation-duration: 13s;
+		animation-delay: -2s;
+	}
+
+	.banner__wave-layer--4 {
+		opacity: 1;
+		animation-duration: 20s;
+		animation-delay: -3s;
+	}
+
+	@keyframes banner-wave {
+		0% {
+			transform: translate3d(-90px, 0, 0);
+		}
+
+		100% {
+			transform: translate3d(85px, 0, 0);
+		}
+	}
+
+	@media (max-width: 720px) {
+		.banner {
+			min-height: 24rem;
+			border-radius: 0 0 24px 24px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.banner__wave-layer {
+			transition: none;
+			animation: none;
+		}
+	}
+</style>
+
+<script>
+	import '../scripts/banner.ts';
+</script>

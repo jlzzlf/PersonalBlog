@@ -1,0 +1,23 @@
+---
+import type { HomeSiteStat } from '../../lib/homepage';
+
+interface Props {
+	stats: HomeSiteStat[];
+}
+
+const { stats } = Astro.props;
+---
+
+<article class="surface-card panel stats-card">
+	<p class="eyebrow">Site Stats</p>
+	<dl class="stats-list" aria-label="站点统计">
+		{
+			stats.map((stat) => (
+				<div class="stats-row">
+					<dt>{stat.label}</dt>
+					<dd>{stat.value}</dd>
+				</div>
+			))
+		}
+	</dl>
+</article>

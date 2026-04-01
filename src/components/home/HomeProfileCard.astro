@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+import HomeAvatar from '../../assets/home-avatar.jpg';
+import { profileActionButtons, profileContent } from '../../data/home/profile';
+---
+
+<article class="surface-card panel profile-card">
+	<div class="profile-card__main">
+		<div class="profile-copy">
+			<div class="profile-heading">
+				<p class="profile-kicker">{profileContent.lead}</p>
+				<h1 class="profile-name">{profileContent.name}</h1>
+				<p class="profile-role">{profileContent.role}</p>
+			</div>
+			<div class="profile-intro" aria-label="个人介绍">
+				{profileContent.introLines.map((line) => <p>{line}</p>)}
+			</div>
+			<div class="profile-tags" aria-label="个人关注方向">
+				{profileContent.tags.map((tag) => <span>{tag}</span>)}
+			</div>
+		</div>
+		<aside class="profile-aside">
+			<div class="avatar-frame" aria-label="头像位置">
+				<Image
+					src={HomeAvatar}
+					alt="头像"
+					class="avatar-image"
+					width={480}
+					loading="eager"
+					decoding="async"
+					quality={72}
+				/>
+			</div>
+			<p class="profile-note">{profileContent.note}</p>
+		</aside>
+	</div>
+	<footer class="profile-card__footer">
+		<div class="profile-actions" aria-label="个人主页与联系方式入口">
+			{
+				profileActionButtons.map((item) => (
+					item.href ? (
+						<a
+							class="profile-action"
+							href={item.href}
+							target="_blank"
+							rel="noreferrer"
+							aria-label={item.label}
+							title={item.label}
+						>
+							<img
+								src={item.imageSrc}
+								alt={item.alt}
+								class:list={['profile-action-image', item.iconClass]}
+							/>
+						</a>
+					) : (
+						<button
+							class="profile-action"
+							type="button"
+							aria-label={item.label}
+							title={item.label}
+						>
+							<img
+								src={item.imageSrc}
+								alt={item.alt}
+								class:list={['profile-action-image', item.iconClass]}
+							/>
+						</button>
+					)
+				))
+			}
+		</div>
+	</footer>
+</article>

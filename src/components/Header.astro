@@ -14,7 +14,7 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 ---
 
 <header class="site-header">
-	<nav>
+	<nav class="header-shell" aria-label="主导航">
 		<a class="brand" href="/">
 			<span class="brand-mark">MB</span>
 			<span class="brand-copy">
@@ -22,7 +22,7 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 				<small>学习、项目与生活记录</small>
 			</span>
 		</a>
-		<div class="internal-links" aria-label="主导航">
+		<div class="internal-links">
 			{
 				navItems.map((item) => (
 					<a href={item.href} class:list={['nav-link', { active: isActive(item.href) }]}>
@@ -31,6 +31,9 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 				))
 			}
 		</div>
+		<button class="settings-button" type="button" aria-label="设置">
+			<img src="/favicon.svg" alt="" class="settings-icon" />
+		</button>
 	</nav>
 </header>
 
@@ -39,28 +42,30 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		padding: 1rem;
+		width: 100%;
+		border-bottom: 1px solid rgba(224, 242, 247, 0.95);
+		background: linear-gradient(180deg, rgba(248, 254, 255, 0.94), rgba(255, 255, 255, 0.82));
+		backdrop-filter: blur(22px);
+		-webkit-backdrop-filter: blur(22px);
+		box-shadow: 0 12px 34px rgba(112, 159, 176, 0.08);
 	}
 
-	nav {
-		display: flex;
+	.header-shell {
+		display: grid;
+		grid-template-columns: minmax(14rem, 1fr) auto minmax(14rem, 1fr);
 		align-items: center;
-		justify-content: space-between;
 		gap: 1rem;
 		width: min(1360px, calc(100% - 2rem));
 		margin: 0 auto;
-		padding: 0.85rem 1rem;
-		border: 1px solid var(--line);
-		border-radius: 999px;
-		background: rgba(255, 251, 244, 0.82);
-		box-shadow: 0 12px 32px rgba(45, 49, 43, 0.08);
+		padding: 0.9rem 0;
+		min-height: 4.6rem;
 	}
 
 	.brand {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.85rem;
-		color: rgb(var(--black));
+		color: var(--color-text);
 		text-decoration: none;
 	}
 
@@ -71,8 +76,10 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		width: 2.75rem;
 		height: 2.75rem;
 		border-radius: 999px;
-		background: linear-gradient(135deg, rgba(22, 88, 71, 0.14), rgba(201, 111, 74, 0.18));
-		color: var(--accent-dark);
+		background: linear-gradient(135deg, rgba(204, 255, 255, 0.92), rgba(255, 214, 232, 0.64));
+		color: var(--color-link-hover);
+		border: 1px solid rgba(153, 230, 255, 0.4);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
 		font-size: 0.82rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
@@ -88,7 +95,7 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 	}
 
 	.brand-copy small {
-		color: rgb(var(--gray));
+		color: var(--color-subtext);
 		font-size: 0.76rem;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
@@ -98,7 +105,10 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.35rem;
+		justify-content: center;
+		gap: 0.5rem;
+		min-width: 0;
+		justify-self: center;
 	}
 
 	.nav-link {
@@ -107,47 +117,105 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		justify-content: center;
 		padding: 0.7rem 1rem;
 		border-radius: 999px;
-		color: rgb(var(--gray-dark));
+		border: 1px solid transparent;
+		background: transparent;
+		color: var(--color-text);
 		font-size: 0.95rem;
 		font-weight: 600;
 		text-decoration: none;
 		transition:
 			transform 180ms ease,
 			background-color 180ms ease,
-			color 180ms ease;
+			color 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease;
 	}
 
 	.nav-link:hover {
 		transform: translateY(-1px);
-		background: rgba(255, 255, 255, 0.72);
-		color: var(--accent-dark);
+		background: rgba(230, 250, 255, 0.78);
+		border-color: rgba(153, 230, 255, 0.56);
+		box-shadow: 0 10px 20px rgba(112, 159, 176, 0.08);
+		color: var(--color-link-hover);
 	}
 
 	.nav-link.active {
-		background: rgba(22, 88, 71, 0.12);
-		color: var(--accent-dark);
+		background: var(--color-primary-soft);
+		border-color: rgba(153, 230, 255, 0.7);
+		color: var(--color-link-hover);
+	}
+
+	.settings-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.9rem;
+		height: 2.9rem;
+		padding: 0;
+		border: 1px solid rgba(224, 242, 247, 0.95);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.72);
+		color: var(--color-link-hover);
+		cursor: pointer;
+		justify-self: end;
+		box-shadow: 0 10px 24px rgba(112, 159, 176, 0.08);
+		transition:
+			transform 180ms ease,
+			background-color 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.settings-button:hover {
+		transform: translateY(-1px);
+		background: rgba(255, 244, 204, 0.78);
+		border-color: rgba(255, 244, 204, 0.95);
+		box-shadow: 0 14px 24px rgba(112, 159, 176, 0.12);
+	}
+
+	.settings-icon {
+		display: block;
+		width: 1.55rem;
+		height: 1.55rem;
+		object-fit: contain;
 	}
 
 	@media (max-width: 720px) {
-		.site-header {
-			padding: 0.9rem;
+		.header-shell {
+			grid-template-columns: auto auto;
+			grid-template-areas:
+				'brand settings'
+				'links links';
+			align-items: start;
+			gap: 0.9rem;
+			width: calc(100% - 1rem);
+			padding: 0.9rem 0;
 		}
 
-		nav {
-			padding: 1rem;
-			border-radius: 28px;
-			flex-direction: column;
-			align-items: flex-start;
-			background: rgba(255, 251, 244, 0.96);
-			box-shadow: 0 10px 24px rgba(45, 49, 43, 0.06);
+		.brand {
+			grid-area: brand;
 		}
 
 		.internal-links {
+			grid-area: links;
 			width: 100%;
+			justify-content: flex-start;
+			overflow-x: auto;
+			padding-bottom: 0.15rem;
+			scrollbar-width: none;
 		}
 
 		.nav-link {
-			flex: 1 1 auto;
+			flex: 0 0 auto;
+		}
+
+		.internal-links::-webkit-scrollbar {
+			display: none;
+		}
+
+		.settings-button {
+			grid-area: settings;
+			justify-self: end;
 		}
 	}
 </style>

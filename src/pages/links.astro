@@ -1,0 +1,338 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const externalLinks = [
+	{
+		label: 'Bilibili',
+		meta: 'space.bilibili.com',
+		description: '视频主页',
+		href: 'https://space.bilibili.com/13105791?spm_id_from=333.1007.0.0',
+		thumbSrc: '/images/bilibili-fill.png',
+		thumbAlt: 'Bilibili 图标',
+	},
+	{
+		label: 'GitHub',
+		meta: 'github.com/jlzzlf',
+		description: '代码仓库',
+		href: 'https://github.com/jlzzlf',
+		thumbSrc: '/images/github.png',
+		thumbAlt: 'GitHub 图标',
+	},
+	{
+		label: 'LeetCode',
+		meta: 'leetcode.cn',
+		description: '算法练习',
+		href: 'https://leetcode.cn/u/fdrksk6o8H/',
+		thumbSrc: '/images/LeetCode.png',
+		thumbAlt: 'LeetCode 图标',
+	},
+	{
+		label: 'Kenney',
+		meta: 'kenney.nl',
+		description: '免费游戏素材与资源',
+		href: 'https://www.kenney.nl/games',
+		thumbText: 'K',
+		thumbTheme: 'is-mint',
+	},
+	{
+		label: 'Cloudflare',
+		meta: 'dash.cloudflare.com',
+		description: '站点与域名控制台',
+		href: 'https://dash.cloudflare.com/7bc595f6612f980a082d7fb0ca89d7fd/home/overview',
+		thumbText: 'CF',
+		thumbTheme: 'is-sky',
+	},
+	{
+		label: 'ChatGPT',
+		meta: 'chatgpt.com',
+		description: '日常对话与辅助工具',
+		href: 'https://chatgpt.com/',
+		thumbText: 'AI',
+		thumbTheme: 'is-pink',
+	},
+	{
+		label: 'labuladong',
+		meta: 'labuladong.online',
+		description: '算法题解与框架笔记',
+		href: 'https://labuladong.online/algo/home/',
+		thumbText: '算',
+		thumbTheme: 'is-yellow',
+	},
+	{
+		label: '52Poké Wiki',
+		meta: 'wiki.52poke.com',
+		description: '宝可梦资料查询',
+		href: 'https://wiki.52poke.com/wiki/%E4%B8%BB%E9%A1%B5',
+		thumbText: '宝',
+		thumbTheme: 'is-mint',
+	},
+	{
+		label: 'Unity Asset Store',
+		meta: 'assetstore.unity.com',
+		description: 'Unity 插件与素材市场',
+		href: 'https://assetstore.unity.com/zh-CN',
+		thumbText: 'U',
+		thumbTheme: 'is-sky',
+	},
+];
+
+const pageTitle = `快捷导航 | ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description={`快捷导航页，汇总常用网站卡片。${SITE_DESCRIPTION}`} />
+	</head>
+	<body>
+		<Header />
+		<main class="links-page">
+			<section class="surface-card links-hero">
+				<p class="eyebrow">Quick Nav</p>
+				<h1>快捷导航</h1>
+				<p>
+					这里把常用网站拆成一块一块的矩形模块，方便快速跳转，也让空白区变成真正有用的内容。
+				</p>
+				<div class="links-actions">
+					<a class="button" href="/">返回首页</a>
+					<a class="button secondary" href="/blog/">查看博客</a>
+				</div>
+			</section>
+
+			<section class="links-section">
+				<div class="links-section__header">
+					<p class="eyebrow">Websites</p>
+					<h2>常用网站</h2>
+				</div>
+				<div class="links-grid">
+					{
+						externalLinks.map((item) => (
+							<a class="surface-card nav-tile is-external" href={item.href} target="_blank" rel="noreferrer">
+								<div class="nav-tile__top">
+									<div class:list={['nav-thumb', item.thumbSrc ? 'has-image' : 'is-placeholder', item.thumbTheme]}>
+										{
+											item.thumbSrc ? (
+												<img src={item.thumbSrc} alt={item.thumbAlt} loading="lazy" />
+											) : (
+												<span>{item.thumbText}</span>
+											)
+										}
+									</div>
+									<div class="nav-tile__head">
+										<strong>{item.label}</strong>
+										<small>{item.meta}</small>
+									</div>
+								</div>
+								<div class="nav-tile__body">
+									<p>{item.description}</p>
+								</div>
+							</a>
+						))
+					}
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.links-page {
+		display: grid;
+		gap: 1.4rem;
+	}
+
+	.links-hero,
+	.links-section {
+		width: min(1360px, calc(100% - 2rem));
+		margin: 0 auto;
+	}
+
+	.links-hero {
+		display: grid;
+		gap: 0.9rem;
+		max-width: 64rem;
+		padding: clamp(1.5rem, 2vw, 2rem);
+	}
+
+	.links-hero p:last-of-type {
+		margin-bottom: 0;
+		color: var(--color-subtext);
+		font-size: 0.98rem;
+		line-height: 1.75;
+	}
+
+	.links-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+		margin-top: 0.3rem;
+	}
+
+	.links-section {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.links-section__header {
+		display: grid;
+		gap: 0.25rem;
+		width: fit-content;
+	}
+
+	.links-section__header h2 {
+		font-size: 1.55rem;
+	}
+
+	.links-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+		gap: 0.9rem;
+	}
+
+	.nav-tile {
+		display: grid;
+		gap: 0.7rem;
+		align-content: start;
+		min-height: 8.4rem;
+		padding: 1rem 1.05rem;
+		border: 1px solid var(--color-border);
+		border-radius: 22px;
+		background: rgba(255, 255, 255, 0.86);
+		color: var(--color-text);
+		text-decoration: none;
+		transition:
+			transform 180ms ease,
+			box-shadow 180ms ease,
+			border-color 180ms ease,
+			background-color 180ms ease;
+	}
+
+	.nav-tile:hover {
+		transform: translateY(-2px);
+		border-color: rgba(153, 230, 255, 0.72);
+		background: rgba(230, 250, 255, 0.9);
+		box-shadow: 0 16px 32px rgba(112, 159, 176, 0.1);
+	}
+
+	.nav-tile__top {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 0.75rem;
+		align-items: start;
+	}
+
+	.nav-thumb {
+		display: grid;
+		place-items: center;
+		width: 3rem;
+		height: 3rem;
+		overflow: hidden;
+		border: 1px solid rgba(224, 242, 247, 0.92);
+		border-radius: 14px;
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(230, 250, 255, 0.78));
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+	}
+
+	.nav-thumb img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		padding: 0.45rem;
+		object-fit: contain;
+		object-position: center;
+	}
+
+	.nav-thumb.is-placeholder span {
+		color: var(--color-link-hover);
+		font-size: 1.08rem;
+		font-weight: 800;
+		letter-spacing: 0.02em;
+	}
+
+	.nav-thumb.is-mint {
+		background: linear-gradient(135deg, rgba(204, 255, 255, 0.94), rgba(230, 250, 255, 0.86));
+	}
+
+	.nav-thumb.is-yellow {
+		background: linear-gradient(135deg, rgba(255, 244, 204, 0.96), rgba(255, 214, 232, 0.62));
+	}
+
+	.nav-thumb.is-sky {
+		background: linear-gradient(135deg, rgba(153, 230, 255, 0.9), rgba(230, 250, 255, 0.82));
+	}
+
+	.nav-thumb.is-pink {
+		background: linear-gradient(135deg, rgba(255, 214, 232, 0.92), rgba(255, 255, 255, 0.86));
+	}
+
+	.nav-tile__head {
+		display: grid;
+		gap: 0.18rem;
+		min-width: 0;
+		padding-top: 0.08rem;
+	}
+
+	.nav-tile__head strong {
+		font-size: 1.06rem;
+		line-height: 1.25;
+		color: var(--color-link-hover);
+	}
+
+	.nav-tile__head small {
+		color: var(--color-subtext);
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.03em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.nav-tile__body {
+		display: grid;
+		gap: 0.2rem;
+		padding-top: 0.72rem;
+		border-top: 1px solid rgba(224, 242, 247, 0.82);
+	}
+
+	.nav-tile__body p {
+		margin: 0;
+		color: var(--color-text);
+		font-size: 0.9rem;
+		line-height: 1.55;
+	}
+
+	.nav-tile.is-external {
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 214, 232, 0.2));
+	}
+
+	@media (max-width: 860px) {
+		.links-hero,
+		.links-section {
+			width: min(44rem, calc(100% - 1rem));
+		}
+
+		.links-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 720px) {
+		.links-page {
+			gap: 1.1rem;
+		}
+
+		.links-hero,
+		.links-section {
+			width: calc(100% - 1rem);
+		}
+
+		.links-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -1,0 +1,44 @@
+---
+import { archiveEntryContent } from '../../data/home/archive';
+import type { HomeArchiveEntryStat } from '../../lib/homepage';
+
+interface Props {
+	stats: HomeArchiveEntryStat[];
+}
+
+const { stats } = Astro.props;
+---
+
+<article class="surface-card panel archive-entry-card">
+	<div class="archive-entry-card__copy">
+		<p class="eyebrow">Archive Desk</p>
+		<h2>归档入口</h2>
+		<p class="archive-entry-copy">
+			{archiveEntryContent.copy}
+		</p>
+		<div class="archive-entry-actions">
+			{
+				archiveEntryContent.actions.map((action) => (
+					<a class:list={['button', { secondary: action.variant === 'secondary' }]} href={action.href}>
+						{action.label}
+					</a>
+				))
+			}
+		</div>
+	</div>
+	<div class="archive-entry-card__aside">
+		<div class="archive-entry-metrics" aria-label="归档概览">
+			{
+				stats.map((item) => (
+					<div class="archive-entry-metric">
+						<strong>{item.value}</strong>
+						<span>{item.label}</span>
+					</div>
+				))
+			}
+		</div>
+		<ul class="archive-entry-features" aria-label="归档页功能">
+			{archiveEntryContent.features.map((item) => <li>{item}</li>)}
+		</ul>
+	</div>
+</article>

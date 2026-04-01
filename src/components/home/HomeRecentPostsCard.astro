@@ -1,0 +1,30 @@
+---
+import type { HomeRecentPost } from '../../lib/homepage';
+
+interface Props {
+	posts: HomeRecentPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+<article class="surface-card panel recent-card">
+	<p class="eyebrow">Recent Posts</p>
+	<h2>最近内容</h2>
+	<div class="recent-list">
+		{
+			posts.map((post) => (
+				<a class="recent-item" href={post.href}>
+					<div class="recent-item__meta">
+						<span>{post.pubDateLabel}</span>
+						<strong>最新归档</strong>
+					</div>
+					<div class="recent-item__body">
+						<strong>{post.title}</strong>
+						<p>{post.description}</p>
+					</div>
+				</a>
+			))
+		}
+	</div>
+</article>
