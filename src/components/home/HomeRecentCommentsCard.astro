@@ -1,4 +1,4 @@
-<article class="surface-card panel latest-comments-card">
+﻿<article class="surface-card panel latest-comments-card">
 	<div class="latest-comments-card__header">
 		<div>
 			<p class="eyebrow">Recent Comments</p>
@@ -48,12 +48,24 @@
 				return normalized;
 			};
 
+			const resolveCommentHref = (item) => {
+				const discussionTitle = String(item.discussionTitle || '').trim();
+				if (discussionTitle.startsWith('/')) {
+					return `${discussionTitle}#comments`;
+				}
+
+				return item.commentUrl || item.discussionUrl || 'https://github.com/jlzzlf/PersonalBlog/discussions';
+			};
+
 			const createCommentCard = (item) => {
 				const link = document.createElement('a');
 				link.className = 'latest-comment-item';
-				link.href = item.commentUrl || item.discussionUrl || 'https://github.com/jlzzlf/PersonalBlog/discussions';
-				link.target = '_blank';
-				link.rel = 'noreferrer';
+				link.href = resolveCommentHref(item);
+
+				if (/^https?:\/\//.test(link.href)) {
+					link.target = '_blank';
+					link.rel = 'noreferrer';
+				}
 
 				const meta = document.createElement('div');
 				meta.className = 'latest-comment-item__meta';
@@ -130,7 +142,7 @@
 					}
 
 					if (!Array.isArray(data.comments) || data.comments.length === 0) {
-						renderEmpty(data.message || '还没有评论，等第一条留言出现后这里就会更新。');
+						renderEmpty(data.message || '还没有评论，等第一条留言出现后这里就会自动更新。');
 						return;
 					}
 
