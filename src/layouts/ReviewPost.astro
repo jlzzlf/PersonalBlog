@@ -1,0 +1,241 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+
+type Props = CollectionEntry<'reviews'>['data'];
+
+const { title, description, mediaType, score, pubDate, tags = [], coverImage } = Astro.props;
+const usesPublicCoverImage = typeof coverImage === 'string';
+const resolvedHeroImage =
+	coverImage &&
+	(usesPublicCoverImage
+		? { src: coverImage }
+		: {
+				src: coverImage.src,
+				width: coverImage.width,
+				height: coverImage.height,
+			});
+---
+
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`${title} | 评分与评论`} description={description} />
+	</head>
+
+	<body class="review-post-page">
+		<Header />
+		<main class="review-post-page__main">
+			<a class="review-post-back" href="/about">返回更多</a>
+
+			<article class="review-post-layout">
+				<section class="surface-card review-post-hero">
+					<div class="review-post-hero__copy">
+						<p class="eyebrow">Review</p>
+						<div class="review-post-hero__meta">
+							<span class="review-post-type">{mediaType}</span>
+							<span class="review-post-date">
+								<FormattedDate date={pubDate} />
+							</span>
+						</div>
+						<h1>{title}</h1>
+						<p class="review-post-description">{description}</p>
+						{
+							tags.length > 0 && (
+								<div class="review-post-tags" aria-label="评分标签">
+									{
+										tags.map((tag) => (
+											<span class="review-post-tag">{tag}</span>
+										))
+									}
+								</div>
+							)
+						}
+					</div>
+
+					<div class="surface-card review-post-score-card">
+						<p>评分</p>
+						<strong>{score.toFixed(1)}</strong>
+						<small>/ 10</small>
+					</div>
+				</section>
+
+				{
+					resolvedHeroImage && (
+						<figure class="surface-card review-post-cover">
+							<img
+								src={resolvedHeroImage.src}
+								width={resolvedHeroImage.width}
+								height={resolvedHeroImage.height}
+								alt={title}
+								loading="eager"
+								decoding="async"
+							/>
+						</figure>
+					)
+				}
+
+				<section class="surface-card review-post-content prose">
+					<slot />
+				</section>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.review-post-page__main {
+		width: min(980px, calc(100% - 1.2rem));
+		margin: 0 auto;
+		padding-top: 1.4rem;
+	}
+
+	.review-post-back {
+		display: inline-flex;
+		margin-bottom: 1rem;
+		color: var(--color-link-hover);
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.review-post-layout {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.review-post-hero,
+	.review-post-content {
+		padding: clamp(1.4rem, 2.2vw, 2rem);
+	}
+
+	.review-post-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(12rem, 15rem);
+		gap: 1rem;
+		align-items: stretch;
+	}
+
+	.review-post-hero__copy {
+		display: grid;
+		gap: 0.8rem;
+	}
+
+	.review-post-hero__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.6rem;
+	}
+
+	.review-post-type,
+	.review-post-date {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.32rem 0.68rem;
+		border-radius: 999px;
+		border: 1px solid var(--color-border);
+		background: rgba(255, 255, 255, 0.8);
+		font-size: 0.82rem;
+		font-weight: 700;
+		color: var(--color-subtext);
+	}
+
+	.review-post-hero h1 {
+		margin-bottom: 0;
+	}
+
+	.review-post-description {
+		margin: 0;
+		color: var(--color-subtext);
+		font-size: 1.04rem;
+		line-height: 1.72;
+	}
+
+	.review-post-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+	}
+
+	.review-post-tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.36rem 0.72rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: rgba(230, 250, 255, 0.84);
+		color: var(--color-link-hover);
+		font-size: 0.84rem;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.review-post-score-card {
+		display: grid;
+		place-items: center;
+		padding: 1.2rem;
+		align-content: center;
+		text-align: center;
+		background:
+			linear-gradient(135deg, rgba(204, 255, 255, 0.78), rgba(255, 214, 232, 0.58)),
+			radial-gradient(circle at top left, rgba(255, 255, 255, 0.42), transparent 52%);
+	}
+
+	.review-post-score-card p,
+	.review-post-score-card small {
+		margin: 0;
+	}
+
+	.review-post-score-card p {
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-subtext);
+	}
+
+	.review-post-score-card strong {
+		font-size: clamp(3rem, 8vw, 4.6rem);
+		line-height: 1;
+		color: var(--color-link-hover);
+	}
+
+	.review-post-score-card small {
+		font-size: 0.92rem;
+		font-weight: 700;
+		color: var(--color-subtext);
+	}
+
+	.review-post-cover {
+		margin: 0;
+		padding: 0;
+		overflow: hidden;
+	}
+
+	.review-post-cover img {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: inherit;
+	}
+
+	.review-post-content {
+		min-width: 0;
+	}
+
+	@media (max-width: 720px) {
+		.review-post-page__main {
+			width: calc(100% - 1rem);
+			padding-top: 1rem;
+		}
+
+		.review-post-hero {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

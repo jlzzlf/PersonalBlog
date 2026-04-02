@@ -46,4 +46,23 @@ const projects = defineCollection({
 		}),
 });
 
-export const collections = { blog, projects };
+const reviews = defineCollection({
+	loader: glob({ base: './src/content/reviews', pattern: '**/*.{md,mdx}' }),
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(),
+			description: z.string(),
+			mediaType: z.enum(['动画', '游戏']),
+			score: z.number().min(0).max(10),
+			pubDate: z.coerce.date(),
+			tags: z.array(z.string().trim().min(1)).optional().default([]),
+			coverImage: z
+				.union([
+					z.string().trim().regex(/^\/.+/, 'Public cover images must start with "/"'),
+					image(),
+				])
+				.optional(),
+		}),
+});
+
+export const collections = { blog, projects, reviews };

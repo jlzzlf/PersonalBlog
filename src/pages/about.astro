@@ -1,4 +1,5 @@
 ﻿---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -7,6 +8,9 @@ import { galleryItems } from '../data/gallery';
 
 const pageTitle = `更多 | ${SITE_TITLE}`;
 const galleryPreviewItems = galleryItems.slice(0, 4);
+const mediaReviews = (await getCollection('reviews'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 4);
 const galleryPreviewFallbackJson = JSON.stringify(galleryPreviewItems);
 const previewFramePresets = [
 	{ tilt: '-1.8deg', lift: '0px' },
@@ -20,33 +24,9 @@ const getPreviewFrameStyle = (index: number) => {
 	return `--frame-tilt: ${preset.tilt}; --frame-lift: ${preset.lift};`;
 };
 
-const mediaReviews = [
-	{
-		type: '动画',
-		title: '葬送的芙莉莲',
-		score: 9.4,
-		comment: '节奏很稳，画面和情绪留白都很舒服，是那种会想慢慢看下去的作品。',
-		tags: ['氛围感', '旅行感', '角色关系'],
-	},
-	{
-		type: '游戏',
-		title: '吸血鬼幸存者',
-		score: 9.1,
-		comment: '反馈非常快，成长节奏抓人，短时间内就能让人进入“再来一局”的状态。',
-		tags: ['成长循环', '反馈强', '高重复游玩'],
-	},
-	{
-		type: '动画',
-		title: '孤独摇滚！',
-		score: 8.9,
-		comment: '角色演出很有记忆点，夸张和真实之间平衡得很好，能量很足。',
-		tags: ['演出', '角色塑造', '轻松感'],
-	},
-];
-
 const widgetNotes = [
 	'图片库现在只在这里展示少量预览图，完整内容会进入独立图库页。',
-	'评分与评论后面可以继续改成单独数据源，方便持续补充。',
+	'评分与评论现在已经支持独立 MDX 文件，后面直接新增内容就行。',
 	'如果还想扩展，这一页也适合继续加收藏夹、追番清单和游玩记录。',
 ];
 ---
@@ -103,31 +83,21 @@ const widgetNotes = [
 					<div class="widget-card__header">
 						<p class="widget-card__eyebrow">Reviews</p>
 						<h2>游戏 / 动漫评分与评论</h2>
-						<p>以后这里可以像“迷你评分墙”一样，持续补充看过或玩过的内容。</p>
+						<p>这里会自动读取 <code>src/content/reviews</code> 里的 MDX 文件，点击条目就能进入详情页。</p>
 					</div>
 					<div class="review-list">
 						{
 							mediaReviews.map((item) => (
-								<article class="review-card">
-									<div class="review-card__top">
-										<div>
-											<p class="review-card__type">{item.type}</p>
-											<h3>{item.title}</h3>
-										</div>
-										<div class="review-card__score">
-											<span>{item.score.toFixed(1)}</span>
-											<small>/ 10</small>
-										</div>
+								<a class="review-card" href={`/reviews/${item.id}/`}>
+									<div class="review-card__meta">
+										<p class="review-card__type">{item.data.mediaType}</p>
+										<h3>{item.data.title}</h3>
 									</div>
-									<p class="review-card__comment">{item.comment}</p>
-									<div class="review-card__tags" aria-label="评价关键词">
-										{
-											item.tags.map((tag) => (
-												<span>{tag}</span>
-											))
-										}
+									<div class="review-card__score">
+										<span>{item.data.score.toFixed(1)}</span>
+										<small>/ 10</small>
 									</div>
-								</article>
+								</a>
 							))
 						}
 					</div>
@@ -266,8 +236,7 @@ const widgetNotes = [
 	}
 
 	.extras-hero__copy p:last-child,
-	.widget-card__header p,
-	.review-card__comment {
+	.widget-card__header p {
 		margin: 0;
 		color: var(--color-subtext);
 	}
@@ -412,28 +381,45 @@ const widgetNotes = [
 	.review-list,
 	.tracker-list {
 		display: grid;
-		gap: 0.8rem;
+		gap: 0.72rem;
 	}
 
 	.review-card,
 	.tracker-item {
 		display: grid;
-		gap: 0.7rem;
 		padding: 1rem;
 		border: 1px solid var(--color-border);
 		border-radius: 22px;
 		background: rgba(255, 255, 255, 0.78);
 	}
 
-	.review-card__top {
+	.review-card {
 		display: flex;
-		align-items: flex-start;
+		align-items: center;
 		justify-content: space-between;
-		gap: 0.85rem;
+		gap: 1rem;
+		padding-block: 0.95rem;
+		color: inherit;
+		text-decoration: none;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.review-card:hover {
+		transform: translateY(-2px);
+		border-color: rgba(153, 230, 255, 0.76);
+		box-shadow: 0 16px 28px rgba(112, 159, 176, 0.11);
+	}
+
+	.review-card__meta {
+		display: grid;
+		gap: 0.24rem;
 	}
 
 	.review-card__type {
-		margin: 0 0 0.3rem;
+		margin: 0;
 		color: var(--color-subtext);
 		font-size: 0.74rem;
 		font-weight: 700;
@@ -443,7 +429,8 @@ const widgetNotes = [
 
 	.review-card h3 {
 		margin: 0;
-		font-size: 1.2rem;
+		font-size: 1.02rem;
+		line-height: 1.3;
 	}
 
 	.review-card__score {
@@ -464,24 +451,6 @@ const widgetNotes = [
 
 	.review-card__score small {
 		font-size: 0.74rem;
-	}
-
-	.review-card__tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.45rem;
-	}
-
-	.review-card__tags span {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.34rem 0.68rem;
-		border-radius: 999px;
-		background: rgba(230, 250, 255, 0.82);
-		border: 1px solid rgba(153, 230, 255, 0.45);
-		color: var(--color-link-hover);
-		font-size: 0.78rem;
-		font-weight: 700;
 	}
 
 	.widget-note-list {
@@ -537,8 +506,8 @@ const widgetNotes = [
 			margin-bottom: 0.85rem;
 		}
 
-		.review-card__top {
-			flex-direction: column;
+		.review-card {
+			align-items: flex-start;
 		}
 	}
 
