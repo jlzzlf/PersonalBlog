@@ -4,17 +4,14 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
-import { galleryItems } from '../data/gallery';
 
 const pageTitle = `更多 | ${SITE_TITLE}`;
-const galleryPreviewItems = galleryItems.slice(0, 4);
 const mediaReviews = (await getCollection('reviews'))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 	.slice(0, 4);
-const galleryPreviewFallbackJson = JSON.stringify(galleryItems);
 
 const widgetNotes = [
-	'图片库现在只在这里展示少量预览图，完整内容会进入独立图库页。',
+	'图片库现在收成了一个独立入口，打开后直接进入完整图库页。',
 	'评分与评论现在已经支持独立 MDX 文件，后面直接新增内容就行。',
 	'如果还想扩展，这一页也适合继续加收藏夹、追番清单和游玩记录。',
 ];
@@ -51,20 +48,14 @@ const widgetNotes = [
 						<div class="widget-card__title-row">
 							<div>
 								<h2>图片库</h2>
-								<p>这里只放几张预览图，点击后进入独立图片库页面查看照片墙。</p>
+								<p>这里不再放预览图，保留一个清晰入口，点击后直接进入独立图片库页面。</p>
 							</div>
-							<a class="button secondary widget-card__link" href="/gallery">进入图片库</a>
 						</div>
 					</div>
 
-					<div class="gallery-preview-grid" aria-label="图片库预览" data-gallery-preview-grid data-preview-limit="4">
-						{
-							galleryPreviewItems.map((item) => (
-								<a class="gallery-preview-item" href="/gallery" aria-label="打开图片库">
-									<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
-								</a>
-							))
-						}
+					<div class="gallery-entry-panel" aria-label="图片库入口">
+						<p>打开后会进入完整图片库页面，统一查看所有图片内容。</p>
+						<a class="button secondary widget-card__link" href="/gallery">进入图片库</a>
 					</div>
 				</article>
 
@@ -129,62 +120,6 @@ const widgetNotes = [
 			</section>
 		</main>
 		<Footer />
-		<script type="application/json" data-gallery-preview-fallback set:html={galleryPreviewFallbackJson}></script>
-
-		<script is:inline>
-			(() => {
-				const root = document.querySelector('[data-gallery-preview-grid]');
-				const fallback = document.querySelector('[data-gallery-preview-fallback]');
-				if (!(root instanceof HTMLElement)) return;
-
-				const previewLimit = Number(root.dataset.previewLimit || '4');
-				const fallbackItems =
-					fallback instanceof HTMLScriptElement && fallback.textContent ? JSON.parse(fallback.textContent) : [];
-
-				const pickRandomItems = (items, limit) => {
-					const shuffled = [...items];
-					for (let index = shuffled.length - 1; index > 0; index -= 1) {
-						const swapIndex = Math.floor(Math.random() * (index + 1));
-						[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-					}
-					return shuffled.slice(0, Math.min(limit, shuffled.length));
-				};
-
-				const createPreviewLink = (item) => {
-					const link = document.createElement('a');
-					link.href = '/gallery';
-					link.className = 'gallery-preview-item';
-					link.setAttribute('aria-label', '打开图片库');
-
-					const image = document.createElement('img');
-					image.src = item.src;
-					image.alt = item.alt || '图片库预览图';
-					image.loading = 'lazy';
-					image.decoding = 'async';
-
-					link.append(image);
-					return link;
-				};
-
-				const renderPreview = (items) => {
-					root.replaceChildren(...pickRandomItems(items, previewLimit).map((item) => createPreviewLink(item)));
-				};
-
-				if (Array.isArray(fallbackItems) && fallbackItems.length > 0) {
-					renderPreview(fallbackItems);
-				}
-
-				fetch('/api/gallery', { headers: { Accept: 'application/json' } })
-					.then((response) => (response.ok ? response.json() : null))
-					.then((data) => {
-						if (!data || !Array.isArray(data.images) || data.images.length === 0) return;
-						renderPreview(data.images);
-					})
-					.catch(() => {
-						// Keep the static preview as a fallback when the runtime API is unavailable.
-					});
-			})();
-		</script>
 	</body>
 </html>
 
@@ -301,43 +236,25 @@ const widgetNotes = [
 		flex: 0 0 auto;
 	}
 
-	.gallery-preview-grid {
+	.gallery-entry-panel {
 		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: 0.8rem;
-		align-self: start;
-	}
-
-	.gallery-preview-item {
-		display: block;
-		min-width: 0;
-		overflow: hidden;
-		width: 100%;
-		aspect-ratio: 1 / 1;
-		border-radius: 22px;
+		justify-items: start;
+		gap: 1rem;
+		padding: clamp(1.3rem, 2vw, 1.8rem);
 		border: 1px solid rgba(187, 231, 245, 0.72);
+		border-radius: 26px;
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 253, 0.92)),
-			radial-gradient(circle at top left, rgba(214, 255, 255, 0.45), transparent 55%);
-		box-shadow: 0 18px 36px rgba(112, 159, 176, 0.1);
-		transition:
-			transform 180ms ease,
-			box-shadow 180ms ease,
-			border-color 180ms ease;
+			radial-gradient(circle at top left, rgba(204, 255, 255, 0.46), transparent 48%),
+			linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(238, 248, 252, 0.92));
+		box-shadow:
+			0 18px 36px rgba(112, 159, 176, 0.1),
+			inset 0 1px 0 rgba(255, 255, 255, 0.84);
 	}
 
-	.gallery-preview-item:hover {
-		transform: translateY(-3px);
-		border-color: rgba(153, 230, 255, 0.76);
-		box-shadow: 0 22px 40px rgba(112, 159, 176, 0.14);
-	}
-
-	.gallery-preview-item img {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
+	.gallery-entry-panel p {
+		margin: 0;
+		color: var(--color-subtext);
+		line-height: 1.7;
 	}
 
 	.review-list,
@@ -460,18 +377,8 @@ const widgetNotes = [
 			align-items: flex-start;
 		}
 
-		.gallery-preview-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
 		.review-card {
 			align-items: flex-start;
-		}
-	}
-
-	@media (max-width: 520px) {
-		.gallery-preview-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
 </style>
