@@ -1,0 +1,53 @@
+<section class="surface-card comments-section" aria-label="文章评论区">
+	<div class="comments-section__header">
+		<p class="eyebrow">Comments</p>
+		<h2>评论区</h2>
+		<p>欢迎在这里留言交流。</p>
+	</div>
+
+	<div class="comments-section__embed">
+		<script
+			is:inline
+			src="https://giscus.app/client.js"
+			data-repo="jlzzlf/PersonalBlog"
+			data-repo-id="R_kgDOR0Tyzg"
+			data-category="Announcements"
+			data-category-id="DIC_kwDOR0Tyzs4C52ew"
+			data-mapping="pathname"
+			data-strict="0"
+			data-reactions-enabled="1"
+			data-emit-metadata="0"
+			data-input-position="bottom"
+			data-theme="preferred_color_scheme"
+			data-lang="zh-CN"
+			crossorigin="anonymous"
+			async
+		></script>
+	</div>
+</section>
+
+<style>
+	.comments-section {
+		display: grid;
+		gap: 1rem;
+		padding: clamp(1.5rem, 2.2vw, 2.2rem);
+	}
+
+	.comments-section__header {
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.comments-section__header h2,
+	.comments-section__header p {
+		margin: 0;
+	}
+
+	.comments-section__header p:last-child {
+		color: var(--color-subtext);
+	}
+
+	.comments-section__embed {
+		min-width: 0;
+	}
+</style>
