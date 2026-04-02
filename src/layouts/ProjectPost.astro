@@ -1,4 +1,4 @@
----
+﻿---
 import type { CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
@@ -35,17 +35,11 @@ const resolvedHeroImage =
 						<p class="eyebrow">Project Detail</p>
 						<h1>{title}</h1>
 						<p class="project-post-summary">{summary}</p>
-						{
-							teaser && <p class="project-post-teaser">{teaser}</p>
-						}
+						{teaser && <p class="project-post-teaser">{teaser}</p>}
 						{
 							tags.length > 0 && (
 								<div class="project-post-tags" aria-label="项目标签">
-									{
-										tags.map((tag) => (
-											<span class="project-post-tag">{tag}</span>
-										))
-									}
+									{tags.map((tag) => <span class="project-post-tag">{tag}</span>)}
 								</div>
 							)
 						}

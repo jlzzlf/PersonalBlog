@@ -129,9 +129,16 @@ async function fetchRecentComments({ token, owner, name, categoryId }) {
 		}),
 	});
 
-	const payload = await response.json().catch(() => null);
+	const rawText = await response.text();
+	let payload = null;
+	try {
+		payload = rawText ? JSON.parse(rawText) : null;
+	} catch {
+		throw new Error(`GitHub Discussions returned a non-JSON response with status ${response.status}.`);
+	}
+
 	if (!response.ok || !payload) {
-		throw new Error('Failed to fetch recent comments from GitHub Discussions.');
+		throw new Error(`GitHub Discussions request failed with status ${response.status}.`);
 	}
 
 	if (Array.isArray(payload.errors) && payload.errors.length > 0) {
@@ -178,6 +185,14 @@ export async function onRequest(context) {
 			},
 		);
 	} catch (error) {
+		console.error('comments api failed', {
+			message: error instanceof Error ? error.message : String(error),
+			owner,
+			name,
+			categoryId,
+			hasToken: Boolean(token),
+		});
+
 		return Response.json(
 			{
 				comments: [],

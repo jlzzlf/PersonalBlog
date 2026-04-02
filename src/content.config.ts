@@ -1,4 +1,4 @@
-import { defineCollection } from 'astro:content';
+﻿import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
@@ -66,3 +66,5 @@ const reviews = defineCollection({
 });
 
 export const collections = { blog, projects, reviews };
+
+
