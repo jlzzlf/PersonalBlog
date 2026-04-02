@@ -46,11 +46,7 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 			<section class="photo-flow" aria-label="图片墙" data-photo-flow>
 				{
 					initialPhotoColumns.map((columnItems, columnIndex) => (
-						<div
-							class="photo-column"
-							data-direction={columnIndex % 2 === 0 ? 'down' : 'up'}
-							style={`--scroll-duration: ${44 + columnIndex * 4}s;`}
-						>
+						<div class="photo-column" data-direction={columnIndex % 2 === 0 ? 'down' : 'up'}>
 							<div class="photo-column__track">
 								<div class="photo-column__group" data-group="primary">
 									{
@@ -95,6 +91,9 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 				let currentItems = Array.isArray(fallbackItems) ? fallbackItems : [];
 				let currentColumnCount = 0;
 				let measureFrame = 0;
+				let animationFrame = 0;
+				let lastTick = 0;
+				let columnStates = [];
 
 				const getColumnCount = () => {
 					if (window.matchMedia('(max-width: 520px)').matches) return 1;
@@ -114,9 +113,54 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 					return columns;
 				};
 
+				const stopColumnAnimation = () => {
+					window.cancelAnimationFrame(animationFrame);
+					animationFrame = 0;
+					lastTick = 0;
+				};
+
+				const applyColumnTransform = (state) => {
+					if (!(state.track instanceof HTMLElement)) return;
+
+					const translateY = state.direction === 'down' ? -state.distance + state.offset : -state.offset;
+					state.track.style.transform = `translateY(${translateY}px)`;
+				};
+
+				const stepColumns = (timestamp) => {
+					if (!columnStates.length) {
+						stopColumnAnimation();
+						return;
+					}
+
+					if (!lastTick) {
+						lastTick = timestamp;
+					}
+
+					const delta = Math.min(48, timestamp - lastTick);
+					lastTick = timestamp;
+
+					columnStates.forEach((state) => {
+						if (!Number.isFinite(state.distance) || state.distance <= 0) return;
+
+						state.offset = (state.offset + (state.speed * delta) / 1000) % state.distance;
+						applyColumnTransform(state);
+					});
+
+					animationFrame = window.requestAnimationFrame(stepColumns);
+				};
+
+				const startColumnAnimation = () => {
+					stopColumnAnimation();
+					if (!columnStates.length) return;
+					animationFrame = window.requestAnimationFrame(stepColumns);
+				};
+
 				const measureColumns = () => {
+					stopColumnAnimation();
+					columnStates = [];
+
 					const columns = flow.querySelectorAll('.photo-column');
-					columns.forEach((column) => {
+					columns.forEach((column, columnIndex) => {
 						if (!(column instanceof HTMLElement)) return;
 						const track = column.querySelector('.photo-column__track');
 						const primaryGroup = column.querySelector('[data-group="primary"]');
@@ -127,9 +171,16 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 						const distance = primaryGroup.getBoundingClientRect().height + gap;
 						if (!Number.isFinite(distance) || distance <= 0) return;
 
-						column.style.setProperty('--loop-distance', `${distance}px`);
-						column.classList.add('photo-column--animated');
+						const direction = column.dataset.direction === 'down' ? 'down' : 'up';
+						const speed = 26 + columnIndex * 4;
+						const offset = direction === 'down' ? 0 : 0;
+						const state = { direction, distance, offset, speed, track };
+
+						columnStates.push(state);
+						applyColumnTransform(state);
 					});
+
+					startColumnAnimation();
 				};
 
 				const scheduleMeasure = () => {
@@ -147,10 +198,6 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 					}
 
 					const image = document.createElement('img');
-					image.src = item.src;
-					image.alt = isClone ? '' : item.alt || '图片库图片';
-					image.loading = 'lazy';
-					image.decoding = 'async';
 					image.addEventListener(
 						'load',
 						() => {
@@ -158,12 +205,21 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 						},
 						{ once: true },
 					);
+					image.alt = isClone ? '' : item.alt || '图片库图片';
+					image.loading = 'lazy';
+					image.decoding = 'async';
+					image.src = item.src;
 
 					const media = document.createElement('div');
 					media.className = 'photo-card__media';
 
 					media.append(image);
 					figure.append(media);
+
+					if (image.complete) {
+						scheduleMeasure();
+					}
+
 					return figure;
 				};
 
@@ -171,7 +227,6 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 					const column = document.createElement('div');
 					column.className = 'photo-column';
 					column.dataset.direction = columnIndex % 2 === 0 ? 'down' : 'up';
-					column.style.setProperty('--scroll-duration', `${44 + columnIndex * 4 + items.length * 2.2}s`);
 
 					const track = document.createElement('div');
 					track.className = 'photo-column__track';
@@ -200,6 +255,7 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 					currentColumnCount = columnCount;
 					const columns = splitIntoColumns(currentItems, columnCount);
 
+					stopColumnAnimation();
 					flow.replaceChildren(...columns.map((columnItems, columnIndex) => createPhotoColumn(columnItems, columnIndex)));
 					if (count instanceof HTMLElement) {
 						count.textContent = `${items.length} 张图片`;
@@ -234,6 +290,15 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 					},
 					{ passive: true },
 				);
+
+				document.addEventListener('visibilitychange', () => {
+					if (document.hidden) {
+						stopColumnAnimation();
+						return;
+					}
+
+					scheduleMeasure();
+				});
 
 				if ('ResizeObserver' in window) {
 					const observer = new ResizeObserver(() => {
@@ -294,7 +359,7 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 		display: grid;
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: var(--photo-flow-gap);
-		height: clamp(34rem, 78vh, 62rem);
+		height: clamp(24rem, 58vh, 34rem);
 		overflow: hidden;
 		align-items: stretch;
 		mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
@@ -311,30 +376,12 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 		flex-direction: column;
 		gap: var(--photo-flow-gap);
 		will-change: transform;
+		transform: translateY(0);
 	}
 
 	.photo-column__group {
 		display: grid;
 		gap: var(--photo-flow-gap);
-	}
-
-	.photo-column--animated .photo-column__track {
-		animation-duration: var(--scroll-duration, 48s);
-		animation-timing-function: linear;
-		animation-iteration-count: infinite;
-		animation-fill-mode: both;
-	}
-
-	.photo-column[data-direction='up'].photo-column--animated .photo-column__track {
-		animation-name: gallery-scroll-up;
-	}
-
-	.photo-column[data-direction='down'].photo-column--animated .photo-column__track {
-		animation-name: gallery-scroll-down;
-	}
-
-	.photo-column:hover .photo-column__track {
-		animation-play-state: paused;
 	}
 
 	.photo-card {
@@ -375,30 +422,10 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 		height: auto;
 	}
 
-	@keyframes gallery-scroll-up {
-		from {
-			transform: translateY(0);
-		}
-
-		to {
-			transform: translateY(calc(-1 * var(--loop-distance, 0px)));
-		}
-	}
-
-	@keyframes gallery-scroll-down {
-		from {
-			transform: translateY(calc(-1 * var(--loop-distance, 0px)));
-		}
-
-		to {
-			transform: translateY(0);
-		}
-	}
-
 	@media (max-width: 980px) {
 		.photo-flow {
 			grid-template-columns: repeat(3, minmax(0, 1fr));
-			height: clamp(32rem, 74vh, 56rem);
+			height: clamp(22rem, 54vh, 30rem);
 		}
 	}
 
@@ -410,28 +437,15 @@ const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 		.photo-flow {
 			--photo-flow-gap: 0.8rem;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-			height: clamp(28rem, 70vh, 46rem);
+			height: clamp(20rem, 50vh, 26rem);
 		}
 	}
 
 	@media (max-width: 520px) {
 		.photo-flow {
 			grid-template-columns: 1fr;
-			height: clamp(24rem, 66vh, 38rem);
+			height: clamp(18rem, 46vh, 22rem);
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.photo-flow {
-			height: auto;
-			overflow: visible;
-			mask-image: none;
-			-webkit-mask-image: none;
-		}
-
-		.photo-column--animated .photo-column__track {
-			animation: none;
-			transform: none !important;
-		}
-	}
 </style>

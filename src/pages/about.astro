@@ -303,8 +303,8 @@ const widgetNotes = [
 
 	.gallery-preview-grid {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.95rem;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 0.8rem;
 		align-self: start;
 	}
 
@@ -312,8 +312,9 @@ const widgetNotes = [
 		display: block;
 		min-width: 0;
 		overflow: hidden;
+		width: 100%;
 		aspect-ratio: 1 / 1;
-		border-radius: 24px;
+		border-radius: 22px;
 		border: 1px solid rgba(187, 231, 245, 0.72);
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 253, 0.92)),
@@ -459,8 +460,18 @@ const widgetNotes = [
 			align-items: flex-start;
 		}
 
+		.gallery-preview-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
 		.review-card {
 			align-items: flex-start;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.gallery-preview-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
 </style>
