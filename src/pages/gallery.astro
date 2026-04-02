@@ -21,7 +21,7 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 				<div class="gallery-hero__copy">
 					<p class="eyebrow">Gallery</p>
 					<h1>图片库</h1>
-					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面先用更稳定的混合网格来展示不同尺寸的图片。</p>
+					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面改回更直接的瀑布流照片墙展示。</p>
 				</div>
 				<div class="gallery-hero__meta">
 					<span data-gallery-count>{galleryItems.length} 张图片</span>
@@ -32,11 +32,7 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 			<section class="photo-wall" aria-label="图片墙" data-photo-wall>
 				{
 					galleryItems.map((item) => (
-						<figure
-							class="photo-wall__item"
-							data-shape="square"
-							style="--photo-ratio: 4 / 5;"
-						>
+						<figure class="photo-wall__item">
 							<div class="photo-wall__media">
 								<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
 							</div>
@@ -67,26 +63,9 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 					return shuffled;
 				};
 
-				const getShapeFromRatio = (ratio) => {
-					if (ratio >= 1.75) return 'panorama';
-					if (ratio >= 1.12) return 'landscape';
-					if (ratio <= 0.82) return 'portrait';
-					return 'square';
-				};
-
-				const applyImageLayout = (figure, image) => {
-					const naturalWidth = image.naturalWidth || 4;
-					const naturalHeight = image.naturalHeight || 5;
-					const ratio = naturalWidth / naturalHeight;
-					figure.dataset.shape = getShapeFromRatio(ratio);
-					figure.style.setProperty('--photo-ratio', `${naturalWidth} / ${naturalHeight}`);
-				};
-
 				const createWallItem = (item) => {
 					const figure = document.createElement('figure');
 					figure.className = 'photo-wall__item';
-					figure.dataset.shape = 'square';
-					figure.style.setProperty('--photo-ratio', '4 / 5');
 
 					const media = document.createElement('div');
 					media.className = 'photo-wall__media';
@@ -96,17 +75,6 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 					image.alt = item.alt || '图片库图片';
 					image.loading = 'lazy';
 					image.decoding = 'async';
-					image.addEventListener(
-						'load',
-						() => {
-							applyImageLayout(figure, image);
-						},
-						{ once: true },
-					);
-
-					if (image.complete && image.naturalWidth > 0) {
-						applyImageLayout(figure, image);
-					}
 
 					media.append(image);
 					figure.append(media);
@@ -182,22 +150,16 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 	}
 
 	.photo-wall {
-		display: grid;
-		grid-template-columns: repeat(12, minmax(0, 1fr));
-		grid-auto-flow: dense;
-		gap: 1rem;
-		align-items: start;
+		column-count: 4;
+		column-gap: 1rem;
 	}
 
 	.photo-wall__item {
 		position: relative;
-		width: 100%;
-		display: grid;
-		gap: 0.7rem;
-		align-content: start;
-		justify-self: stretch;
-		grid-column: span 4 / span 4;
-		margin: 0;
+		display: block;
+		margin: 0 0 1rem;
+		break-inside: avoid;
+		overflow: hidden;
 		padding: 0.85rem;
 		border-radius: 30px;
 		border: 1px solid rgba(187, 231, 245, 0.75);
@@ -211,18 +173,6 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 			transform 180ms ease,
 			box-shadow 180ms ease,
 			border-color 180ms ease;
-	}
-
-	.photo-wall__item[data-shape='portrait'] {
-		grid-column: span 3 / span 3;
-	}
-
-	.photo-wall__item[data-shape='landscape'] {
-		grid-column: span 6 / span 6;
-	}
-
-	.photo-wall__item[data-shape='panorama'] {
-		grid-column: span 8 / span 8;
 	}
 
 	.photo-wall__item::before {
@@ -251,34 +201,18 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 		width: 100%;
 		overflow: hidden;
 		border-radius: 22px;
-		aspect-ratio: var(--photo-ratio, 4 / 5);
 		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
 	}
 
 	.photo-wall__item img {
 		display: block;
 		width: 100%;
-		height: 100%;
-		object-fit: cover;
+		height: auto;
 	}
 
 	@media (max-width: 980px) {
 		.photo-wall {
-			grid-template-columns: repeat(8, minmax(0, 1fr));
-		}
-
-		.photo-wall__item,
-		.photo-wall__item[data-shape='square'],
-		.photo-wall__item[data-shape='landscape'] {
-			grid-column: span 4 / span 4;
-		}
-
-		.photo-wall__item[data-shape='portrait'] {
-			grid-column: span 3 / span 3;
-		}
-
-		.photo-wall__item[data-shape='panorama'] {
-			grid-column: span 8 / span 8;
+			column-count: 3;
 		}
 	}
 
@@ -288,34 +222,14 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 		}
 
 		.photo-wall {
-			grid-template-columns: repeat(4, minmax(0, 1fr));
-			gap: 0.8rem;
-		}
-
-		.photo-wall__item,
-		.photo-wall__item[data-shape='portrait'],
-		.photo-wall__item[data-shape='square'] {
-			grid-column: span 2 / span 2;
-		}
-
-		.photo-wall__item[data-shape='landscape'],
-		.photo-wall__item[data-shape='panorama'] {
-			grid-column: span 4 / span 4;
+			column-count: 2;
+			column-gap: 0.8rem;
 		}
 	}
 
 	@media (max-width: 520px) {
 		.photo-wall {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			grid-auto-rows: 10px;
-		}
-
-		.photo-wall__item,
-		.photo-wall__item[data-shape='portrait'],
-		.photo-wall__item[data-shape='square'],
-		.photo-wall__item[data-shape='landscape'],
-		.photo-wall__item[data-shape='panorama'] {
-			grid-column: span 2 / span 2;
+			column-count: 1;
 		}
 	}
 </style>
