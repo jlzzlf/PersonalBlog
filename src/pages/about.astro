@@ -7,6 +7,18 @@ import { galleryItems } from '../data/gallery';
 
 const pageTitle = `更多 | ${SITE_TITLE}`;
 const galleryPreviewItems = galleryItems.slice(0, 4);
+const galleryPreviewFallbackJson = JSON.stringify(galleryPreviewItems);
+const previewFramePresets = [
+	{ tilt: '-1.8deg', lift: '0px' },
+	{ tilt: '1.35deg', lift: '1px' },
+	{ tilt: '-0.95deg', lift: '-4px' },
+	{ tilt: '2.2deg', lift: '2px' },
+];
+
+const getPreviewFrameStyle = (index: number) => {
+	const preset = previewFramePresets[index % previewFramePresets.length];
+	return `--frame-tilt: ${preset.tilt}; --frame-lift: ${preset.lift};`;
+};
 
 const mediaReviews = [
 	{
@@ -79,11 +91,7 @@ const widgetNotes = [
 					<div class="gallery-preview-grid" aria-label="图片库预览" data-gallery-preview-grid data-preview-limit="4">
 						{
 							galleryPreviewItems.map((item, index) => (
-								<a
-									class:list={['gallery-preview-item', { 'gallery-preview-item--large': index === 0 }]}
-									href="/gallery"
-									aria-label="打开图片库"
-								>
+								<a class="gallery-preview-item" href="/gallery" aria-label="打开图片库" style={getPreviewFrameStyle(index)}>
 									<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
 								</a>
 							))
@@ -162,19 +170,40 @@ const widgetNotes = [
 			</section>
 		</main>
 		<Footer />
+		<script type="application/json" data-gallery-preview-fallback set:html={galleryPreviewFallbackJson}></script>
 
 		<script is:inline>
 			(() => {
 				const root = document.querySelector('[data-gallery-preview-grid]');
+				const fallback = document.querySelector('[data-gallery-preview-fallback]');
 				if (!(root instanceof HTMLElement)) return;
 
 				const previewLimit = Number(root.dataset.previewLimit || '4');
+				const fallbackItems =
+					fallback instanceof HTMLScriptElement && fallback.textContent ? JSON.parse(fallback.textContent) : [];
 
-				const createPreviewLink = (item, index) => {
+				const shuffleItems = (items) => {
+					const shuffled = [...items];
+					for (let index = shuffled.length - 1; index > 0; index -= 1) {
+						const swapIndex = Math.floor(Math.random() * (index + 1));
+						[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+					}
+					return shuffled;
+				};
+
+				const applyRandomFrame = (element) => {
+					const tilt = (Math.random() * 5.4 - 2.7).toFixed(2);
+					const lift = (Math.random() * 10 - 5).toFixed(1);
+					element.style.setProperty('--frame-tilt', `${tilt}deg`);
+					element.style.setProperty('--frame-lift', `${lift}px`);
+				};
+
+				const createPreviewLink = (item) => {
 					const link = document.createElement('a');
 					link.href = '/gallery';
-					link.className = `gallery-preview-item${index === 0 ? ' gallery-preview-item--large' : ''}`;
+					link.className = 'gallery-preview-item';
 					link.setAttribute('aria-label', '打开图片库');
+					applyRandomFrame(link);
 
 					const image = document.createElement('img');
 					image.src = item.src;
@@ -187,8 +216,12 @@ const widgetNotes = [
 				};
 
 				const renderPreview = (items) => {
-					root.replaceChildren(...items.slice(0, previewLimit).map((item, index) => createPreviewLink(item, index)));
+					root.replaceChildren(...shuffleItems(items).slice(0, previewLimit).map((item) => createPreviewLink(item)));
 				};
+
+				if (Array.isArray(fallbackItems) && fallbackItems.length > 0) {
+					renderPreview(fallbackItems);
+				}
 
 				fetch('/api/gallery', { headers: { Accept: 'application/json' } })
 					.then((response) => (response.ok ? response.json() : null))
@@ -319,43 +352,61 @@ const widgetNotes = [
 	}
 
 	.gallery-preview-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.85rem;
+		column-count: 3;
+		column-gap: 1rem;
+		align-self: start;
 	}
 
 	.gallery-preview-item {
 		display: block;
+		position: relative;
+		margin: 0 0 1rem;
+		padding: 0.7rem;
+		break-inside: avoid;
 		overflow: hidden;
-		border-radius: 24px;
-		border: 1px solid var(--color-border);
-		background: rgba(255, 255, 255, 0.8);
-		box-shadow: 0 14px 28px rgba(112, 159, 176, 0.08);
+		border-radius: 28px;
+		border: 1px solid rgba(187, 231, 245, 0.72);
+		background:
+			linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(239, 248, 253, 0.92)),
+			radial-gradient(circle at top left, rgba(214, 255, 255, 0.5), transparent 55%);
+		box-shadow:
+			0 18px 36px rgba(112, 159, 176, 0.12),
+			inset 0 1px 0 rgba(255, 255, 255, 0.82);
+		transform: translateY(var(--frame-lift, 0px)) rotate(var(--frame-tilt, 0deg));
 		transition:
 			transform 180ms ease,
 			box-shadow 180ms ease,
 			border-color 180ms ease;
 	}
 
-	.gallery-preview-item:hover {
-		transform: translateY(-2px);
-		border-color: rgba(153, 230, 255, 0.76);
-		box-shadow: 0 18px 32px rgba(112, 159, 176, 0.12);
+	.gallery-preview-item::before {
+		content: '';
+		position: absolute;
+		top: 0.8rem;
+		left: 50%;
+		width: 3rem;
+		height: 0.45rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.72);
+		transform: translateX(-50%);
+		box-shadow: 0 2px 10px rgba(112, 159, 176, 0.08);
+		pointer-events: none;
 	}
 
-	.gallery-preview-item--large {
-		grid-column: span 2;
+	.gallery-preview-item:hover {
+		transform: translateY(calc(var(--frame-lift, 0px) - 5px)) rotate(var(--frame-tilt, 0deg));
+		border-color: rgba(153, 230, 255, 0.76);
+		box-shadow:
+			0 24px 42px rgba(112, 159, 176, 0.16),
+			inset 0 1px 0 rgba(255, 255, 255, 0.84);
 	}
 
 	.gallery-preview-item img {
 		display: block;
 		width: 100%;
-		height: 14rem;
-		object-fit: cover;
-	}
-
-	.gallery-preview-item--large img {
-		height: 18rem;
+		height: auto;
+		border-radius: 20px;
+		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
 	}
 
 	.review-list,
@@ -479,20 +530,21 @@ const widgetNotes = [
 		}
 
 		.gallery-preview-grid {
-			grid-template-columns: 1fr;
+			column-count: 2;
 		}
 
-		.gallery-preview-item--large {
-			grid-column: auto;
-		}
-
-		.gallery-preview-item img,
-		.gallery-preview-item--large img {
-			height: 13rem;
+		.gallery-preview-item {
+			margin-bottom: 0.85rem;
 		}
 
 		.review-card__top {
 			flex-direction: column;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.gallery-preview-grid {
+			column-count: 1;
 		}
 	}
 </style>
