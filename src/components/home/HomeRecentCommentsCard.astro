@@ -1,0 +1,144 @@
+<article class="surface-card panel latest-comments-card">
+	<div class="latest-comments-card__header">
+		<div>
+			<p class="eyebrow">Recent Comments</p>
+			<h2>最新评论</h2>
+			<p class="latest-comments-copy">这里会自动读取 GitHub Discussions 里的最新评论，方便直接看到最近互动。</p>
+		</div>
+		<a
+			class="button secondary latest-comments-card__action"
+			href="https://github.com/jlzzlf/PersonalBlog/discussions"
+			target="_blank"
+			rel="noreferrer"
+		>
+			查看讨论区
+		</a>
+	</div>
+
+	<div class="latest-comments-status" data-comments-status>正在加载最新评论…</div>
+	<div class="latest-comments-list" data-comments-list aria-live="polite"></div>
+
+	<script is:inline>
+		(() => {
+			const script = document.currentScript;
+			const root = script?.closest('.latest-comments-card');
+			if (!(root instanceof HTMLElement)) return;
+
+			const status = root.querySelector('[data-comments-status]');
+			const list = root.querySelector('[data-comments-list]');
+			if (!(status instanceof HTMLElement) || !(list instanceof HTMLElement)) return;
+
+			const formatter = new Intl.DateTimeFormat('zh-CN', {
+				month: 'short',
+				day: 'numeric',
+				hour: '2-digit',
+				minute: '2-digit',
+			});
+
+			const trimExcerpt = (text) => {
+				const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+				if (!normalized) return '这条评论还没有可展示的正文。';
+				return normalized.length > 88 ? `${normalized.slice(0, 88)}…` : normalized;
+			};
+
+			const formatDiscussionLabel = (title) => {
+				const normalized = String(title || '').trim();
+				if (!normalized) return '博客评论';
+				if (normalized.startsWith('/')) return `来源 ${normalized}`;
+				return normalized;
+			};
+
+			const createCommentCard = (item) => {
+				const link = document.createElement('a');
+				link.className = 'latest-comment-item';
+				link.href = item.commentUrl || item.discussionUrl || 'https://github.com/jlzzlf/PersonalBlog/discussions';
+				link.target = '_blank';
+				link.rel = 'noreferrer';
+
+				const meta = document.createElement('div');
+				meta.className = 'latest-comment-item__meta';
+
+				const author = document.createElement('div');
+				author.className = 'latest-comment-item__author';
+
+				const avatar = document.createElement('img');
+				avatar.className = 'latest-comment-item__avatar';
+				avatar.src = item.authorAvatarUrl || 'https://avatars.githubusercontent.com/u/9919?s=96&v=4';
+				avatar.alt = `${item.authorLogin || 'GitHub 用户'} 的头像`;
+				avatar.loading = 'lazy';
+				avatar.decoding = 'async';
+
+				const authorCopy = document.createElement('div');
+				authorCopy.className = 'latest-comment-item__author-copy';
+
+				const authorName = document.createElement('strong');
+				authorName.textContent = item.authorLogin || 'GitHub 用户';
+
+				const source = document.createElement('span');
+				source.textContent = formatDiscussionLabel(item.discussionTitle);
+
+				authorCopy.append(authorName, source);
+				author.append(avatar, authorCopy);
+
+				const time = document.createElement('time');
+				time.className = 'latest-comment-item__time';
+				const publishedAt = item.publishedAt ? new Date(item.publishedAt) : null;
+				time.dateTime = publishedAt ? publishedAt.toISOString() : '';
+				time.textContent = publishedAt && !Number.isNaN(publishedAt.valueOf()) ? formatter.format(publishedAt) : '刚刚';
+
+				meta.append(author, time);
+
+				const body = document.createElement('div');
+				body.className = 'latest-comment-item__body';
+
+				const excerpt = document.createElement('p');
+				excerpt.textContent = trimExcerpt(item.bodyText);
+
+				const tag = document.createElement('span');
+				tag.className = 'latest-comment-item__tag';
+				tag.textContent = item.isReply ? '回复' : '评论';
+
+				body.append(excerpt, tag);
+				link.append(meta, body);
+				return link;
+			};
+
+			const renderEmpty = (message) => {
+				status.hidden = true;
+				list.replaceChildren();
+
+				const empty = document.createElement('div');
+				empty.className = 'latest-comments-empty';
+				empty.textContent = message;
+				list.append(empty);
+			};
+
+			const renderComments = (items) => {
+				status.hidden = true;
+				list.replaceChildren(...items.map((item) => createCommentCard(item)));
+			};
+
+			fetch('/api/comments', { headers: { Accept: 'application/json' } })
+				.then(async (response) => {
+					const data = await response.json().catch(() => null);
+					return { ok: response.ok, data };
+				})
+				.then(({ ok, data }) => {
+					if (!ok || !data) {
+						renderEmpty('最新评论暂时没有加载出来，稍后再来看看。');
+						return;
+					}
+
+					if (!Array.isArray(data.comments) || data.comments.length === 0) {
+						renderEmpty(data.message || '还没有评论，等第一条留言出现后这里就会更新。');
+						return;
+					}
+
+					renderComments(data.comments);
+				})
+				.catch(() => {
+					renderEmpty('最新评论暂时没有加载出来，稍后再来看看。');
+				});
+		})();
+	</script>
+</article>

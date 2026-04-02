@@ -28,3 +28,16 @@ export const profileActionButtons = [
 		href: 'https://leetcode.cn/u/fdrksk6o8H/',
 	},
 ] as const;
+
+export const profileContacts = [
+	{
+		label: '邮箱',
+		value: '1692754047@qq.com',
+		href: 'mailto:1692754047@qq.com',
+	},
+	{
+		label: '电话',
+		value: '15852938328',
+		href: 'tel:15852938328',
+	},
+] as const;

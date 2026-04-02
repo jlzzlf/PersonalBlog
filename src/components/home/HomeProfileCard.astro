@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import HomeAvatar from '../../assets/home-avatar.jpg';
-import { profileActionButtons, profileContent } from '../../data/home/profile';
+import { profileActionButtons, profileContacts, profileContent } from '../../data/home/profile';
 ---
 
 <article class="surface-card panel profile-card">
@@ -35,7 +35,17 @@ import { profileActionButtons, profileContent } from '../../data/home/profile';
 		</aside>
 	</div>
 	<footer class="profile-card__footer">
-		<div class="profile-actions" aria-label="个人主页与联系方式入口">
+		<div class="profile-contacts" aria-label="联系方式">
+			{
+				profileContacts.map((item) => (
+					<p class="profile-contact">
+						<span>{item.label}</span>
+						<a href={item.href}>{item.value}</a>
+					</p>
+				))
+			}
+		</div>
+		<div class="profile-actions" aria-label="个人主页与外部入口">
 			{
 				profileActionButtons.map((item) => (
 					item.href ? (

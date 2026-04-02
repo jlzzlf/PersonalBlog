@@ -5,6 +5,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import HomeArchiveEntryCard from '../components/home/HomeArchiveEntryCard.astro';
+import HomeRecentCommentsCard from '../components/home/HomeRecentCommentsCard.astro';
 import HomeProfileCard from '../components/home/HomeProfileCard.astro';
 import HomeProjectShowcaseCard from '../components/home/HomeProjectShowcaseCard.astro';
 import HomeQuickNavCard from '../components/home/HomeQuickNavCard.astro';
@@ -41,6 +42,7 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 
 					<HomeQuickNavCard />
 					<HomeArchiveEntryCard stats={archiveEntryStats} />
+					<HomeRecentCommentsCard />
 				</section>
 			</section>
 		</main>
@@ -67,7 +69,7 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 				'hero hero hero hero hero hero recent recent recent recent recent recent'
 				'secondary secondary secondary secondary secondary secondary secondary secondary secondary secondary secondary secondary'
 				'planner planner planner planner planner planner planner planner planner planner planner planner'
-				'archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry';
+				'archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry latest-comments latest-comments latest-comments latest-comments latest-comments latest-comments';
 			gap: 1.05rem;
 			align-items: stretch;
 			width: min(1360px, calc(100% - 2rem));
@@ -322,10 +324,41 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 			display: flex;
 			flex-wrap: wrap;
 			align-items: center;
-			justify-content: flex-end;
+			justify-content: space-between;
 			gap: 0.7rem;
 			padding-top: 0.3rem;
 			border-top: 0;
+		}
+
+		.profile-contacts {
+			display: grid;
+			gap: 0.28rem;
+			justify-items: start;
+		}
+
+		.profile-contact {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 0.4rem;
+			margin: 0;
+			color: rgba(31, 41, 55, 0.84);
+			font-size: 0.84rem;
+			font-weight: 700;
+			line-height: 1.55;
+		}
+
+		.profile-contact span {
+			color: var(--color-subtext);
+		}
+
+		.profile-contact a {
+			color: var(--color-link-hover);
+			text-decoration: none;
+		}
+
+		.profile-contact a:hover {
+			text-decoration: underline;
 		}
 
 		.profile-actions {
@@ -527,14 +560,162 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 		.archive-entry-card {
 			grid-area: archive-entry;
 			display: grid;
-			grid-template-columns: minmax(0, 1.08fr) minmax(18rem, 0.92fr);
+			grid-template-columns: 1fr;
 			gap: 1.1rem;
 			align-items: stretch;
-			min-height: 15rem;
+			min-height: 0;
 			background:
 				radial-gradient(circle at 0% 0%, rgba(255, 214, 232, 0.22), transparent 30%),
 				radial-gradient(circle at 100% 100%, rgba(204, 255, 255, 0.22), transparent 34%),
 				linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(230, 250, 255, 0.82));
+		}
+
+		.latest-comments-card {
+			grid-area: latest-comments;
+			display: grid;
+			align-content: start;
+			gap: 0.9rem;
+			min-height: 0;
+			background:
+				radial-gradient(circle at top right, rgba(255, 214, 232, 0.18), transparent 28%),
+				radial-gradient(circle at bottom left, rgba(204, 255, 255, 0.2), transparent 34%),
+				linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(238, 248, 252, 0.9));
+		}
+
+		.latest-comments-card__header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 1rem;
+		}
+
+		.latest-comments-card__header h2 {
+			margin-bottom: 0.35rem;
+		}
+
+		.latest-comments-copy {
+			margin: 0;
+			color: var(--color-subtext);
+			font-size: 0.92rem;
+			line-height: 1.65;
+		}
+
+		.latest-comments-card__action {
+			flex: 0 0 auto;
+		}
+
+		.latest-comments-status,
+		.latest-comments-empty {
+			padding: 1rem 1.05rem;
+			border: 1px solid rgba(153, 230, 255, 0.34);
+			border-radius: 22px;
+			background: rgba(255, 255, 255, 0.72);
+			color: var(--color-subtext);
+			font-size: 0.92rem;
+			line-height: 1.65;
+		}
+
+		.latest-comments-list {
+			display: grid;
+			gap: 0.78rem;
+		}
+
+		.latest-comment-item {
+			display: grid;
+			gap: 0.72rem;
+			padding: 1rem 1.05rem;
+			border: 1px solid rgba(153, 230, 255, 0.34);
+			border-radius: 22px;
+			background: rgba(255, 255, 255, 0.78);
+			color: var(--color-text);
+			text-decoration: none;
+			transition:
+				transform 180ms ease,
+				box-shadow 180ms ease,
+				border-color 180ms ease,
+				background-color 180ms ease;
+		}
+
+		.latest-comment-item:hover {
+			transform: translateY(-2px);
+			border-color: rgba(153, 230, 255, 0.72);
+			background: rgba(230, 250, 255, 0.9);
+			box-shadow: 0 16px 28px rgba(112, 159, 176, 0.1);
+		}
+
+		.latest-comment-item__meta {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 0.85rem;
+		}
+
+		.latest-comment-item__author {
+			display: flex;
+			align-items: center;
+			gap: 0.72rem;
+			min-width: 0;
+		}
+
+		.latest-comment-item__avatar {
+			display: block;
+			width: 2.5rem;
+			height: 2.5rem;
+			border-radius: 999px;
+			object-fit: cover;
+			box-shadow: 0 10px 20px rgba(112, 159, 176, 0.12);
+		}
+
+		.latest-comment-item__author-copy {
+			display: grid;
+			gap: 0.12rem;
+			min-width: 0;
+		}
+
+		.latest-comment-item__author-copy strong {
+			font-size: 0.96rem;
+			line-height: 1.2;
+		}
+
+		.latest-comment-item__author-copy span {
+			color: var(--color-subtext);
+			font-size: 0.8rem;
+			line-height: 1.45;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.latest-comment-item__time {
+			color: var(--color-subtext);
+			font-size: 0.82rem;
+			font-weight: 700;
+			white-space: nowrap;
+		}
+
+		.latest-comment-item__body {
+			display: grid;
+			gap: 0.55rem;
+		}
+
+		.latest-comment-item__body p {
+			margin: 0;
+			color: var(--color-text);
+			font-size: 0.92rem;
+			line-height: 1.7;
+		}
+
+		.latest-comment-item__tag {
+			display: inline-flex;
+			align-items: center;
+			width: fit-content;
+			padding: 0.28rem 0.62rem;
+			border: 1px solid rgba(153, 230, 255, 0.42);
+			border-radius: 999px;
+			background: rgba(230, 250, 255, 0.84);
+			color: var(--color-link-hover);
+			font-size: 0.74rem;
+			font-weight: 700;
 		}
 
 		.archive-entry-card__copy {
@@ -1096,7 +1277,7 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 					'hero hero hero hero recent recent recent recent'
 					'secondary secondary secondary secondary secondary secondary secondary secondary'
 					'planner planner planner planner planner planner planner planner'
-					'archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry archive-entry';
+					'archive-entry archive-entry archive-entry archive-entry latest-comments latest-comments latest-comments latest-comments';
 				gap: 0.95rem;
 			}
 
@@ -1147,7 +1328,8 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 					'recent'
 					'secondary'
 					'planner'
-					'archive-entry';
+					'archive-entry'
+					'latest-comments';
 				gap: 0.95rem;
 				width: min(44rem, calc(100% - 1rem));
 			}
@@ -1162,6 +1344,7 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 			.stats-card,
 			.project-showcase-card,
 			.archive-entry-card,
+			.latest-comments-card,
 			.quick-nav-card,
 			.secondary-band {
 				min-height: 0;
@@ -1183,6 +1366,10 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 				grid-template-columns: 1fr;
 			}
 
+			.latest-comments-card__header {
+				flex-direction: column;
+			}
+
 			.profile-card__footer {
 				flex-direction: column;
 				align-items: flex-start;
@@ -1200,6 +1387,7 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 
 			.panel,
 			.archive-entry-card,
+			.latest-comments-card,
 			.profile-card {
 				padding: 1rem;
 			}
@@ -1235,6 +1423,10 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 
 			.archive-entry-metrics {
 				grid-template-columns: 1fr;
+			}
+
+			.latest-comment-item__meta {
+				flex-direction: column;
 			}
 
 			.quick-nav-grid {
