@@ -272,6 +272,13 @@ code {
 	border-radius: 0.45rem;
 	background: rgba(230, 250, 255, 0.82);
 	color: #18485d;
+	font-family:
+		'SFMono-Regular',
+		'Cascadia Code',
+		'Fira Code',
+		'JetBrains Mono',
+		'Consolas',
+		monospace;
 }
 
 pre {
@@ -285,6 +292,75 @@ pre {
 
 pre > code {
 	all: unset;
+}
+
+pre.astro-code {
+	position: relative;
+	padding: 1.35em;
+	padding-top: 2.85rem;
+	border: 1px solid rgba(153, 230, 255, 0.18);
+	border-radius: 22px;
+	background: #24292e !important;
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.04),
+		0 18px 36px rgba(15, 23, 42, 0.18);
+	color: #e1e4e8;
+}
+
+pre.astro-code::before {
+	content: attr(data-language);
+	position: absolute;
+	top: 0.9rem;
+	right: 1rem;
+	padding: 0.18rem 0.6rem;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.06);
+	color: rgba(255, 255, 255, 0.82);
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	line-height: 1.2;
+}
+
+pre.astro-code[data-language='csharp']::before {
+	content: 'C#';
+}
+
+pre.astro-code[data-language='javascript']::before {
+	content: 'JavaScript';
+	text-transform: none;
+}
+
+pre.astro-code[data-language='typescript']::before {
+	content: 'TypeScript';
+	text-transform: none;
+}
+
+pre.astro-code[data-language='bash']::before,
+pre.astro-code[data-language='shell']::before,
+pre.astro-code[data-language='sh']::before {
+	content: 'Shell';
+	text-transform: none;
+}
+
+pre.astro-code > code {
+	display: grid;
+	font-family:
+		'SFMono-Regular',
+		'Cascadia Code',
+		'Fira Code',
+		'JetBrains Mono',
+		'Consolas',
+		monospace;
+	font-size: 0.94rem;
+	line-height: 1.7;
+}
+
+pre.astro-code .line {
+	display: block;
+	min-height: 1.7em;
 }
 
 blockquote {
