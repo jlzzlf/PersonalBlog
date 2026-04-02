@@ -115,6 +115,8 @@ async function fetchRecentComments({ token, owner, name, categoryId }) {
 			Accept: 'application/vnd.github+json',
 			Authorization: `Bearer ${token}`,
 			'Content-Type': 'application/json',
+			'User-Agent': 'PersonalBlog-CommentsFetcher',
+			'X-GitHub-Api-Version': '2022-11-28',
 		},
 		body: JSON.stringify({
 			query: RECENT_COMMENTS_QUERY,
@@ -134,7 +136,8 @@ async function fetchRecentComments({ token, owner, name, categoryId }) {
 	try {
 		payload = rawText ? JSON.parse(rawText) : null;
 	} catch {
-		throw new Error(`GitHub Discussions returned a non-JSON response with status ${response.status}.`);
+		const bodySnippet = rawText.slice(0, 300);
+		throw new Error(`GitHub Discussions returned a non-JSON response with status ${response.status}. Body: ${bodySnippet}`);
 	}
 
 	if (!response.ok || !payload) {
