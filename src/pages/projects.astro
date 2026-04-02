@@ -1,103 +1,630 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
 
 const pageTitle = `项目展示 | ${SITE_TITLE}`;
+const entries = (await getCollection('projects')).sort(
+	(first, second) =>
+		(first.data.order ?? Number.MAX_SAFE_INTEGER) -
+			(second.data.order ?? Number.MAX_SAFE_INTEGER) ||
+		second.data.year.localeCompare(first.data.year, 'zh-CN') ||
+		first.data.title.localeCompare(second.data.title, 'zh-CN'),
+);
 
-const sections = [
-	{
-		title: '当前项目',
-		text: '这里后面可以集中放正在做的个人项目、课程作品、实验性质的小工具，方便首页之外单独整理展示。',
-	},
-	{
-		title: '展示方式',
-		text: '之后可以继续补项目封面、技术栈、上线地址、仓库链接和阶段截图，让这里更像正式作品页。',
-	},
-	{
-		title: '后续扩展',
-		text: '如果项目越来越多，也可以在这里继续拆分分类、筛选和时间线，把它做成完整的作品集入口。',
-	},
-];
+const projectTags = [...new Set(entries.flatMap((entry) => entry.data.tags ?? []))].sort((a, b) =>
+	a.localeCompare(b, 'zh-CN'),
+);
+
+const getCoverImageAttrs = (coverImage: (typeof entries)[number]['data']['coverImage']) => {
+	if (!coverImage) return null;
+	if (typeof coverImage === 'string') return { src: coverImage };
+	return {
+		src: coverImage.src,
+		width: coverImage.width,
+		height: coverImage.height,
+	};
+};
+
+const projectCards = entries.map((entry) => ({
+	entry,
+	href: `/projects/${entry.id}/`,
+	coverImage: getCoverImageAttrs(entry.data.coverImage),
+	searchText: [
+		entry.data.title,
+		entry.data.summary,
+		entry.data.teaser,
+		...(entry.data.tags ?? []),
+		...(entry.data.stack ?? []),
+	]
+		.join(' ')
+		.toLowerCase(),
+	tagText: (entry.data.tags ?? []).join('|'),
+}));
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={pageTitle} description="项目展示页，占位用于后续整理个人项目与作品。" />
+		<BaseHead title={pageTitle} description="按项目独立展示作品与实践页面，支持搜索、筛选和分页浏览。" />
 	</head>
 	<body>
 		<Header />
-		<main class="feature-page">
-			<section class="surface-card feature-hero">
+		<main class="projects-page">
+			<section class="surface-card projects-hero">
 				<p class="eyebrow">Projects</p>
 				<h1>项目展示</h1>
 				<p>
-					这里会慢慢整理成你的个人项目页。后面无论是课程作业、练手工具、完整作品还是长期计划，都可以统一放在这里。
+					这里会集中放置每一个独立项目页面。左侧可以搜索和筛选，右侧点击具体项目卡片后，会进入它自己的详情页。
 				</p>
-				<div class="feature-actions">
-					<a class="button" href="/">返回首页</a>
-					<a class="button secondary" href="/blog">查看博客</a>
-				</div>
 			</section>
 
-			<section class="feature-grid">
-				{
-					sections.map((section) => (
-						<article class="surface-card feature-card">
-							<h2>{section.title}</h2>
-							<p>{section.text}</p>
-						</article>
-					))
-				}
-			</section>
+			<div class="projects-shell" data-project-browser>
+				<aside class="surface-card projects-sidebar" aria-label="项目搜索与筛选">
+					<div class="projects-sidebar__section">
+						<label class="projects-sidebar__label" for="project-search">搜索项目</label>
+						<input
+							id="project-search"
+							class="projects-sidebar__search"
+							type="search"
+							placeholder="标题、技术或关键词"
+							data-project-search
+						/>
+					</div>
+
+					{
+						projectTags.length > 0 && (
+							<div class="projects-sidebar__section">
+								<p class="projects-sidebar__label">按标签筛选</p>
+								<div class="projects-filter-list">
+									{
+										projectTags.map((tag) => (
+											<label class="projects-filter-option">
+												<input type="checkbox" value={tag} data-project-tag />
+												<span>{tag}</span>
+											</label>
+										))
+									}
+								</div>
+							</div>
+						)
+					}
+
+					<button class="button secondary projects-sidebar__reset" type="button" data-project-reset>
+						清空筛选
+					</button>
+
+					<p class="projects-sidebar__summary" data-project-summary>
+						当前显示 {projectCards.length} / {projectCards.length} 个项目
+					</p>
+				</aside>
+
+				<section class="projects-content" aria-label="项目列表">
+					<div class="projects-grid">
+						{
+							projectCards.map(({ entry, href, coverImage, searchText, tagText }) => (
+								<a
+									class="surface-card project-tile"
+									href={href}
+									data-project-card
+									data-search={searchText}
+									data-tags={tagText}
+								>
+									<div class="project-tile__media">
+										{
+											coverImage ? (
+												<img
+													src={coverImage.src}
+													width={coverImage.width}
+													height={coverImage.height}
+													alt={entry.data.title}
+													loading="lazy"
+													decoding="async"
+												/>
+											) : (
+												<div class="project-tile__placeholder" aria-hidden="true">
+													<span>{entry.data.title.slice(0, 2)}</span>
+												</div>
+											)
+										}
+									</div>
+									<div class="project-tile__body">
+										<div class="project-tile__meta">
+											<span>{entry.data.status}</span>
+											<span>{entry.data.year}</span>
+										</div>
+										<h2>{entry.data.title}</h2>
+										<p>{entry.data.summary}</p>
+										{
+											entry.data.tags.length > 0 && (
+												<div class="project-tile__tags" aria-label="项目标签">
+													{
+														entry.data.tags.map((tag) => (
+															<span class="project-tile__tag">{tag}</span>
+														))
+													}
+												</div>
+											)
+										}
+									</div>
+								</a>
+							))
+						}
+
+						<p class="surface-card project-empty" data-project-empty hidden>
+							没有找到匹配的项目，可以换个关键词，或者清空筛选重新查看全部内容。
+						</p>
+					</div>
+
+					<nav class="surface-card projects-pagination" aria-label="项目分页" data-project-pagination hidden>
+						<button class="projects-pagination__button" type="button" data-project-prev>
+							上一页
+						</button>
+						<p class="projects-pagination__status" data-project-page-status>第 1 / 1 页</p>
+						<button class="projects-pagination__button" type="button" data-project-next>
+							下一页
+						</button>
+					</nav>
+				</section>
+			</div>
 		</main>
 		<Footer />
+
+		<script is:inline>
+			(() => {
+				const root = document.querySelector('[data-project-browser]');
+				if (!(root instanceof HTMLElement)) return;
+
+				const searchInput = root.querySelector('[data-project-search]');
+				const tagInputs = Array.from(root.querySelectorAll('[data-project-tag]'));
+				const resetButton = root.querySelector('[data-project-reset]');
+				const summary = root.querySelector('[data-project-summary]');
+				const emptyState = root.querySelector('[data-project-empty]');
+				const pagination = root.querySelector('[data-project-pagination]');
+				const previousButton = root.querySelector('[data-project-prev]');
+				const nextButton = root.querySelector('[data-project-next]');
+				const pageStatus = root.querySelector('[data-project-page-status]');
+				const cards = Array.from(root.querySelectorAll('[data-project-card]'));
+				const pageSize = 25;
+				let currentPage = 1;
+
+				const applyFilters = ({ resetPage = false } = {}) => {
+					const query =
+						searchInput instanceof HTMLInputElement ? searchInput.value.trim().toLowerCase() : '';
+					const selectedTags = tagInputs
+						.filter(
+							(input) => input instanceof HTMLInputElement && input.checked,
+						)
+						.map((input) => (input instanceof HTMLInputElement ? input.value : ''));
+
+					const matchedCards = cards.filter((card) => {
+						if (!(card instanceof HTMLElement)) return false;
+						const searchText = card.dataset.search ?? '';
+						const tags = (card.dataset.tags ?? '').split('|').filter(Boolean);
+						const matchesQuery = query === '' || searchText.includes(query);
+						const matchesTags =
+							selectedTags.length === 0 || selectedTags.every((tag) => tags.includes(tag));
+						return matchesQuery && matchesTags;
+					});
+
+					const pageCount = Math.max(1, Math.ceil(matchedCards.length / pageSize));
+					if (resetPage) currentPage = 1;
+					currentPage = Math.min(currentPage, pageCount);
+
+					const pageStart = (currentPage - 1) * pageSize;
+					const visibleCards = new Set(matchedCards.slice(pageStart, pageStart + pageSize));
+
+					for (const card of cards) {
+						if (!(card instanceof HTMLElement)) continue;
+						card.hidden = !visibleCards.has(card);
+					}
+
+					if (summary instanceof HTMLElement) {
+						summary.textContent =
+							matchedCards.length === 0
+								? `当前显示 0 / ${cards.length} 个项目`
+								: `匹配到 ${matchedCards.length} 个项目${pageCount > 1 ? `，第 ${currentPage} / ${pageCount} 页` : ''}`;
+					}
+
+					if (emptyState instanceof HTMLElement) {
+						emptyState.hidden = matchedCards.length !== 0;
+					}
+
+					if (pagination instanceof HTMLElement) {
+						pagination.hidden = matchedCards.length <= pageSize;
+					}
+
+					if (pageStatus instanceof HTMLElement) {
+						pageStatus.textContent = `第 ${currentPage} / ${pageCount} 页`;
+					}
+
+					if (previousButton instanceof HTMLButtonElement) {
+						previousButton.disabled = currentPage === 1 || matchedCards.length === 0;
+					}
+
+					if (nextButton instanceof HTMLButtonElement) {
+						nextButton.disabled = currentPage === pageCount || matchedCards.length === 0;
+					}
+				};
+
+				if (searchInput instanceof HTMLInputElement) {
+					searchInput.addEventListener('input', () => applyFilters({ resetPage: true }));
+				}
+
+				for (const input of tagInputs) {
+					if (!(input instanceof HTMLInputElement)) continue;
+					input.addEventListener('change', () => applyFilters({ resetPage: true }));
+				}
+
+				if (resetButton instanceof HTMLButtonElement) {
+					resetButton.addEventListener('click', () => {
+						if (searchInput instanceof HTMLInputElement) {
+							searchInput.value = '';
+						}
+
+						for (const input of tagInputs) {
+							if (input instanceof HTMLInputElement) {
+								input.checked = false;
+							}
+						}
+
+						applyFilters({ resetPage: true });
+					});
+				}
+
+				if (previousButton instanceof HTMLButtonElement) {
+					previousButton.addEventListener('click', () => {
+						if (currentPage <= 1) return;
+						currentPage -= 1;
+						applyFilters();
+					});
+				}
+
+				if (nextButton instanceof HTMLButtonElement) {
+					nextButton.addEventListener('click', () => {
+						currentPage += 1;
+						applyFilters();
+					});
+				}
+
+				applyFilters();
+			})();
+		</script>
 	</body>
 </html>
 
 <style>
-	.feature-page {
+	.projects-page {
 		display: grid;
 		gap: 1.4rem;
 	}
 
-	.feature-hero,
-	.feature-card {
+	.projects-hero {
+		max-width: 62rem;
 		padding: clamp(1.5rem, 2vw, 2rem);
 	}
 
-	.feature-hero {
-		max-width: 62rem;
-	}
-
-	.feature-hero p:last-of-type,
-	.feature-card p:last-child {
+	.projects-hero p:last-child {
 		margin-bottom: 0;
-		color: rgb(var(--gray));
+		color: var(--color-subtext);
 	}
 
-	.feature-actions {
+	.projects-shell {
+		display: grid;
+		grid-template-columns: minmax(14.5rem, 18rem) minmax(0, 1fr);
+		gap: 1rem;
+		align-items: start;
+	}
+
+	.projects-sidebar,
+	.project-empty,
+	.projects-pagination {
+		padding: 1.35rem;
+	}
+
+	.projects-sidebar {
+		position: sticky;
+		top: 6rem;
+		display: grid;
+		gap: 1.2rem;
+	}
+
+	.projects-sidebar__section {
+		display: grid;
+		gap: 0.75rem;
+	}
+
+	.projects-sidebar__label {
+		margin: 0;
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-subtext);
+	}
+
+	.projects-sidebar__search {
+		width: 100%;
+		padding: 0.85rem 0.95rem;
+		border: 1px solid var(--color-border);
+		border-radius: 18px;
+		background: rgba(255, 255, 255, 0.86);
+		color: var(--color-text);
+		outline: none;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			background-color 180ms ease;
+	}
+
+	.projects-sidebar__search:focus {
+		border-color: rgba(153, 230, 255, 0.9);
+		box-shadow: 0 0 0 4px rgba(153, 230, 255, 0.16);
+		background: rgba(255, 255, 255, 0.94);
+	}
+
+	.projects-filter-list {
+		display: grid;
+		gap: 0.65rem;
+	}
+
+	.projects-filter-option {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.8rem;
-		margin-top: 1.4rem;
+		align-items: center;
+		gap: 0.7rem;
+		padding: 0.8rem 0.9rem;
+		border: 1px solid var(--color-border);
+		border-radius: 18px;
+		background: rgba(255, 255, 255, 0.82);
+		cursor: pointer;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			background-color 180ms ease;
 	}
 
-	.feature-grid {
+	.projects-filter-option:hover {
+		transform: translateY(-1px);
+		border-color: rgba(153, 230, 255, 0.75);
+		box-shadow: 0 10px 22px rgba(112, 159, 176, 0.08);
+	}
+
+	.projects-filter-option input {
+		width: 1rem;
+		height: 1rem;
+		margin: 0;
+		accent-color: var(--accent);
+	}
+
+	.projects-filter-option span {
+		font-size: 0.95rem;
+		font-weight: 700;
+	}
+
+	.projects-sidebar__reset {
+		width: 100%;
+	}
+
+	.projects-sidebar__summary,
+	.projects-content__hint,
+	.project-tile p,
+	.project-empty {
+		margin: 0;
+		color: var(--color-subtext);
+	}
+
+	.projects-content {
+		display: grid;
+		gap: 1rem;
+		align-content: start;
+	}
+
+	.projects-grid {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 1rem;
+		align-items: start;
 	}
 
-	.feature-card h2 {
-		font-size: 1.45rem;
+	.project-tile {
+		display: grid;
+		grid-template-rows: 50% minmax(0, 50%);
+		aspect-ratio: 1 / 1;
+		overflow: hidden;
+		color: inherit;
+		text-decoration: none;
+		width: 100%;
+		transition:
+			transform 180ms ease,
+			box-shadow 180ms ease,
+			border-color 180ms ease;
 	}
 
-	@media (max-width: 860px) {
-		.feature-grid {
+	.project-tile:hover {
+		transform: translateY(-3px);
+		border-color: rgba(153, 230, 255, 0.92);
+		box-shadow: 0 22px 40px rgba(112, 159, 176, 0.14);
+	}
+
+	.project-tile__media {
+		position: relative;
+		overflow: hidden;
+		background: linear-gradient(135deg, rgba(204, 255, 255, 0.62), rgba(255, 214, 232, 0.34));
+	}
+
+	.project-tile__media img,
+	.project-tile__placeholder {
+		width: 100%;
+		height: 100%;
+	}
+
+	.project-tile__media img {
+		object-fit: cover;
+		transition: transform 240ms ease;
+	}
+
+	.project-tile__placeholder {
+		display: grid;
+		place-items: center;
+		background:
+			radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.22), transparent 18%),
+			linear-gradient(135deg, rgba(204, 255, 255, 0.72), rgba(255, 214, 232, 0.52));
+	}
+
+	.project-tile__placeholder span {
+		font-size: clamp(1.3rem, 3vw, 2.2rem);
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		color: rgba(24, 72, 93, 0.82);
+	}
+
+	.project-tile:hover .project-tile__media img {
+		transform: scale(1.04);
+	}
+
+	.project-tile__body {
+		display: grid;
+		gap: 0.45rem;
+		align-content: start;
+		padding: 0.78rem 0.78rem 0.85rem;
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 253, 255, 0.9));
+	}
+
+	.project-tile__meta {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.35rem;
+		font-size: 0.68rem;
+		font-weight: 700;
+		color: var(--color-subtext);
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.project-tile h2 {
+		margin: 0;
+		font-size: clamp(1rem, 1.45vw, 1.16rem);
+		line-height: 1.15;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow: hidden;
+	}
+
+	.project-tile p {
+		font-size: 0.8rem;
+		line-height: 1.45;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		overflow: hidden;
+	}
+
+	.project-tile__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-top: auto;
+	}
+
+	.project-tile__tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.28rem 0.56rem;
+		border-radius: 999px;
+		border: 1px solid rgba(153, 230, 255, 0.42);
+		background: rgba(230, 250, 255, 0.88);
+		color: var(--color-link-hover);
+		font-size: 0.7rem;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.project-empty {
+		grid-column: 1 / -1;
+	}
+
+	.projects-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.8rem;
+	}
+
+	.projects-pagination__button {
+		min-width: 5.5rem;
+		padding: 0.72rem 0.95rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.88);
+		color: var(--color-text);
+		font: inherit;
+		font-size: 0.92rem;
+		font-weight: 700;
+		cursor: pointer;
+		transition:
+			transform 180ms ease,
+			border-color 180ms ease,
+			box-shadow 180ms ease,
+			background-color 180ms ease;
+	}
+
+	.projects-pagination__button:hover:not(:disabled) {
+		transform: translateY(-1px);
+		border-color: rgba(153, 230, 255, 0.76);
+		box-shadow: 0 10px 22px rgba(112, 159, 176, 0.08);
+	}
+
+	.projects-pagination__button:disabled {
+		opacity: 0.45;
+		cursor: not-allowed;
+	}
+
+	.projects-pagination__status {
+		margin: 0;
+		color: var(--color-subtext);
+		font-size: 0.92rem;
+		font-weight: 700;
+	}
+
+	.project-tile[hidden],
+	.project-empty[hidden],
+	.projects-pagination[hidden] {
+		display: none !important;
+	}
+
+	@media (max-width: 980px) {
+		.projects-shell {
 			grid-template-columns: 1fr;
+		}
+
+		.projects-sidebar {
+			position: static;
+		}
+
+		.projects-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 720px) {
+		.projects-sidebar,
+		.project-empty,
+		.projects-pagination {
+			padding: 1.1rem;
+		}
+
+		.projects-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.projects-pagination {
+			flex-wrap: wrap;
 		}
 	}
 </style>

@@ -1,0 +1,284 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+
+type Props = CollectionEntry<'projects'>['data'];
+
+const { title, summary, teaser, status, year, role, tags = [], stack = [], coverImage } = Astro.props;
+const usesPublicCoverImage = typeof coverImage === 'string';
+const resolvedHeroImage =
+	coverImage &&
+	(usesPublicCoverImage
+		? { src: coverImage }
+		: {
+				src: coverImage.src,
+				width: coverImage.width,
+				height: coverImage.height,
+			});
+---
+
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`${title} | 项目展示`} description={summary} />
+	</head>
+
+	<body class="project-post-page">
+		<Header />
+		<main class="project-post-page__main">
+			<a class="project-post-back" href="/projects">返回项目展示</a>
+
+			<article class="project-post-layout">
+				<section class="surface-card project-post-hero">
+					<div class="project-post-hero__copy">
+						<p class="eyebrow">Project Detail</p>
+						<h1>{title}</h1>
+						<p class="project-post-summary">{summary}</p>
+						{
+							teaser && <p class="project-post-teaser">{teaser}</p>
+						}
+						{
+							tags.length > 0 && (
+								<div class="project-post-tags" aria-label="项目标签">
+									{
+										tags.map((tag) => (
+											<span class="project-post-tag">{tag}</span>
+										))
+									}
+								</div>
+							)
+						}
+					</div>
+
+					{
+						resolvedHeroImage && (
+							<figure class="project-post-hero__media">
+								<img
+									src={resolvedHeroImage.src}
+									width={resolvedHeroImage.width}
+									height={resolvedHeroImage.height}
+									alt={title}
+									loading="eager"
+									decoding="async"
+								/>
+							</figure>
+						)
+					}
+				</section>
+
+				<section class="project-post-grid">
+					<aside class="surface-card project-post-meta">
+						<p class="project-post-meta__eyebrow">Snapshot</p>
+						<h2>项目信息</h2>
+						<dl class="project-post-facts">
+							<div>
+								<dt>当前状态</dt>
+								<dd>{status}</dd>
+							</div>
+							<div>
+								<dt>项目年份</dt>
+								<dd>{year}</dd>
+							</div>
+							<div>
+								<dt>开发方式</dt>
+								<dd>{role}</dd>
+							</div>
+							<div>
+								<dt>技术栈</dt>
+								<dd>{stack.join(' / ') || '待补充'}</dd>
+							</div>
+						</dl>
+					</aside>
+
+					<section class="surface-card project-post-content prose">
+						<slot />
+					</section>
+				</section>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.project-post-page__main {
+		width: min(1120px, calc(100% - 1.2rem));
+		margin: 0 auto;
+		padding-top: 1.4rem;
+	}
+
+	.project-post-back {
+		display: inline-flex;
+		margin-bottom: 1rem;
+		color: var(--color-link-hover);
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.project-post-layout {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.project-post-hero,
+	.project-post-meta,
+	.project-post-content {
+		padding: clamp(1.35rem, 2.2vw, 1.9rem);
+	}
+
+	.project-post-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1.05fr) minmax(18rem, 0.95fr);
+		gap: 1rem;
+		align-items: stretch;
+	}
+
+	.project-post-hero__copy {
+		display: grid;
+		gap: 0.9rem;
+		align-content: start;
+	}
+
+	.project-post-hero__copy h1 {
+		margin-bottom: 0;
+	}
+
+	.project-post-summary,
+	.project-post-teaser {
+		margin: 0;
+		color: var(--color-subtext);
+	}
+
+	.project-post-summary {
+		font-size: 1.04rem;
+		line-height: 1.72;
+	}
+
+	.project-post-teaser {
+		line-height: 1.7;
+	}
+
+	.project-post-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+	}
+
+	.project-post-tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.36rem 0.72rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: rgba(230, 250, 255, 0.84);
+		color: var(--color-link-hover);
+		font-size: 0.84rem;
+		font-weight: 700;
+		line-height: 1.2;
+	}
+
+	.project-post-hero__media {
+		margin: 0;
+		overflow: hidden;
+		border-radius: 24px;
+		background: linear-gradient(135deg, rgba(204, 255, 255, 0.62), rgba(255, 214, 232, 0.34));
+	}
+
+	.project-post-hero__media img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		min-height: 100%;
+		object-fit: cover;
+	}
+
+	.project-post-grid {
+		display: grid;
+		grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
+		gap: 1rem;
+		align-items: start;
+	}
+
+	.project-post-meta {
+		display: grid;
+		gap: 0.9rem;
+		position: sticky;
+		top: 6rem;
+	}
+
+	.project-post-meta h2,
+	.project-post-content :global(h2:first-child) {
+		margin-top: 0;
+	}
+
+	.project-post-meta__eyebrow {
+		margin: 0;
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-subtext);
+	}
+
+	.project-post-facts {
+		display: grid;
+		gap: 0.8rem;
+		margin: 0;
+	}
+
+	.project-post-facts div {
+		display: grid;
+		gap: 0.22rem;
+		padding: 0.85rem 0.95rem;
+		border: 1px solid var(--color-border);
+		border-radius: 20px;
+		background: rgba(255, 255, 255, 0.76);
+	}
+
+	.project-post-facts dt {
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-subtext);
+	}
+
+	.project-post-facts dd {
+		margin: 0;
+		color: var(--color-text);
+		font-weight: 700;
+	}
+
+	.project-post-content {
+		min-width: 0;
+	}
+
+	@media (max-width: 920px) {
+		.project-post-hero,
+		.project-post-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.project-post-meta {
+			position: static;
+		}
+
+		.project-post-hero__media img {
+			aspect-ratio: 16 / 9;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.project-post-page__main {
+			width: calc(100% - 1rem);
+			padding-top: 1rem;
+		}
+
+		.project-post-hero,
+		.project-post-meta,
+		.project-post-content {
+			padding: 1.15rem;
+		}
+	}
+</style>

@@ -24,4 +24,26 @@ const blog = defineCollection({
 		}),
 });
 
-export const collections = { blog };
+const projects = defineCollection({
+	loader: glob({ base: './src/content/projects', pattern: '**/*.{md,mdx}' }),
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(),
+			summary: z.string(),
+			teaser: z.string().optional().default(''),
+			tags: z.array(z.string().trim().min(1)).optional().default([]),
+			status: z.string(),
+			year: z.string(),
+			role: z.string(),
+			stack: z.array(z.string().trim().min(1)).optional().default([]),
+			order: z.number().int().optional(),
+			coverImage: z
+				.union([
+					z.string().trim().regex(/^\/.+/, 'Public cover images must start with "/"'),
+					image(),
+				])
+				.optional(),
+		}),
+});
+
+export const collections = { blog, projects };

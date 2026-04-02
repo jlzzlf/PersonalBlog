@@ -1,93 +1,498 @@
----
+﻿---
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
+import { galleryItems } from '../data/gallery';
 
-const pageTitle = `关于 | ${SITE_TITLE}`;
+const pageTitle = `更多 | ${SITE_TITLE}`;
+const galleryPreviewItems = galleryItems.slice(0, 4);
 
-const cards = [
+const mediaReviews = [
 	{
-		title: '这个博客会写什么',
-		text: '以学习笔记、项目实践和阶段性思考为主，也会保留一点生活气息，让它更像真正属于自己的空间。',
+		type: '动画',
+		title: '葬送的芙莉莲',
+		score: 9.4,
+		comment: '节奏很稳，画面和情绪留白都很舒服，是那种会想慢慢看下去的作品。',
+		tags: ['氛围感', '旅行感', '角色关系'],
 	},
 	{
-		title: '为什么先从首页开始',
-		text: '首页决定了站点的整体气质，也决定后面新增模块时有没有统一的视觉与结构基础。',
+		type: '游戏',
+		title: '吸血鬼幸存者',
+		score: 9.1,
+		comment: '反馈非常快，成长节奏抓人，短时间内就能让人进入“再来一局”的状态。',
+		tags: ['成长循环', '反馈强', '高重复游玩'],
 	},
 	{
-		title: '接下来会继续补什么',
-		text: '个人介绍、项目展示、内容分类、联系入口，以及一些更细的页面动效与排版细节。',
+		type: '动画',
+		title: '孤独摇滚！',
+		score: 8.9,
+		comment: '角色演出很有记忆点，夸张和真实之间平衡得很好，能量很足。',
+		tags: ['演出', '角色塑造', '轻松感'],
 	},
+];
+
+const widgetNotes = [
+	'图片库现在只在这里展示少量预览图，完整内容会进入独立图库页。',
+	'评分与评论后面可以继续改成单独数据源，方便持续补充。',
+	'如果还想扩展，这一页也适合继续加收藏夹、追番清单和游玩记录。',
 ];
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={pageTitle} description="关于这个博客与后续建设方向。" />
+		<BaseHead title={pageTitle} description="更多页面：放一些图片收藏、评分评论和杂项小组件。" />
 	</head>
 	<body>
 		<Header />
-		<main class="about-page">
-			<section class="surface-card about-hero">
-				<p class="eyebrow">About This Blog</p>
-				<h1>这里会慢慢长成一个更像“我”的地方。</h1>
-				<p>
-					当前版本先专注于干净的内容表达和稳定的页面结构。后面我们可以继续把它扩展成一个完整的
-					个人博客主页，让每次新增内容都自然地融入这个站点。
-				</p>
+		<main class="extras-page">
+			<section class="surface-card extras-hero">
+				<div class="extras-hero__copy">
+					<p class="eyebrow">More</p>
+					<h1>把一些不适合放首页，但又很想保留的内容，集中放在这里。</h1>
+					<p>
+						这个页面现在更像一个杂项实验区。后面可以慢慢加上图片库、评分评论、收藏记录，或者别的轻量小组件，让它变成更有生活感的角落。
+					</p>
+				</div>
+				<div class="extras-hero__chips" aria-label="页面内容概览">
+					<span>图片库预览</span>
+					<span>游戏 / 动漫评分</span>
+					<span>短评记录</span>
+					<span>杂项小组件</span>
+				</div>
 			</section>
 
-			<section class="about-grid">
-				{
-					cards.map((card) => (
-						<article class="surface-card about-card">
-							<h2>{card.title}</h2>
-							<p>{card.text}</p>
-						</article>
-					))
-				}
+			<section class="extras-grid">
+				<article class="surface-card widget-card widget-card--gallery">
+					<div class="widget-card__header">
+						<p class="widget-card__eyebrow">Gallery</p>
+						<div class="widget-card__title-row">
+							<div>
+								<h2>图片库</h2>
+								<p>这里只放几张预览图，点击后进入独立图片库页面查看照片墙。</p>
+							</div>
+							<a class="button secondary widget-card__link" href="/gallery">进入图片库</a>
+						</div>
+					</div>
+
+					<div class="gallery-preview-grid" aria-label="图片库预览" data-gallery-preview-grid data-preview-limit="4">
+						{
+							galleryPreviewItems.map((item, index) => (
+								<a
+									class:list={['gallery-preview-item', { 'gallery-preview-item--large': index === 0 }]}
+									href="/gallery"
+									aria-label="打开图片库"
+								>
+									<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+								</a>
+							))
+						}
+					</div>
+				</article>
+
+				<article class="surface-card widget-card widget-card--reviews">
+					<div class="widget-card__header">
+						<p class="widget-card__eyebrow">Reviews</p>
+						<h2>游戏 / 动漫评分与评论</h2>
+						<p>以后这里可以像“迷你评分墙”一样，持续补充看过或玩过的内容。</p>
+					</div>
+					<div class="review-list">
+						{
+							mediaReviews.map((item) => (
+								<article class="review-card">
+									<div class="review-card__top">
+										<div>
+											<p class="review-card__type">{item.type}</p>
+											<h3>{item.title}</h3>
+										</div>
+										<div class="review-card__score">
+											<span>{item.score.toFixed(1)}</span>
+											<small>/ 10</small>
+										</div>
+									</div>
+									<p class="review-card__comment">{item.comment}</p>
+									<div class="review-card__tags" aria-label="评价关键词">
+										{
+											item.tags.map((tag) => (
+												<span>{tag}</span>
+											))
+										}
+									</div>
+								</article>
+							))
+						}
+					</div>
+				</article>
+
+				<article class="surface-card widget-card widget-card--notes">
+					<div class="widget-card__header">
+						<p class="widget-card__eyebrow">Next Widgets</p>
+						<h2>这个页面后面还能放什么</h2>
+					</div>
+					<ul class="widget-note-list">
+						{
+							widgetNotes.map((note) => (
+								<li>{note}</li>
+							))
+						}
+					</ul>
+				</article>
+
+				<article class="surface-card widget-card widget-card--tracker">
+					<div class="widget-card__header">
+						<p class="widget-card__eyebrow">Tracker</p>
+						<h2>最近想补上的小模块</h2>
+					</div>
+					<div class="tracker-list">
+						<div class="tracker-item">
+							<strong>图片分类</strong>
+							<span>后面可以继续把插画、截图、横幅素材拆成不同子分类。</span>
+						</div>
+						<div class="tracker-item">
+							<strong>评分数据化</strong>
+							<span>把评分和评论改成单独文件，后续新增会比直接写死在页面里更舒服。</span>
+						</div>
+						<div class="tracker-item">
+							<strong>更多收藏</strong>
+							<span>后面可以继续加音乐、壁纸、角色偏好和游玩记录。</span>
+						</div>
+					</div>
+				</article>
 			</section>
 		</main>
 		<Footer />
+
+		<script is:inline>
+			(() => {
+				const root = document.querySelector('[data-gallery-preview-grid]');
+				if (!(root instanceof HTMLElement)) return;
+
+				const previewLimit = Number(root.dataset.previewLimit || '4');
+
+				const createPreviewLink = (item, index) => {
+					const link = document.createElement('a');
+					link.href = '/gallery';
+					link.className = `gallery-preview-item${index === 0 ? ' gallery-preview-item--large' : ''}`;
+					link.setAttribute('aria-label', '打开图片库');
+
+					const image = document.createElement('img');
+					image.src = item.src;
+					image.alt = item.alt || '图片库预览图';
+					image.loading = 'lazy';
+					image.decoding = 'async';
+
+					link.append(image);
+					return link;
+				};
+
+				const renderPreview = (items) => {
+					root.replaceChildren(...items.slice(0, previewLimit).map((item, index) => createPreviewLink(item, index)));
+				};
+
+				fetch('/api/gallery', { headers: { Accept: 'application/json' } })
+					.then((response) => (response.ok ? response.json() : null))
+					.then((data) => {
+						if (!data || !Array.isArray(data.images) || data.images.length === 0) return;
+						renderPreview(data.images);
+					})
+					.catch(() => {
+						// Keep the static preview as a fallback when the runtime API is unavailable.
+					});
+			})();
+		</script>
 	</body>
 </html>
 
 <style>
-	.about-page {
+	.extras-page {
 		display: grid;
-		gap: 1.4rem;
-	}
-
-	.about-hero,
-	.about-card {
-		padding: clamp(1.5rem, 2vw, 2rem);
-	}
-
-	.about-hero {
-		max-width: 56rem;
-	}
-
-	.about-hero p:last-child,
-	.about-card p:last-child {
-		margin-bottom: 0;
-		color: rgb(var(--gray));
-	}
-
-	.about-grid {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 1rem;
 	}
 
-	.about-card h2 {
-		font-size: 1.45rem;
+	.extras-hero,
+	.widget-card {
+		padding: clamp(1.35rem, 2vw, 1.9rem);
 	}
 
-	@media (max-width: 860px) {
-		.about-grid {
+	.extras-hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+		gap: 1rem;
+		align-items: stretch;
+	}
+
+	.extras-hero__copy {
+		display: grid;
+		gap: 0.95rem;
+	}
+
+	.extras-hero__copy h1 {
+		margin-bottom: 0;
+		font-size: clamp(2.2rem, 4vw, 3.8rem);
+	}
+
+	.extras-hero__copy p:last-child,
+	.widget-card__header p,
+	.review-card__comment {
+		margin: 0;
+		color: var(--color-subtext);
+	}
+
+	.extras-hero__chips {
+		display: flex;
+		flex-wrap: wrap;
+		align-content: start;
+		gap: 0.65rem;
+		padding: 1rem;
+		border: 1px solid rgba(153, 230, 255, 0.42);
+		border-radius: 24px;
+		background:
+			radial-gradient(circle at top left, rgba(204, 255, 255, 0.5), transparent 45%),
+			linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(230, 250, 255, 0.72));
+	}
+
+	.extras-hero__chips span {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.48rem 0.86rem;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.78);
+		border: 1px solid rgba(153, 230, 255, 0.5);
+		color: var(--color-link-hover);
+		font-size: 0.84rem;
+		font-weight: 700;
+	}
+
+	.extras-grid {
+		display: grid;
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		gap: 1rem;
+	}
+
+	.widget-card {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.widget-card--gallery {
+		grid-column: span 7;
+	}
+
+	.widget-card--reviews {
+		grid-column: span 5;
+	}
+
+	.widget-card--notes,
+	.widget-card--tracker {
+		grid-column: span 6;
+	}
+
+	.widget-card__header {
+		display: grid;
+		gap: 0.35rem;
+	}
+
+	.widget-card__header h2 {
+		margin: 0;
+		font-size: clamp(1.5rem, 2.2vw, 2rem);
+	}
+
+	.widget-card__eyebrow {
+		margin: 0;
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-subtext);
+	}
+
+	.widget-card__title-row {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.widget-card__link {
+		flex: 0 0 auto;
+	}
+
+	.gallery-preview-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.85rem;
+	}
+
+	.gallery-preview-item {
+		display: block;
+		overflow: hidden;
+		border-radius: 24px;
+		border: 1px solid var(--color-border);
+		background: rgba(255, 255, 255, 0.8);
+		box-shadow: 0 14px 28px rgba(112, 159, 176, 0.08);
+		transition:
+			transform 180ms ease,
+			box-shadow 180ms ease,
+			border-color 180ms ease;
+	}
+
+	.gallery-preview-item:hover {
+		transform: translateY(-2px);
+		border-color: rgba(153, 230, 255, 0.76);
+		box-shadow: 0 18px 32px rgba(112, 159, 176, 0.12);
+	}
+
+	.gallery-preview-item--large {
+		grid-column: span 2;
+	}
+
+	.gallery-preview-item img {
+		display: block;
+		width: 100%;
+		height: 14rem;
+		object-fit: cover;
+	}
+
+	.gallery-preview-item--large img {
+		height: 18rem;
+	}
+
+	.review-list,
+	.tracker-list {
+		display: grid;
+		gap: 0.8rem;
+	}
+
+	.review-card,
+	.tracker-item {
+		display: grid;
+		gap: 0.7rem;
+		padding: 1rem;
+		border: 1px solid var(--color-border);
+		border-radius: 22px;
+		background: rgba(255, 255, 255, 0.78);
+	}
+
+	.review-card__top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.85rem;
+	}
+
+	.review-card__type {
+		margin: 0 0 0.3rem;
+		color: var(--color-subtext);
+		font-size: 0.74rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.review-card h3 {
+		margin: 0;
+		font-size: 1.2rem;
+	}
+
+	.review-card__score {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.1rem;
+		padding: 0.45rem 0.7rem;
+		border-radius: 18px;
+		background: linear-gradient(135deg, rgba(204, 255, 255, 0.78), rgba(255, 214, 232, 0.54));
+		color: var(--color-link-hover);
+		font-weight: 700;
+	}
+
+	.review-card__score span {
+		font-size: 1.28rem;
+		line-height: 1;
+	}
+
+	.review-card__score small {
+		font-size: 0.74rem;
+	}
+
+	.review-card__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+	}
+
+	.review-card__tags span {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.34rem 0.68rem;
+		border-radius: 999px;
+		background: rgba(230, 250, 255, 0.82);
+		border: 1px solid rgba(153, 230, 255, 0.45);
+		color: var(--color-link-hover);
+		font-size: 0.78rem;
+		font-weight: 700;
+	}
+
+	.widget-note-list {
+		display: grid;
+		gap: 0.9rem;
+		margin: 0;
+		padding-left: 1.15rem;
+	}
+
+	.widget-note-list li::marker {
+		color: var(--accent);
+	}
+
+	.tracker-item strong {
+		font-size: 1rem;
+	}
+
+	.tracker-item span {
+		color: var(--color-subtext);
+		line-height: 1.6;
+	}
+
+	@media (max-width: 980px) {
+		.extras-hero,
+		.extras-grid {
 			grid-template-columns: 1fr;
+		}
+
+		.widget-card--gallery,
+		.widget-card--reviews,
+		.widget-card--notes,
+		.widget-card--tracker {
+			grid-column: auto;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.extras-hero,
+		.widget-card {
+			padding: 1.15rem;
+		}
+
+		.widget-card__title-row {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.gallery-preview-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.gallery-preview-item--large {
+			grid-column: auto;
+		}
+
+		.gallery-preview-item img,
+		.gallery-preview-item--large img {
+			height: 13rem;
+		}
+
+		.review-card__top {
+			flex-direction: column;
 		}
 	}
 </style>

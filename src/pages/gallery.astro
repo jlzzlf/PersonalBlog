@@ -1,0 +1,174 @@
+﻿---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+import { galleryItems } from '../data/gallery';
+
+const pageTitle = `图片库 | ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description="图片库页面，使用 R2 CDN 地址展示照片墙。" />
+	</head>
+	<body>
+		<Header />
+		<main class="gallery-page">
+			<section class="surface-card gallery-hero">
+				<div class="gallery-hero__copy">
+					<p class="eyebrow">Gallery</p>
+					<h1>图片库</h1>
+					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面直接用照片墙方式展示。</p>
+				</div>
+				<div class="gallery-hero__meta">
+					<span data-gallery-count>{galleryItems.length} 张图片</span>
+					<a class="button secondary" href="/about">返回更多</a>
+				</div>
+			</section>
+
+			<section class="photo-wall" aria-label="图片墙" data-photo-wall>
+				{
+					galleryItems.map((item) => (
+						<figure class="photo-wall__item">
+							<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+						</figure>
+					))
+				}
+			</section>
+		</main>
+		<Footer />
+
+		<script is:inline>
+			(() => {
+				const wall = document.querySelector('[data-photo-wall]');
+				const count = document.querySelector('[data-gallery-count]');
+				if (!(wall instanceof HTMLElement)) return;
+
+				const createWallItem = (item) => {
+					const figure = document.createElement('figure');
+					figure.className = 'photo-wall__item';
+
+					const image = document.createElement('img');
+					image.src = item.src;
+					image.alt = item.alt || '图片库图片';
+					image.loading = 'lazy';
+					image.decoding = 'async';
+
+					figure.append(image);
+					return figure;
+				};
+
+				const renderWall = (items) => {
+					wall.replaceChildren(...items.map((item) => createWallItem(item)));
+					if (count instanceof HTMLElement) {
+						count.textContent = `${items.length} 张图片`;
+					}
+				};
+
+				fetch('/api/gallery', { headers: { Accept: 'application/json' } })
+					.then((response) => (response.ok ? response.json() : null))
+					.then((data) => {
+						if (!data || !Array.isArray(data.images) || data.images.length === 0) return;
+						renderWall(data.images);
+					})
+					.catch(() => {
+						// Keep the static wall as a fallback when the runtime API is unavailable.
+					});
+			})();
+		</script>
+	</body>
+</html>
+
+<style>
+	.gallery-page {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.gallery-hero {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: clamp(1.35rem, 2vw, 1.9rem);
+	}
+
+	.gallery-hero__copy {
+		display: grid;
+		gap: 0.8rem;
+		max-width: 42rem;
+	}
+
+	.gallery-hero__copy h1 {
+		margin-bottom: 0;
+	}
+
+	.gallery-hero__copy p:last-child,
+	.gallery-hero__meta span {
+		margin: 0;
+		color: var(--color-subtext);
+	}
+
+	.gallery-hero__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.8rem;
+	}
+
+	.gallery-hero__meta span {
+		font-size: 0.95rem;
+		font-weight: 700;
+	}
+
+	.photo-wall {
+		column-count: 4;
+		column-gap: 1rem;
+	}
+
+	.photo-wall__item {
+		margin: 0 0 1rem;
+		break-inside: avoid;
+		overflow: hidden;
+		border-radius: 24px;
+		border: 1px solid var(--color-border);
+		background: rgba(255, 255, 255, 0.82);
+		box-shadow: 0 16px 30px rgba(112, 159, 176, 0.09);
+	}
+
+	.photo-wall__item img {
+		display: block;
+		width: 100%;
+		height: auto;
+	}
+
+	@media (max-width: 980px) {
+		.photo-wall {
+			column-count: 3;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.gallery-hero {
+			padding: 1.15rem;
+		}
+
+		.photo-wall {
+			column-count: 2;
+			column-gap: 0.8rem;
+		}
+
+		.photo-wall__item {
+			margin-bottom: 0.8rem;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.photo-wall {
+			column-count: 1;
+		}
+	}
+</style>

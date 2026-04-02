@@ -1,0 +1,12 @@
+name = "personal-blog"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-04-02"
+
+[vars]
+GALLERY_PUBLIC_BASE_URL = "https://cdn.joylife-zhang.site"
+GALLERY_OBJECT_PREFIX = "picture/"
+
+[[r2_buckets]]
+binding = "MUSIC_BUCKET"
+bucket_name = "blog-video"
+remote = true
