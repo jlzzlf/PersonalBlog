@@ -40,7 +40,16 @@ import { profileActionButtons, profileContacts, profileContent } from '../../dat
 				profileContacts.map((item) => (
 					<p class="profile-contact">
 						<span>{item.label}</span>
-						<a href={item.href}>{item.value}</a>
+						<button
+							class="profile-contact__copy"
+							type="button"
+							data-copy-text={item.value}
+							data-copy-label={item.label}
+							aria-label={`复制${item.label}：${item.value}`}
+							title={`点击复制${item.label}`}
+						>
+							{item.value}
+						</button>
 					</p>
 				))
 			}

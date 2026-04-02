@@ -13,12 +13,15 @@ import HomeRecentPostsCard from '../components/home/HomeRecentPostsCard.astro';
 import HomeSiteStatsCard from '../components/home/HomeSiteStatsCard.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { buildHomePageViewModel } from '../lib/homepage';
+import { buildHomeProjectShowcaseItems, sortProjectEntries } from '../lib/projects';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+const projectEntries = sortProjectEntries(await getCollection('projects'));
 
 const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(posts);
+const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 ---
 
 <!doctype html>
@@ -37,7 +40,7 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 
 					<section class="secondary-band">
 						<HomeSiteStatsCard stats={siteStats} />
-						<HomeProjectShowcaseCard />
+						<HomeProjectShowcaseCard items={projectShowcaseItems} />
 					</section>
 
 					<HomeQuickNavCard />
@@ -352,13 +355,26 @@ const { recentPosts, siteStats, archiveEntryStats } = buildHomePageViewModel(pos
 			color: var(--color-subtext);
 		}
 
-		.profile-contact a {
+		.profile-contact__copy {
+			padding: 0;
+			border: 0;
+			background: transparent;
 			color: var(--color-link-hover);
+			font: inherit;
 			text-decoration: none;
+			cursor: pointer;
+			transition:
+				color 180ms ease,
+				opacity 180ms ease;
 		}
 
-		.profile-contact a:hover {
+		.profile-contact__copy:hover {
+			opacity: 0.82;
 			text-decoration: underline;
+		}
+
+		.profile-contact__copy.is-copied {
+			color: #0f766e;
 		}
 
 		.profile-actions {

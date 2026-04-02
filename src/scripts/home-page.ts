@@ -36,6 +36,7 @@ const mountHomePage = () => {
 
 	refreshHomeLayout();
 	let clockTimer = 0;
+	const removeCopyHandlers: Array<() => void> = [];
 	const currentTime = home.querySelector('[data-current-time]');
 	if (currentTime instanceof HTMLElement) {
 		const updateClock = () => {
@@ -56,10 +57,56 @@ const mountHomePage = () => {
 		}, 1000);
 	}
 
+	const copyButtons = Array.from(home.querySelectorAll('[data-copy-text]'));
+	for (const button of copyButtons) {
+		if (!(button instanceof HTMLButtonElement)) continue;
+
+		const originalText = button.textContent ?? '';
+		let resetTimer = 0;
+		const handleClick = async () => {
+			const copyText = button.dataset.copyText ?? '';
+			if (!copyText) return;
+
+			try {
+				await navigator.clipboard.writeText(copyText);
+				button.textContent = '已复制';
+				button.classList.add('is-copied');
+			} catch {
+				button.textContent = '复制失败';
+				button.classList.add('is-copied');
+			}
+
+			if (resetTimer) {
+				window.clearTimeout(resetTimer);
+			}
+
+			resetTimer = window.setTimeout(() => {
+				button.textContent = originalText;
+				button.classList.remove('is-copied');
+				resetTimer = 0;
+			}, 1600);
+		};
+
+		button.addEventListener('click', handleClick);
+		removeCopyHandlers.push(() => {
+			button.removeEventListener('click', handleClick);
+			if (resetTimer) {
+				window.clearTimeout(resetTimer);
+				resetTimer = 0;
+			}
+			button.textContent = originalText;
+			button.classList.remove('is-copied');
+		});
+	}
+
 	state.cleanup = () => {
 		if (clockTimer) {
 			window.clearInterval(clockTimer);
 			clockTimer = 0;
+		}
+
+		for (const removeHandler of removeCopyHandlers) {
+			removeHandler();
 		}
 	};
 };

@@ -1,13 +1,19 @@
 ---
-import { projectShowcaseItems } from '../../data/home/projects';
+import type { HomeProjectShowcaseItem } from '../../lib/projects';
+
+interface Props {
+	items: HomeProjectShowcaseItem[];
+}
+
+const { items } = Astro.props;
 ---
 
 <article class="surface-card panel project-showcase-card">
 	<p class="eyebrow">Project Showcase</p>
 	<h2>项目展示</h2>
-	<div class:list={['project-showcase-grid', { 'is-single': projectShowcaseItems.length === 1 }]} aria-label="项目展示">
+	<div class:list={['project-showcase-grid', { 'is-single': items.length === 1 }]} aria-label="项目展示">
 		{
-			projectShowcaseItems.map((item) => (
+			items.map((item) => (
 				<a
 					class:list={['project-showcase-tile', { 'is-more': item.isMore }]}
 					href={item.href}

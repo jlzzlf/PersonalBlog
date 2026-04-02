@@ -4,15 +4,10 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import { SITE_TITLE } from '../consts';
+import { sortProjectEntries } from '../lib/projects';
 
 const pageTitle = `项目展示 | ${SITE_TITLE}`;
-const entries = (await getCollection('projects')).sort(
-	(first, second) =>
-		(first.data.order ?? Number.MAX_SAFE_INTEGER) -
-			(second.data.order ?? Number.MAX_SAFE_INTEGER) ||
-		second.data.year.localeCompare(first.data.year, 'zh-CN') ||
-		first.data.title.localeCompare(second.data.title, 'zh-CN'),
-);
+const entries = sortProjectEntries(await getCollection('projects'));
 
 const projectTags = [...new Set(entries.flatMap((entry) => entry.data.tags ?? []))].sort((a, b) =>
 	a.localeCompare(b, 'zh-CN'),
