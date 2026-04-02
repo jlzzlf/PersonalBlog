@@ -8,11 +8,11 @@ import { galleryItems } from '../data/gallery';
 const pageTitle = `图片库 | ${SITE_TITLE}`;
 const galleryFallbackJson = JSON.stringify(galleryItems);
 const photoFramePresets = [
-	{ tilt: '-1.4deg', lift: '0px' },
-	{ tilt: '1.8deg', lift: '-4px' },
-	{ tilt: '-0.8deg', lift: '2px' },
-	{ tilt: '2.1deg', lift: '3px' },
-	{ tilt: '-2.2deg', lift: '-2px' },
+	{ tilt: '-0.65deg', lift: '0px' },
+	{ tilt: '0.8deg', lift: '-1px' },
+	{ tilt: '-0.45deg', lift: '1px' },
+	{ tilt: '0.95deg', lift: '1px' },
+	{ tilt: '-0.9deg', lift: '0px' },
 ];
 
 const getPhotoFrameStyle = (index: number) => {
@@ -44,7 +44,11 @@ const getPhotoFrameStyle = (index: number) => {
 			<section class="photo-wall" aria-label="图片墙" data-photo-wall>
 				{
 					galleryItems.map((item, index) => (
-						<figure class="photo-wall__item" data-shape="square" style={`${getPhotoFrameStyle(index)} --photo-ratio: 4 / 5; --masonry-span: 24;`}>
+						<figure
+							class="photo-wall__item photo-wall__item--ready"
+							data-shape="square"
+							style={`${getPhotoFrameStyle(index)} --photo-ratio: 4 / 5; grid-row-end: span 30;`}
+						>
 							<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
 						</figure>
 					))
@@ -75,8 +79,8 @@ const getPhotoFrameStyle = (index: number) => {
 				};
 
 				const applyRandomFrame = (element) => {
-					const tilt = (Math.random() * 5.6 - 2.8).toFixed(2);
-					const lift = (Math.random() * 10 - 5).toFixed(1);
+					const tilt = (Math.random() * 2.2 - 1.1).toFixed(2);
+					const lift = (Math.random() * 4 - 2).toFixed(1);
 					element.style.setProperty('--frame-tilt', `${tilt}deg`);
 					element.style.setProperty('--frame-lift', `${lift}px`);
 				};
@@ -88,14 +92,20 @@ const getPhotoFrameStyle = (index: number) => {
 					return 'square';
 				};
 
-				const measureItem = (figure) => {
+				const measureItem = (figure, image) => {
 					const styles = window.getComputedStyle(wall);
 					const rowSize = Number.parseFloat(styles.gridAutoRows);
 					const rowGap = Number.parseFloat(styles.rowGap);
 					if (!Number.isFinite(rowSize) || rowSize <= 0) return;
 
-					const span = Math.max(16, Math.ceil((figure.offsetHeight + rowGap) / (rowSize + rowGap)));
-					figure.style.setProperty('--masonry-span', String(span));
+					const figureStyles = window.getComputedStyle(figure);
+					const paddingBlock =
+						Number.parseFloat(figureStyles.paddingTop) + Number.parseFloat(figureStyles.paddingBottom);
+					const imageHeight =
+						image instanceof HTMLImageElement ? image.getBoundingClientRect().height : figure.scrollHeight;
+					const contentHeight = Math.max(imageHeight + paddingBlock, 220);
+					const span = Math.max(16, Math.ceil((contentHeight + rowGap) / (rowSize + rowGap)));
+					figure.style.gridRowEnd = `span ${span}`;
 					figure.classList.add('photo-wall__item--ready');
 				};
 
@@ -105,7 +115,7 @@ const getPhotoFrameStyle = (index: number) => {
 					const ratio = naturalWidth / naturalHeight;
 					figure.dataset.shape = getShapeFromRatio(ratio);
 					figure.style.setProperty('--photo-ratio', `${naturalWidth} / ${naturalHeight}`);
-					window.requestAnimationFrame(() => measureItem(figure));
+					window.requestAnimationFrame(() => measureItem(figure, image));
 				};
 
 				const scheduleRefresh = () => {
@@ -114,7 +124,8 @@ const getPhotoFrameStyle = (index: number) => {
 						const items = wall.querySelectorAll('.photo-wall__item');
 						items.forEach((item) => {
 							if (item instanceof HTMLElement) {
-								measureItem(item);
+								const image = item.querySelector('img');
+								measureItem(item, image instanceof HTMLImageElement ? image : undefined);
 							}
 						});
 					});
@@ -125,7 +136,7 @@ const getPhotoFrameStyle = (index: number) => {
 					figure.className = 'photo-wall__item';
 					figure.dataset.shape = 'square';
 					figure.style.setProperty('--photo-ratio', '4 / 5');
-					figure.style.setProperty('--masonry-span', '24');
+					figure.style.gridRowEnd = 'span 30';
 					applyRandomFrame(figure);
 
 					const image = document.createElement('img');
@@ -247,7 +258,7 @@ const getPhotoFrameStyle = (index: number) => {
 	.photo-wall__item {
 		position: relative;
 		grid-column: span 4;
-		grid-row: span var(--masonry-span, 24);
+		margin: 0;
 		overflow: hidden;
 		padding: 0.85rem;
 		border-radius: 30px;
@@ -259,16 +270,10 @@ const getPhotoFrameStyle = (index: number) => {
 			0 20px 40px rgba(112, 159, 176, 0.12),
 			inset 0 1px 0 rgba(255, 255, 255, 0.84);
 		transform: translateY(var(--frame-lift, 0px)) rotate(var(--frame-tilt, 0deg));
-		opacity: 0;
 		transition:
-			opacity 220ms ease,
 			transform 180ms ease,
 			box-shadow 180ms ease,
 			border-color 180ms ease;
-	}
-
-	.photo-wall__item--ready {
-		opacity: 1;
 	}
 
 	.photo-wall__item[data-shape='portrait'] {
@@ -298,10 +303,10 @@ const getPhotoFrameStyle = (index: number) => {
 	}
 
 	.photo-wall__item:hover {
-		transform: translateY(calc(var(--frame-lift, 0px) - 6px)) rotate(var(--frame-tilt, 0deg));
+		transform: translateY(calc(var(--frame-lift, 0px) - 4px)) rotate(var(--frame-tilt, 0deg));
 		border-color: rgba(153, 230, 255, 0.82);
 		box-shadow:
-			0 26px 46px rgba(112, 159, 176, 0.18),
+			0 24px 42px rgba(112, 159, 176, 0.15),
 			inset 0 1px 0 rgba(255, 255, 255, 0.88);
 	}
 
