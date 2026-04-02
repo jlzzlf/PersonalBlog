@@ -44,14 +44,21 @@
 			const formatDiscussionLabel = (title) => {
 				const normalized = String(title || '').trim();
 				if (!normalized) return '博客评论';
-				if (normalized.startsWith('/')) return `来源 ${normalized}`;
 				return normalized;
 			};
 
+			const extractSitePath = (title) => {
+				const normalized = String(title || '').trim();
+				if (!normalized) return '';
+
+				const match = normalized.match(/\/(blog|reviews|projects|links|profile|about|archive|study-log)(?:\/[\w\u4e00-\u9fa5-]+)?\/?/i);
+				return match ? match[0].replace(/\/$/, '') : '';
+			};
+
 			const resolveCommentHref = (item) => {
-				const discussionTitle = String(item.discussionTitle || '').trim();
-				if (discussionTitle.startsWith('/')) {
-					return `${discussionTitle}#comments`;
+				const sitePath = extractSitePath(item.discussionTitle);
+				if (sitePath) {
+					return `${sitePath}#comments`;
 				}
 
 				return item.commentUrl || item.discussionUrl || 'https://github.com/jlzzlf/PersonalBlog/discussions';
@@ -60,9 +67,10 @@
 			const createCommentCard = (item) => {
 				const link = document.createElement('a');
 				link.className = 'latest-comment-item';
-				link.href = resolveCommentHref(item);
+				const resolvedHref = resolveCommentHref(item);
+				link.href = resolvedHref;
 
-				if (/^https?:\/\//.test(link.href)) {
+				if (/^https?:\/\//.test(resolvedHref)) {
 					link.target = '_blank';
 					link.rel = 'noreferrer';
 				}
