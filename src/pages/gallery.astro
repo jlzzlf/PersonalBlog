@@ -7,18 +7,6 @@ import { galleryItems } from '../data/gallery';
 
 const pageTitle = `图片库 | ${SITE_TITLE}`;
 const galleryFallbackJson = JSON.stringify(galleryItems);
-const photoFramePresets = [
-	{ tilt: '-0.65deg', lift: '0px' },
-	{ tilt: '0.8deg', lift: '-1px' },
-	{ tilt: '-0.45deg', lift: '1px' },
-	{ tilt: '0.95deg', lift: '1px' },
-	{ tilt: '-0.9deg', lift: '0px' },
-];
-
-const getPhotoFrameStyle = (index: number) => {
-	const preset = photoFramePresets[index % photoFramePresets.length];
-	return `--frame-tilt: ${preset.tilt}; --frame-lift: ${preset.lift};`;
-};
 ---
 
 <!doctype html>
@@ -33,7 +21,7 @@ const getPhotoFrameStyle = (index: number) => {
 				<div class="gallery-hero__copy">
 					<p class="eyebrow">Gallery</p>
 					<h1>图片库</h1>
-					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面改成了混合网格加瀑布流的照片墙展示。</p>
+					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面先用更稳定的混合网格来展示不同尺寸的图片。</p>
 				</div>
 				<div class="gallery-hero__meta">
 					<span data-gallery-count>{galleryItems.length} 张图片</span>
@@ -43,13 +31,15 @@ const getPhotoFrameStyle = (index: number) => {
 
 			<section class="photo-wall" aria-label="图片墙" data-photo-wall>
 				{
-					galleryItems.map((item, index) => (
+					galleryItems.map((item) => (
 						<figure
-							class="photo-wall__item photo-wall__item--ready"
+							class="photo-wall__item"
 							data-shape="square"
-							style={`${getPhotoFrameStyle(index)} --photo-ratio: 4 / 5; grid-row-end: span 30;`}
+							style="--photo-ratio: 4 / 5;"
 						>
-							<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+							<div class="photo-wall__media">
+								<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+							</div>
 						</figure>
 					))
 				}
@@ -67,7 +57,6 @@ const getPhotoFrameStyle = (index: number) => {
 
 				const fallbackItems =
 					fallback instanceof HTMLScriptElement && fallback.textContent ? JSON.parse(fallback.textContent) : [];
-				let resizeFrame = 0;
 
 				const shuffleItems = (items) => {
 					const shuffled = [...items];
@@ -78,35 +67,11 @@ const getPhotoFrameStyle = (index: number) => {
 					return shuffled;
 				};
 
-				const applyRandomFrame = (element) => {
-					const tilt = (Math.random() * 2.2 - 1.1).toFixed(2);
-					const lift = (Math.random() * 4 - 2).toFixed(1);
-					element.style.setProperty('--frame-tilt', `${tilt}deg`);
-					element.style.setProperty('--frame-lift', `${lift}px`);
-				};
-
 				const getShapeFromRatio = (ratio) => {
-					if (ratio >= 1.85) return 'panorama';
-					if (ratio >= 1.2) return 'landscape';
-					if (ratio <= 0.76) return 'portrait';
+					if (ratio >= 1.75) return 'panorama';
+					if (ratio >= 1.12) return 'landscape';
+					if (ratio <= 0.82) return 'portrait';
 					return 'square';
-				};
-
-				const measureItem = (figure, image) => {
-					const styles = window.getComputedStyle(wall);
-					const rowSize = Number.parseFloat(styles.gridAutoRows);
-					const rowGap = Number.parseFloat(styles.rowGap);
-					if (!Number.isFinite(rowSize) || rowSize <= 0) return;
-
-					const figureStyles = window.getComputedStyle(figure);
-					const paddingBlock =
-						Number.parseFloat(figureStyles.paddingTop) + Number.parseFloat(figureStyles.paddingBottom);
-					const imageHeight =
-						image instanceof HTMLImageElement ? image.getBoundingClientRect().height : figure.scrollHeight;
-					const contentHeight = Math.max(imageHeight + paddingBlock, 220);
-					const span = Math.max(16, Math.ceil((contentHeight + rowGap) / (rowSize + rowGap)));
-					figure.style.gridRowEnd = `span ${span}`;
-					figure.classList.add('photo-wall__item--ready');
 				};
 
 				const applyImageLayout = (figure, image) => {
@@ -115,20 +80,6 @@ const getPhotoFrameStyle = (index: number) => {
 					const ratio = naturalWidth / naturalHeight;
 					figure.dataset.shape = getShapeFromRatio(ratio);
 					figure.style.setProperty('--photo-ratio', `${naturalWidth} / ${naturalHeight}`);
-					window.requestAnimationFrame(() => measureItem(figure, image));
-				};
-
-				const scheduleRefresh = () => {
-					window.cancelAnimationFrame(resizeFrame);
-					resizeFrame = window.requestAnimationFrame(() => {
-						const items = wall.querySelectorAll('.photo-wall__item');
-						items.forEach((item) => {
-							if (item instanceof HTMLElement) {
-								const image = item.querySelector('img');
-								measureItem(item, image instanceof HTMLImageElement ? image : undefined);
-							}
-						});
-					});
 				};
 
 				const createWallItem = (item) => {
@@ -136,8 +87,9 @@ const getPhotoFrameStyle = (index: number) => {
 					figure.className = 'photo-wall__item';
 					figure.dataset.shape = 'square';
 					figure.style.setProperty('--photo-ratio', '4 / 5');
-					figure.style.gridRowEnd = 'span 30';
-					applyRandomFrame(figure);
+
+					const media = document.createElement('div');
+					media.className = 'photo-wall__media';
 
 					const image = document.createElement('img');
 					image.src = item.src;
@@ -151,20 +103,13 @@ const getPhotoFrameStyle = (index: number) => {
 						},
 						{ once: true },
 					);
-					image.addEventListener(
-						'error',
-						() => {
-							figure.classList.add('photo-wall__item--ready');
-							scheduleRefresh();
-						},
-						{ once: true },
-					);
 
 					if (image.complete && image.naturalWidth > 0) {
 						applyImageLayout(figure, image);
 					}
 
-					figure.append(image);
+					media.append(image);
+					figure.append(media);
 					return figure;
 				};
 
@@ -173,7 +118,6 @@ const getPhotoFrameStyle = (index: number) => {
 					if (count instanceof HTMLElement) {
 						count.textContent = `${items.length} 张图片`;
 					}
-					scheduleRefresh();
 				};
 
 				if (Array.isArray(fallbackItems) && fallbackItems.length > 0) {
@@ -189,15 +133,6 @@ const getPhotoFrameStyle = (index: number) => {
 					.catch(() => {
 						// Keep the static wall as a fallback when the runtime API is unavailable.
 					});
-
-				window.addEventListener('resize', scheduleRefresh, { passive: true });
-
-				if ('ResizeObserver' in window) {
-					const observer = new ResizeObserver(() => {
-						scheduleRefresh();
-					});
-					observer.observe(wall);
-				}
 			})();
 		</script>
 	</body>
@@ -250,16 +185,19 @@ const getPhotoFrameStyle = (index: number) => {
 		display: grid;
 		grid-template-columns: repeat(12, minmax(0, 1fr));
 		grid-auto-flow: dense;
-		grid-auto-rows: 12px;
 		gap: 1rem;
 		align-items: start;
 	}
 
 	.photo-wall__item {
 		position: relative;
-		grid-column: span 4;
+		width: 100%;
+		display: grid;
+		gap: 0.7rem;
+		align-content: start;
+		justify-self: stretch;
+		grid-column: span 4 / span 4;
 		margin: 0;
-		overflow: hidden;
 		padding: 0.85rem;
 		border-radius: 30px;
 		border: 1px solid rgba(187, 231, 245, 0.75);
@@ -269,7 +207,6 @@ const getPhotoFrameStyle = (index: number) => {
 		box-shadow:
 			0 20px 40px rgba(112, 159, 176, 0.12),
 			inset 0 1px 0 rgba(255, 255, 255, 0.84);
-		transform: translateY(var(--frame-lift, 0px)) rotate(var(--frame-tilt, 0deg));
 		transition:
 			transform 180ms ease,
 			box-shadow 180ms ease,
@@ -277,15 +214,15 @@ const getPhotoFrameStyle = (index: number) => {
 	}
 
 	.photo-wall__item[data-shape='portrait'] {
-		grid-column: span 3;
+		grid-column: span 3 / span 3;
 	}
 
 	.photo-wall__item[data-shape='landscape'] {
-		grid-column: span 5;
+		grid-column: span 6 / span 6;
 	}
 
 	.photo-wall__item[data-shape='panorama'] {
-		grid-column: span 6;
+		grid-column: span 8 / span 8;
 	}
 
 	.photo-wall__item::before {
@@ -303,41 +240,45 @@ const getPhotoFrameStyle = (index: number) => {
 	}
 
 	.photo-wall__item:hover {
-		transform: translateY(calc(var(--frame-lift, 0px) - 4px)) rotate(var(--frame-tilt, 0deg));
+		transform: translateY(-4px);
 		border-color: rgba(153, 230, 255, 0.82);
 		box-shadow:
-			0 24px 42px rgba(112, 159, 176, 0.15),
+			0 26px 48px rgba(112, 159, 176, 0.16),
 			inset 0 1px 0 rgba(255, 255, 255, 0.88);
+	}
+
+	.photo-wall__media {
+		width: 100%;
+		overflow: hidden;
+		border-radius: 22px;
+		aspect-ratio: var(--photo-ratio, 4 / 5);
+		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
 	}
 
 	.photo-wall__item img {
 		display: block;
 		width: 100%;
-		height: auto;
-		aspect-ratio: var(--photo-ratio, 4 / 5);
+		height: 100%;
 		object-fit: cover;
-		border-radius: 22px;
-		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
 	}
 
 	@media (max-width: 980px) {
 		.photo-wall {
 			grid-template-columns: repeat(8, minmax(0, 1fr));
-			grid-auto-rows: 11px;
 		}
 
 		.photo-wall__item,
 		.photo-wall__item[data-shape='square'],
 		.photo-wall__item[data-shape='landscape'] {
-			grid-column: span 4;
+			grid-column: span 4 / span 4;
 		}
 
 		.photo-wall__item[data-shape='portrait'] {
-			grid-column: span 3;
+			grid-column: span 3 / span 3;
 		}
 
 		.photo-wall__item[data-shape='panorama'] {
-			grid-column: span 8;
+			grid-column: span 8 / span 8;
 		}
 	}
 
@@ -348,19 +289,18 @@ const getPhotoFrameStyle = (index: number) => {
 
 		.photo-wall {
 			grid-template-columns: repeat(4, minmax(0, 1fr));
-			grid-auto-rows: 10px;
 			gap: 0.8rem;
 		}
 
 		.photo-wall__item,
 		.photo-wall__item[data-shape='portrait'],
 		.photo-wall__item[data-shape='square'] {
-			grid-column: span 2;
+			grid-column: span 2 / span 2;
 		}
 
 		.photo-wall__item[data-shape='landscape'],
 		.photo-wall__item[data-shape='panorama'] {
-			grid-column: span 4;
+			grid-column: span 4 / span 4;
 		}
 	}
 
@@ -375,7 +315,7 @@ const getPhotoFrameStyle = (index: number) => {
 		.photo-wall__item[data-shape='square'],
 		.photo-wall__item[data-shape='landscape'],
 		.photo-wall__item[data-shape='panorama'] {
-			grid-column: span 2;
+			grid-column: span 2 / span 2;
 		}
 	}
 </style>
