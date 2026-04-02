@@ -11,18 +11,7 @@ const galleryPreviewItems = galleryItems.slice(0, 4);
 const mediaReviews = (await getCollection('reviews'))
 	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
 	.slice(0, 4);
-const galleryPreviewFallbackJson = JSON.stringify(galleryPreviewItems);
-const previewFramePresets = [
-	{ tilt: '-1.8deg', lift: '0px' },
-	{ tilt: '1.35deg', lift: '1px' },
-	{ tilt: '-0.95deg', lift: '-4px' },
-	{ tilt: '2.2deg', lift: '2px' },
-];
-
-const getPreviewFrameStyle = (index: number) => {
-	const preset = previewFramePresets[index % previewFramePresets.length];
-	return `--frame-tilt: ${preset.tilt}; --frame-lift: ${preset.lift};`;
-};
+const galleryPreviewFallbackJson = JSON.stringify(galleryItems);
 
 const widgetNotes = [
 	'图片库现在只在这里展示少量预览图，完整内容会进入独立图库页。',
@@ -70,8 +59,8 @@ const widgetNotes = [
 
 					<div class="gallery-preview-grid" aria-label="图片库预览" data-gallery-preview-grid data-preview-limit="4">
 						{
-							galleryPreviewItems.map((item, index) => (
-								<a class="gallery-preview-item" href="/gallery" aria-label="打开图片库" style={getPreviewFrameStyle(index)}>
+							galleryPreviewItems.map((item) => (
+								<a class="gallery-preview-item" href="/gallery" aria-label="打开图片库">
 									<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
 								</a>
 							))
@@ -152,20 +141,13 @@ const widgetNotes = [
 				const fallbackItems =
 					fallback instanceof HTMLScriptElement && fallback.textContent ? JSON.parse(fallback.textContent) : [];
 
-				const shuffleItems = (items) => {
+				const pickRandomItems = (items, limit) => {
 					const shuffled = [...items];
 					for (let index = shuffled.length - 1; index > 0; index -= 1) {
 						const swapIndex = Math.floor(Math.random() * (index + 1));
 						[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
 					}
-					return shuffled;
-				};
-
-				const applyRandomFrame = (element) => {
-					const tilt = (Math.random() * 5.4 - 2.7).toFixed(2);
-					const lift = (Math.random() * 10 - 5).toFixed(1);
-					element.style.setProperty('--frame-tilt', `${tilt}deg`);
-					element.style.setProperty('--frame-lift', `${lift}px`);
+					return shuffled.slice(0, Math.min(limit, shuffled.length));
 				};
 
 				const createPreviewLink = (item) => {
@@ -173,7 +155,6 @@ const widgetNotes = [
 					link.href = '/gallery';
 					link.className = 'gallery-preview-item';
 					link.setAttribute('aria-label', '打开图片库');
-					applyRandomFrame(link);
 
 					const image = document.createElement('img');
 					image.src = item.src;
@@ -186,7 +167,7 @@ const widgetNotes = [
 				};
 
 				const renderPreview = (items) => {
-					root.replaceChildren(...shuffleItems(items).slice(0, previewLimit).map((item) => createPreviewLink(item)));
+					root.replaceChildren(...pickRandomItems(items, previewLimit).map((item) => createPreviewLink(item)));
 				};
 
 				if (Array.isArray(fallbackItems) && fallbackItems.length > 0) {
@@ -321,60 +302,40 @@ const widgetNotes = [
 	}
 
 	.gallery-preview-grid {
-		column-count: 3;
-		column-gap: 1rem;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.95rem;
 		align-self: start;
 	}
 
 	.gallery-preview-item {
 		display: block;
-		position: relative;
-		margin: 0 0 1rem;
-		padding: 0.7rem;
-		break-inside: avoid;
+		min-width: 0;
 		overflow: hidden;
-		border-radius: 28px;
+		aspect-ratio: 1 / 1;
+		border-radius: 24px;
 		border: 1px solid rgba(187, 231, 245, 0.72);
 		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(239, 248, 253, 0.92)),
-			radial-gradient(circle at top left, rgba(214, 255, 255, 0.5), transparent 55%);
-		box-shadow:
-			0 18px 36px rgba(112, 159, 176, 0.12),
-			inset 0 1px 0 rgba(255, 255, 255, 0.82);
-		transform: translateY(var(--frame-lift, 0px)) rotate(var(--frame-tilt, 0deg));
+			linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 253, 0.92)),
+			radial-gradient(circle at top left, rgba(214, 255, 255, 0.45), transparent 55%);
+		box-shadow: 0 18px 36px rgba(112, 159, 176, 0.1);
 		transition:
 			transform 180ms ease,
 			box-shadow 180ms ease,
 			border-color 180ms ease;
 	}
 
-	.gallery-preview-item::before {
-		content: '';
-		position: absolute;
-		top: 0.8rem;
-		left: 50%;
-		width: 3rem;
-		height: 0.45rem;
-		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.72);
-		transform: translateX(-50%);
-		box-shadow: 0 2px 10px rgba(112, 159, 176, 0.08);
-		pointer-events: none;
-	}
-
 	.gallery-preview-item:hover {
-		transform: translateY(calc(var(--frame-lift, 0px) - 5px)) rotate(var(--frame-tilt, 0deg));
+		transform: translateY(-3px);
 		border-color: rgba(153, 230, 255, 0.76);
-		box-shadow:
-			0 24px 42px rgba(112, 159, 176, 0.16),
-			inset 0 1px 0 rgba(255, 255, 255, 0.84);
+		box-shadow: 0 22px 40px rgba(112, 159, 176, 0.14);
 	}
 
 	.gallery-preview-item img {
 		display: block;
 		width: 100%;
-		height: auto;
-		border-radius: 20px;
+		height: 100%;
+		object-fit: cover;
 		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
 	}
 
@@ -498,22 +459,8 @@ const widgetNotes = [
 			align-items: flex-start;
 		}
 
-		.gallery-preview-grid {
-			column-count: 2;
-		}
-
-		.gallery-preview-item {
-			margin-bottom: 0.85rem;
-		}
-
 		.review-card {
 			align-items: flex-start;
-		}
-	}
-
-	@media (max-width: 520px) {
-		.gallery-preview-grid {
-			column-count: 1;
 		}
 	}
 </style>

@@ -7,6 +7,20 @@ import { galleryItems } from '../data/gallery';
 
 const pageTitle = `图片库 | ${SITE_TITLE}`;
 const galleryFallbackJson = JSON.stringify(galleryItems);
+type GalleryItem = (typeof galleryItems)[number];
+
+const createPhotoColumns = (items: GalleryItem[], columnCount: number) => {
+	const totalColumns = Math.max(1, Math.min(columnCount, items.length || 1));
+	const columns: GalleryItem[][] = Array.from({ length: totalColumns }, () => []);
+
+	items.forEach((item, index) => {
+		columns[index % totalColumns].push(item);
+	});
+
+	return columns;
+};
+
+const initialPhotoColumns = createPhotoColumns(galleryItems, 4);
 ---
 
 <!doctype html>
@@ -21,7 +35,7 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 				<div class="gallery-hero__copy">
 					<p class="eyebrow">Gallery</p>
 					<h1>图片库</h1>
-					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面改回更直接的瀑布流照片墙展示。</p>
+					<p>这里是完整图片库页面，统一从 R2 CDN 地址读取图片，下面会用按列滚动的动态瀑布流方式展示。</p>
 				</div>
 				<div class="gallery-hero__meta">
 					<span data-gallery-count>{galleryItems.length} 张图片</span>
@@ -29,14 +43,39 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 				</div>
 			</section>
 
-			<section class="photo-wall" aria-label="图片墙" data-photo-wall>
+			<section class="photo-flow" aria-label="图片墙" data-photo-flow>
 				{
-					galleryItems.map((item) => (
-						<figure class="photo-wall__item">
-							<div class="photo-wall__media">
-								<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+					initialPhotoColumns.map((columnItems, columnIndex) => (
+						<div
+							class="photo-column"
+							data-direction={columnIndex % 2 === 0 ? 'down' : 'up'}
+							style={`--scroll-duration: ${44 + columnIndex * 4}s;`}
+						>
+							<div class="photo-column__track">
+								<div class="photo-column__group" data-group="primary">
+									{
+										columnItems.map((item) => (
+											<figure class="photo-card">
+												<div class="photo-card__media">
+													<img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
+												</div>
+											</figure>
+										))
+									}
+								</div>
+								<div class="photo-column__group" aria-hidden="true">
+									{
+										columnItems.map((item) => (
+											<figure class="photo-card" aria-hidden="true">
+												<div class="photo-card__media">
+													<img src={item.src} alt="" loading="lazy" decoding="async" />
+												</div>
+											</figure>
+										))
+									}
+								</div>
 							</div>
-						</figure>
+						</div>
 					))
 				}
 			</section>
@@ -46,61 +85,162 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 
 		<script is:inline>
 			(() => {
-				const wall = document.querySelector('[data-photo-wall]');
+				const flow = document.querySelector('[data-photo-flow]');
 				const count = document.querySelector('[data-gallery-count]');
 				const fallback = document.querySelector('[data-gallery-fallback]');
-				if (!(wall instanceof HTMLElement)) return;
+				if (!(flow instanceof HTMLElement)) return;
 
 				const fallbackItems =
 					fallback instanceof HTMLScriptElement && fallback.textContent ? JSON.parse(fallback.textContent) : [];
+				let currentItems = Array.isArray(fallbackItems) ? fallbackItems : [];
+				let currentColumnCount = 0;
+				let measureFrame = 0;
 
-				const shuffleItems = (items) => {
-					const shuffled = [...items];
-					for (let index = shuffled.length - 1; index > 0; index -= 1) {
-						const swapIndex = Math.floor(Math.random() * (index + 1));
-						[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
-					}
-					return shuffled;
+				const getColumnCount = () => {
+					if (window.matchMedia('(max-width: 520px)').matches) return 1;
+					if (window.matchMedia('(max-width: 720px)').matches) return 2;
+					if (window.matchMedia('(max-width: 980px)').matches) return 3;
+					return 4;
 				};
 
-				const createWallItem = (item) => {
-					const figure = document.createElement('figure');
-					figure.className = 'photo-wall__item';
+				const splitIntoColumns = (items, columnCount) => {
+					const totalColumns = Math.max(1, Math.min(columnCount, items.length || 1));
+					const columns = Array.from({ length: totalColumns }, () => []);
 
-					const media = document.createElement('div');
-					media.className = 'photo-wall__media';
+					items.forEach((item, index) => {
+						columns[index % totalColumns].push(item);
+					});
+
+					return columns;
+				};
+
+				const measureColumns = () => {
+					const columns = flow.querySelectorAll('.photo-column');
+					columns.forEach((column) => {
+						if (!(column instanceof HTMLElement)) return;
+						const track = column.querySelector('.photo-column__track');
+						const primaryGroup = column.querySelector('[data-group="primary"]');
+						if (!(track instanceof HTMLElement) || !(primaryGroup instanceof HTMLElement)) return;
+
+						const trackStyles = window.getComputedStyle(track);
+						const gap = Number.parseFloat(trackStyles.rowGap || trackStyles.gap || '0');
+						const distance = primaryGroup.getBoundingClientRect().height + gap;
+						if (!Number.isFinite(distance) || distance <= 0) return;
+
+						column.style.setProperty('--loop-distance', `${distance}px`);
+						column.classList.add('photo-column--animated');
+					});
+				};
+
+				const scheduleMeasure = () => {
+					window.cancelAnimationFrame(measureFrame);
+					measureFrame = window.requestAnimationFrame(() => {
+						measureColumns();
+					});
+				};
+
+				const createPhotoCard = (item, isClone = false) => {
+					const figure = document.createElement('figure');
+					figure.className = 'photo-card';
+					if (isClone) {
+						figure.setAttribute('aria-hidden', 'true');
+					}
 
 					const image = document.createElement('img');
 					image.src = item.src;
-					image.alt = item.alt || '图片库图片';
+					image.alt = isClone ? '' : item.alt || '图片库图片';
 					image.loading = 'lazy';
 					image.decoding = 'async';
+					image.addEventListener(
+						'load',
+						() => {
+							scheduleMeasure();
+						},
+						{ once: true },
+					);
+
+					const media = document.createElement('div');
+					media.className = 'photo-card__media';
 
 					media.append(image);
 					figure.append(media);
 					return figure;
 				};
 
-				const renderWall = (items) => {
-					wall.replaceChildren(...shuffleItems(items).map((item) => createWallItem(item)));
+				const createPhotoColumn = (items, columnIndex) => {
+					const column = document.createElement('div');
+					column.className = 'photo-column';
+					column.dataset.direction = columnIndex % 2 === 0 ? 'down' : 'up';
+					column.style.setProperty('--scroll-duration', `${44 + columnIndex * 4 + items.length * 2.2}s`);
+
+					const track = document.createElement('div');
+					track.className = 'photo-column__track';
+
+					const primaryGroup = document.createElement('div');
+					primaryGroup.className = 'photo-column__group';
+					primaryGroup.dataset.group = 'primary';
+
+					const cloneGroup = document.createElement('div');
+					cloneGroup.className = 'photo-column__group';
+					cloneGroup.setAttribute('aria-hidden', 'true');
+
+					items.forEach((item) => {
+						primaryGroup.append(createPhotoCard(item));
+						cloneGroup.append(createPhotoCard(item, true));
+					});
+
+					track.append(primaryGroup, cloneGroup);
+					column.append(track);
+					return column;
+				};
+
+				const renderFlow = (items) => {
+					currentItems = Array.isArray(items) ? items : [];
+					const columnCount = Math.max(1, Math.min(getColumnCount(), currentItems.length || 1));
+					currentColumnCount = columnCount;
+					const columns = splitIntoColumns(currentItems, columnCount);
+
+					flow.replaceChildren(...columns.map((columnItems, columnIndex) => createPhotoColumn(columnItems, columnIndex)));
 					if (count instanceof HTMLElement) {
 						count.textContent = `${items.length} 张图片`;
 					}
+					scheduleMeasure();
 				};
 
 				if (Array.isArray(fallbackItems) && fallbackItems.length > 0) {
-					renderWall(fallbackItems);
+					renderFlow(fallbackItems);
 				}
 
 				fetch('/api/gallery', { headers: { Accept: 'application/json' } })
 					.then((response) => (response.ok ? response.json() : null))
 					.then((data) => {
 						if (!data || !Array.isArray(data.images) || data.images.length === 0) return;
-						renderWall(data.images);
+						renderFlow(data.images);
 					})
 					.catch(() => {
 						// Keep the static wall as a fallback when the runtime API is unavailable.
 					});
+
+				window.addEventListener(
+					'resize',
+					() => {
+						const nextColumnCount = Math.max(1, Math.min(getColumnCount(), currentItems.length || 1));
+						if (nextColumnCount !== currentColumnCount) {
+							renderFlow(currentItems);
+							return;
+						}
+
+						scheduleMeasure();
+					},
+					{ passive: true },
+				);
+
+				if ('ResizeObserver' in window) {
+					const observer = new ResizeObserver(() => {
+						scheduleMeasure();
+					});
+					observer.observe(flow);
+				}
 			})();
 		</script>
 	</body>
@@ -149,25 +289,64 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 		font-weight: 700;
 	}
 
-	.photo-wall {
-		column-count: 4;
-		column-gap: 1rem;
+	.photo-flow {
+		--photo-flow-gap: 1rem;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--photo-flow-gap);
+		height: clamp(34rem, 78vh, 62rem);
+		overflow: hidden;
+		align-items: stretch;
+		mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
 	}
 
-	.photo-wall__item {
-		position: relative;
-		display: block;
-		margin: 0 0 1rem;
-		break-inside: avoid;
+	.photo-column {
+		min-width: 0;
 		overflow: hidden;
-		padding: 0.85rem;
-		border-radius: 30px;
-		border: 1px solid rgba(187, 231, 245, 0.75);
+	}
+
+	.photo-column__track {
+		display: flex;
+		flex-direction: column;
+		gap: var(--photo-flow-gap);
+		will-change: transform;
+	}
+
+	.photo-column__group {
+		display: grid;
+		gap: var(--photo-flow-gap);
+	}
+
+	.photo-column--animated .photo-column__track {
+		animation-duration: var(--scroll-duration, 48s);
+		animation-timing-function: linear;
+		animation-iteration-count: infinite;
+		animation-fill-mode: both;
+	}
+
+	.photo-column[data-direction='up'].photo-column--animated .photo-column__track {
+		animation-name: gallery-scroll-up;
+	}
+
+	.photo-column[data-direction='down'].photo-column--animated .photo-column__track {
+		animation-name: gallery-scroll-down;
+	}
+
+	.photo-column:hover .photo-column__track {
+		animation-play-state: paused;
+	}
+
+	.photo-card {
+		margin: 0;
+		padding: 0.8rem;
+		border-radius: 28px;
+		border: 1px solid rgba(187, 231, 245, 0.74);
 		background:
 			linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 248, 252, 0.92)),
-			radial-gradient(circle at top left, rgba(204, 255, 255, 0.46), transparent 56%);
+			radial-gradient(circle at top left, rgba(204, 255, 255, 0.44), transparent 56%);
 		box-shadow:
-			0 20px 40px rgba(112, 159, 176, 0.12),
+			0 18px 36px rgba(112, 159, 176, 0.12),
 			inset 0 1px 0 rgba(255, 255, 255, 0.84);
 		transition:
 			transform 180ms ease,
@@ -175,44 +354,51 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 			border-color 180ms ease;
 	}
 
-	.photo-wall__item::before {
-		content: '';
-		position: absolute;
-		top: 0.95rem;
-		left: 50%;
-		width: 3.2rem;
-		height: 0.5rem;
-		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.72);
-		transform: translateX(-50%);
-		box-shadow: 0 2px 10px rgba(112, 159, 176, 0.08);
-		pointer-events: none;
-	}
-
-	.photo-wall__item:hover {
-		transform: translateY(-4px);
+	.photo-card:hover {
+		transform: translateY(-3px);
 		border-color: rgba(153, 230, 255, 0.82);
 		box-shadow:
-			0 26px 48px rgba(112, 159, 176, 0.16),
+			0 22px 42px rgba(112, 159, 176, 0.16),
 			inset 0 1px 0 rgba(255, 255, 255, 0.88);
 	}
 
-	.photo-wall__media {
+	.photo-card__media {
 		width: 100%;
 		overflow: hidden;
 		border-radius: 22px;
 		background: linear-gradient(180deg, rgba(248, 252, 255, 0.9), rgba(232, 244, 249, 0.86));
 	}
 
-	.photo-wall__item img {
+	.photo-card img {
 		display: block;
 		width: 100%;
 		height: auto;
 	}
 
+	@keyframes gallery-scroll-up {
+		from {
+			transform: translateY(0);
+		}
+
+		to {
+			transform: translateY(calc(-1 * var(--loop-distance, 0px)));
+		}
+	}
+
+	@keyframes gallery-scroll-down {
+		from {
+			transform: translateY(calc(-1 * var(--loop-distance, 0px)));
+		}
+
+		to {
+			transform: translateY(0);
+		}
+	}
+
 	@media (max-width: 980px) {
-		.photo-wall {
-			column-count: 3;
+		.photo-flow {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			height: clamp(32rem, 74vh, 56rem);
 		}
 	}
 
@@ -221,15 +407,31 @@ const galleryFallbackJson = JSON.stringify(galleryItems);
 			padding: 1.15rem;
 		}
 
-		.photo-wall {
-			column-count: 2;
-			column-gap: 0.8rem;
+		.photo-flow {
+			--photo-flow-gap: 0.8rem;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			height: clamp(28rem, 70vh, 46rem);
 		}
 	}
 
 	@media (max-width: 520px) {
-		.photo-wall {
-			column-count: 1;
+		.photo-flow {
+			grid-template-columns: 1fr;
+			height: clamp(24rem, 66vh, 38rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.photo-flow {
+			height: auto;
+			overflow: visible;
+			mask-image: none;
+			-webkit-mask-image: none;
+		}
+
+		.photo-column--animated .photo-column__track {
+			animation: none;
+			transform: none !important;
 		}
 	}
 </style>
