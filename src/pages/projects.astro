@@ -52,17 +52,17 @@ const projectCards = entries.map((entry) => ({
 				<p class="eyebrow">Projects</p>
 				<h1>项目展示</h1>
 				<p>
-					这里会集中放置每一个独立项目页面。左侧可以搜索和筛选，右侧点击具体项目卡片后，会进入它自己的详情页。
+					集中展示独立项目与技术实践，可用上方工具条快速筛选。
 				</p>
 			</section>
 
 			<div class="projects-shell" data-project-browser>
-				<aside class="surface-card projects-sidebar" aria-label="项目搜索与筛选">
-					<div class="projects-sidebar__section">
-						<label class="projects-sidebar__label" for="project-search">搜索项目</label>
+				<section class="surface-card projects-toolbar" aria-label="项目搜索与筛选">
+					<div class="projects-toolbar__search-field">
+						<label class="projects-toolbar__label" for="project-search">搜索项目</label>
 						<input
 							id="project-search"
-							class="projects-sidebar__search"
+							class="projects-toolbar__search"
 							type="search"
 							placeholder="标题、技术或关键词"
 							data-project-search
@@ -71,8 +71,7 @@ const projectCards = entries.map((entry) => ({
 
 					{
 						projectTags.length > 0 && (
-							<div class="projects-sidebar__section">
-								<p class="projects-sidebar__label">按标签筛选</p>
+							<div class="projects-toolbar__tags" aria-label="按标签筛选">
 								<div class="projects-filter-list">
 									{
 										projectTags.map((tag) => (
@@ -87,14 +86,14 @@ const projectCards = entries.map((entry) => ({
 						)
 					}
 
-					<button class="button secondary projects-sidebar__reset" type="button" data-project-reset>
+					<button class="button secondary projects-toolbar__reset" type="button" data-project-reset>
 						清空筛选
 					</button>
 
-					<p class="projects-sidebar__summary" data-project-summary>
-						当前显示 {projectCards.length} / {projectCards.length} 个项目
+					<p class="projects-toolbar__summary" data-project-summary>
+						匹配 {projectCards.length} 个项目
 					</p>
-				</aside>
+				</section>
 
 				<section class="projects-content" aria-label="项目列表">
 					<div class="projects-grid">
@@ -219,8 +218,8 @@ const projectCards = entries.map((entry) => ({
 					if (summary instanceof HTMLElement) {
 						summary.textContent =
 							matchedCards.length === 0
-								? `当前显示 0 / ${cards.length} 个项目`
-								: `匹配到 ${matchedCards.length} 个项目${pageCount > 1 ? `，第 ${currentPage} / ${pageCount} 页` : ''}`;
+								? '匹配 0 个项目'
+								: `匹配 ${matchedCards.length} 个项目${pageCount > 1 ? ` · 第 ${currentPage} / ${pageCount} 页` : ''}`;
 					}
 
 					if (emptyState instanceof HTMLElement) {
@@ -293,12 +292,18 @@ const projectCards = entries.map((entry) => ({
 <style>
 	.projects-page {
 		display: grid;
-		gap: 1.4rem;
+		gap: 1rem;
 	}
 
 	.projects-hero {
-		max-width: 62rem;
-		padding: clamp(1.5rem, 2vw, 2rem);
+		display: grid;
+		gap: 0.45rem;
+		max-width: 58rem;
+		padding: clamp(1.05rem, 1.6vw, 1.35rem) clamp(1.2rem, 2vw, 1.6rem);
+	}
+
+	.projects-hero h1 {
+		margin-bottom: 0;
 	}
 
 	.projects-hero p:last-child {
@@ -308,43 +313,45 @@ const projectCards = entries.map((entry) => ({
 
 	.projects-shell {
 		display: grid;
-		grid-template-columns: minmax(14.5rem, 18rem) minmax(0, 1fr);
 		gap: 1rem;
 		align-items: start;
 	}
 
-	.projects-sidebar,
+	.projects-toolbar,
 	.project-empty,
 	.projects-pagination {
-		padding: 1.35rem;
+		padding: 1.05rem;
 	}
 
-	.projects-sidebar {
-		position: sticky;
-		top: 6rem;
-		display: grid;
-		gap: 1.2rem;
-	}
-
-	.projects-sidebar__section {
-		display: grid;
+	.projects-toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: end;
 		gap: 0.75rem;
 	}
 
-	.projects-sidebar__label {
+	.projects-toolbar__search-field {
+		display: grid;
+		flex: 1 1 18rem;
+		gap: 0.4rem;
+		min-width: min(100%, 18rem);
+	}
+
+	.projects-toolbar__label {
 		margin: 0;
-		font-size: 0.82rem;
+		font-size: 0.76rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		color: var(--color-subtext);
 	}
 
-	.projects-sidebar__search {
+	.projects-toolbar__search {
 		width: 100%;
-		padding: 0.85rem 0.95rem;
+		min-height: 3rem;
+		padding: 0.78rem 1rem;
 		border: 1px solid var(--color-border);
-		border-radius: 18px;
+		border-radius: 999px;
 		background: rgba(255, 255, 255, 0.86);
 		color: var(--color-text);
 		outline: none;
@@ -355,24 +362,32 @@ const projectCards = entries.map((entry) => ({
 			background-color 180ms ease;
 	}
 
-	.projects-sidebar__search:focus {
+	.projects-toolbar__search:focus {
 		border-color: rgba(153, 230, 255, 0.9);
 		box-shadow: 0 0 0 4px rgba(153, 230, 255, 0.16);
 		background: rgba(255, 255, 255, 0.94);
 	}
 
+	.projects-toolbar__tags {
+		flex: 999 1 18rem;
+		min-width: 0;
+	}
+
 	.projects-filter-list {
-		display: grid;
-		gap: 0.65rem;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.55rem;
+		align-items: center;
 	}
 
 	.projects-filter-option {
-		display: flex;
+		position: relative;
+		display: inline-flex;
 		align-items: center;
-		gap: 0.7rem;
-		padding: 0.8rem 0.9rem;
+		min-height: 3rem;
+		padding: 0.58rem 0.88rem;
 		border: 1px solid var(--color-border);
-		border-radius: 18px;
+		border-radius: 999px;
 		background: rgba(255, 255, 255, 0.82);
 		cursor: pointer;
 		transition:
@@ -389,27 +404,48 @@ const projectCards = entries.map((entry) => ({
 	}
 
 	.projects-filter-option input {
-		width: 1rem;
-		height: 1rem;
+		position: absolute;
+		width: 1px;
+		height: 1px;
 		margin: 0;
-		accent-color: var(--accent);
+		opacity: 0;
+		pointer-events: none;
 	}
 
 	.projects-filter-option span {
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 		font-weight: 700;
+		line-height: 1.2;
 	}
 
-	.projects-sidebar__reset {
-		width: 100%;
+	.projects-filter-option:focus-within,
+	.projects-filter-option:has(input:checked) {
+		border-color: rgba(153, 230, 255, 0.92);
+		background: rgba(230, 250, 255, 0.92);
+		color: var(--color-link-hover);
+		box-shadow: 0 10px 22px rgba(112, 159, 176, 0.1);
 	}
 
-	.projects-sidebar__summary,
+	.projects-toolbar__reset {
+		flex: 0 0 auto;
+		min-height: 3rem;
+		padding-inline: 1rem;
+	}
+
+	.projects-toolbar__summary,
 	.projects-content__hint,
 	.project-tile p,
 	.project-empty {
 		margin: 0;
 		color: var(--color-subtext);
+	}
+
+	.projects-toolbar__summary {
+		flex: 0 0 auto;
+		align-self: center;
+		font-size: 0.82rem;
+		font-weight: 700;
+		white-space: nowrap;
 	}
 
 	.projects-content {
@@ -594,24 +630,29 @@ const projectCards = entries.map((entry) => ({
 	}
 
 	@media (max-width: 980px) {
-		.projects-shell {
-			grid-template-columns: 1fr;
-		}
-
-		.projects-sidebar {
-			position: static;
-		}
-
 		.projects-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
 
 	@media (max-width: 720px) {
-		.projects-sidebar,
+		.projects-toolbar,
 		.project-empty,
 		.projects-pagination {
 			padding: 1.1rem;
+		}
+
+		.projects-toolbar {
+			display: grid;
+			align-items: stretch;
+		}
+
+		.projects-toolbar__reset {
+			width: 100%;
+		}
+
+		.projects-toolbar__summary {
+			justify-self: start;
 		}
 
 		.projects-grid {

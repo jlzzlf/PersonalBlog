@@ -41,11 +41,20 @@ const buildProjectKeywords = (entry: CollectionEntry<'projects'>) => {
 	return unique([...highlightedKeywords, ...entry.data.stack, ...entry.data.tags]).slice(0, 3);
 };
 
+const sortHomeProjectEntries = (entries: CollectionEntry<'projects'>[]) =>
+	[...entries].sort(
+		(first, second) =>
+			second.data.year.localeCompare(first.data.year, 'zh-CN') ||
+			(first.data.order ?? Number.MAX_SAFE_INTEGER) -
+				(second.data.order ?? Number.MAX_SAFE_INTEGER) ||
+			first.data.title.localeCompare(second.data.title, 'zh-CN'),
+	);
+
 export const buildHomeProjectShowcaseItems = (
 	entries: CollectionEntry<'projects'>[],
-	limit = 2,
+	limit = 4,
 ): HomeProjectShowcaseItem[] => {
-	const showcaseItems = entries.slice(0, limit).map((entry) => ({
+	const showcaseItems = sortHomeProjectEntries(entries).slice(0, limit).map((entry) => ({
 		title: entry.data.title,
 		meta: `${entry.data.status} · ${entry.data.year}`,
 		label: buildProjectLabel(entry),

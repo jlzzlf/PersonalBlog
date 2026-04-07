@@ -6,17 +6,10 @@ interface Props {
 }
 
 const { items } = Astro.props;
-const mainProject = items.find((item) => !item.isMore) ?? items[0];
+const realProjects = items.filter((item) => !item.isMore);
+const mainProject = realProjects[0];
 const moreProject = items.find((item) => item.isMore);
-const sideProjects = items.filter((item) => item !== mainProject && !item.isMore);
-const plannedProjects =
-	sideProjects.length > 0
-		? sideProjects
-		: [
-				{ title: '2D平台跳跃', href: '/projects/' },
-				{ title: '粒子特效系统', href: '/projects/' },
-				{ title: 'AI行为树', href: '/projects/' },
-			];
+const sideProjects = realProjects.filter((item) => item !== mainProject);
 ---
 
 <div class="project-showcase-grid" aria-label="项目展示">
@@ -40,7 +33,6 @@ const plannedProjects =
 				</div>
 				<div class="project-feature-card__actions">
 					<a class="button button-primary" href={mainProject.href}>查看详情</a>
-					<a class="button button-secondary" href="/projects/">源代码</a>
 				</div>
 			</article>
 		)
@@ -57,12 +49,16 @@ const plannedProjects =
 		<p>进入完整项目页，查看全部项目内容和后续更新。</p>
 		<div class="project-more-card__list">
 			{
-				plannedProjects.map((item) => (
-					<a class="project-more-card__item" href={item.href}>
-						<span aria-hidden="true">•</span>
-						<strong>{item.title}</strong>
-					</a>
-				))
+				sideProjects.length > 0 ? (
+					sideProjects.map((item) => (
+						<a class="project-more-card__item" href={item.href}>
+							<span aria-hidden="true">•</span>
+							<strong>{item.title}</strong>
+						</a>
+					))
+				) : (
+					<p class="project-more-card__empty">目前只有这个项目，新增 MDX 项目后会自动出现在这里。</p>
+				)
 			}
 		</div>
 		<a class="project-more-card__button" href={moreProject?.href ?? '/projects/'}>查看全部项目<span aria-hidden="true">→</span></a>
