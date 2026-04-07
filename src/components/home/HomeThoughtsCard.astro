@@ -1,0 +1,46 @@
+---
+import { Image } from 'astro:assets';
+import HomeAvatar from '../../assets/home-avatar.jpg';
+import { profileContent } from '../../data/home/profile';
+import { getRecentThoughts, getThoughtAnchor } from '../../lib/thoughts';
+
+const thoughts = getRecentThoughts(3);
+---
+
+<article class="home-card recent-card moments-card home-reveal" data-reveal-card>
+	<div class="recent-card__avatar">
+		<div class="recent-card__avatar-frame">
+			<Image
+				src={HomeAvatar}
+				alt="头像"
+				class="recent-card__avatar-image"
+				width={160}
+				loading="eager"
+				decoding="async"
+				quality={72}
+			/>
+		</div>
+		<div>
+			<p>{profileContent.note}</p>
+			<span>{profileContent.role}</span>
+		</div>
+	</div>
+
+	<div class="recent-card__header">
+		<div>
+			<p class="section-kicker">MOMENTS</p>
+			<h2>碎碎念</h2>
+		</div>
+		<a class="text-link" href="/thoughts/">查看全部<span aria-hidden="true">→</span></a>
+	</div>
+
+	<div class="recent-list moments-list" aria-label="最近 3 条碎碎念">
+		{
+			thoughts.map((thought, index) => (
+				<a class="recent-item moment-item" href={`/thoughts/#${getThoughtAnchor(thought, index)}`}>
+					<p>{thought.content}</p>
+				</a>
+			))
+		}
+	</div>
+</article>

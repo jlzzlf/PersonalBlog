@@ -9,8 +9,8 @@ import HomeProfileCard from '../components/home/HomeProfileCard.astro';
 import HomeProjectShowcaseCard from '../components/home/HomeProjectShowcaseCard.astro';
 import HomeQuickNavCard from '../components/home/HomeQuickNavCard.astro';
 import HomeRecentCommentsCard from '../components/home/HomeRecentCommentsCard.astro';
-import HomeRecentPostsCard from '../components/home/HomeRecentPostsCard.astro';
 import HomeSiteStatsCard from '../components/home/HomeSiteStatsCard.astro';
+import HomeThoughtsCard from '../components/home/HomeThoughtsCard.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { buildHomePageViewModel } from '../lib/homepage';
 import { buildHomeProjectShowcaseItems, sortProjectEntries } from '../lib/projects';
@@ -35,7 +35,7 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		<main class="home" data-parallax-home>
 			<section id="hero" class="home-section home-hero" aria-label="首页介绍">
 				<HomeProfileCard />
-				<HomeRecentPostsCard posts={recentPosts} />
+				<HomeThoughtsCard />
 			</section>
 
 			<section id="projects" class="home-section projects-section" aria-labelledby="home-projects-title">
@@ -109,7 +109,7 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		display: grid;
 		grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 26rem);
 		gap: clamp(1.25rem, 3vw, 2.5rem);
-		align-items: end;
+		align-items: center;
 		width: min(1180px, 100%);
 		min-height: clamp(32rem, 62svh, 40rem);
 		margin: 0 auto;
@@ -293,6 +293,7 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		color: #4a5a6a;
 		font-size: 1.05rem;
 		line-height: 1.75;
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	}
 
 	.profile-tags {
@@ -415,6 +416,12 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 			0 0 34px rgba(204, 255, 255, 0.28);
 	}
 
+	.moments-card {
+		gap: 1rem;
+		margin-top: 0;
+		padding: clamp(1.15rem, 2vw, 1.65rem);
+	}
+
 	.recent-card__avatar {
 		display: flex;
 		align-items: center;
@@ -449,6 +456,15 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		font-size: 0.85rem;
 	}
 
+	.moments-card .recent-card__avatar {
+		gap: 0.85rem;
+	}
+
+	.moments-card .recent-card__avatar-frame {
+		width: 3.55rem;
+		height: 3.55rem;
+	}
+
 	.recent-card__header {
 		display: flex;
 		align-items: end;
@@ -461,9 +477,17 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		font-size: clamp(1.6rem, 3vw, 2rem);
 	}
 
+	.moments-card .recent-card__header {
+		align-items: center;
+	}
+
 	.recent-list {
 		display: grid;
 		gap: 1rem;
+	}
+
+	.moments-list {
+		gap: 0.62rem;
 	}
 
 	.recent-item {
@@ -487,6 +511,24 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		border-color: rgba(102, 204, 204, 0.5);
 		background: rgba(204, 255, 255, 0.3);
 		box-shadow: 0 16px 30px rgba(102, 204, 204, 0.12);
+	}
+
+	.moment-item {
+		display: block;
+		padding: 0.72rem 0.82rem;
+		border-radius: 1rem;
+	}
+
+	.moment-item p {
+		display: -webkit-box;
+		margin: 0;
+		overflow: hidden;
+		color: #334656;
+		font-size: 0.92rem;
+		line-height: 1.58;
+		text-overflow: ellipsis;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
 	}
 
 	.recent-item__meta,

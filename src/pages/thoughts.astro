@@ -1,0 +1,129 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+import { formatThoughtDate, getSortedThoughts, getThoughtAnchor } from '../lib/thoughts';
+
+const pageTitle = `碎碎念 | ${SITE_TITLE}`;
+const thoughts = getSortedThoughts();
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description="轻量记录技术思考、项目感悟、学习记录和一些个人随感。" />
+	</head>
+	<body>
+		<Header />
+		<main class="thoughts-page">
+			<section class="surface-card thoughts-hero">
+				<p class="eyebrow">Moments</p>
+				<h1>碎碎念</h1>
+				<p>
+					这里放一些不需要写成完整文章的短记录：技术判断、项目复盘、学习线索，和偶尔冒出来的小想法。
+				</p>
+			</section>
+
+			<section class="thoughts-list" aria-label="全部碎碎念">
+				{
+					thoughts.map((thought, index) => (
+						<article id={getThoughtAnchor(thought, index)} class="surface-card thought-card">
+							<div class="thought-card__meta">
+								<time datetime={thought.date}>{formatThoughtDate(thought.date, 'long')}</time>
+							</div>
+							<div class="thought-card__body">
+								<p>{thought.content}</p>
+							</div>
+						</article>
+					))
+				}
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.thoughts-page {
+		display: grid;
+		gap: 1rem;
+	}
+
+	.thoughts-hero,
+	.thoughts-list {
+		width: min(1180px, calc(100% - 2rem));
+		margin: 0 auto;
+	}
+
+	.thoughts-hero {
+		display: grid;
+		gap: 0.7rem;
+		max-width: 62rem;
+		padding: clamp(1.35rem, 2.2vw, 2rem);
+	}
+
+	.thoughts-hero h1 {
+		margin-bottom: 0;
+		font-size: clamp(2.25rem, 4vw, 3.8rem);
+	}
+
+	.thoughts-hero p:last-child {
+		max-width: 48rem;
+		margin: 0;
+		color: var(--color-subtext);
+		font-size: 0.98rem;
+		line-height: 1.75;
+	}
+
+	.thoughts-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr));
+		gap: 0.9rem;
+		align-items: start;
+	}
+
+	.thought-card {
+		display: grid;
+		gap: 0.7rem;
+		min-height: 8.4rem;
+		padding: clamp(1rem, 1.8vw, 1.35rem);
+		scroll-margin-top: 7rem;
+		background:
+			linear-gradient(135deg, rgba(204, 255, 255, 0.22), transparent 52%, rgba(255, 214, 232, 0.14)),
+			rgba(255, 255, 255, 0.82);
+	}
+
+	.thought-card__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.65rem;
+		color: var(--color-subtext);
+		font-size: 0.82rem;
+		font-weight: 700;
+	}
+
+	.thought-card__body {
+		display: grid;
+	}
+
+	.thought-card__body p {
+		margin: 0;
+		color: #334656;
+		font-size: 1rem;
+		line-height: 1.72;
+	}
+
+	@media (max-width: 720px) {
+		.thoughts-page {
+			gap: 0.9rem;
+		}
+
+		.thoughts-hero,
+		.thoughts-list {
+			width: calc(100% - 1rem);
+		}
+	}
+</style>
