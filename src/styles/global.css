@@ -133,6 +133,10 @@ main {
 	padding: 2rem 0 5rem;
 }
 
+body:not(.home-page) main {
+	padding-top: 7rem;
+}
+
 body.home-page {
 	--banner-height: 24rem/*clamp(100rem, 104vh, 204rem);*/
 }
@@ -557,6 +561,11 @@ hr {
 		width: min(1360px, calc(100% - 1rem));
 		padding: 1rem 0 4rem;
 	}
+
+	body:not(.home-page) main {
+		padding-top: 8.25rem;
+	}
+
 }
 
 @media (max-width: 860px) {

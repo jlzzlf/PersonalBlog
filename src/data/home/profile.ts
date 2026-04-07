@@ -3,7 +3,7 @@ export const profileContent = {
 	name: '章立夫',
 	role: 'Unity Developer',
 	tags: ['#Unity开发', '#项目实践', '#生活记录'],
-	introLines: ['这里是我的个人博客。', '我会在这里展示项目、记录学习、分享生活。'],
+	introLines: ['专注 Unity 开发，涵盖游戏与实时交互应用的技术实践。', '我会在这里展示项目、记录学习、分享生活。'],
 	note: '努力成为全栈开发者中...',
 } as const;
 

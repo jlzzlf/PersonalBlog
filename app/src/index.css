@@ -1,0 +1,254 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* 主色：#CCFFFF 薄荷青 */
+    --background: 180 100% 98%;
+    --foreground: 200 30% 15%;
+    --card: 180 80% 96%;
+    --card-foreground: 200 30% 15%;
+    --popover: 180 80% 96%;
+    --popover-foreground: 200 30% 15%;
+    --primary: 180 100% 90%;
+    --primary-foreground: 200 30% 15%;
+    --secondary: 180 60% 94%;
+    --secondary-foreground: 200 30% 15%;
+    --muted: 180 40% 92%;
+    --muted-foreground: 200 15% 45%;
+    --accent: 190 100% 85%;
+    --accent-foreground: 200 30% 15%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 180 50% 88%;
+    --input: 180 50% 88%;
+    --ring: 180 100% 85%;
+    --radius: 0.75rem;
+    
+    /* 自定义颜色变量 */
+    --mint-primary: #CCFFFF;
+    --mint-light: #E6FFFF;
+    --mint-dark: #99E6E6;
+    --mint-accent: #66CCCC;
+    --text-primary: #1a2b3c;
+    --text-secondary: #4a5a6a;
+    --text-muted: #7a8a9a;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply antialiased;
+    background: linear-gradient(135deg, #f0ffff 0%, #e6ffff 50%, #f5ffff 100%);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+  }
+}
+
+/* Custom Animations */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes border-glow {
+  0%, 100% {
+    border-color: rgba(204, 255, 255, 0.6);
+    box-shadow: 0 0 20px rgba(204, 255, 255, 0.4);
+  }
+  50% {
+    border-color: rgba(102, 204, 204, 0.8);
+    box-shadow: 0 0 40px rgba(102, 204, 204, 0.5);
+  }
+}
+
+/* Utility Classes */
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(204, 255, 255, 0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* Glass Effect - 浅色版 */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(204, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(102, 204, 204, 0.1);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(204, 255, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(102, 204, 204, 0.15);
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #66CCCC 0%, #339999 50%, #1a6666 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-mint {
+  background: linear-gradient(135deg, #66CCCC 0%, #99E6E6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Soft Glow - 浅色版 */
+.mint-glow {
+  box-shadow: 0 0 20px rgba(204, 255, 255, 0.5),
+              0 0 40px rgba(204, 255, 255, 0.3),
+              0 0 60px rgba(204, 255, 255, 0.2);
+}
+
+.mint-glow-soft {
+  box-shadow: 0 4px 20px rgba(102, 204, 204, 0.25);
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(102, 204, 204, 0.2);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 30px rgba(204, 255, 255, 0.6);
+}
+
+/* Background Gradients - 浅色版 */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, rgba(204, 255, 255, 0.4) 0%, transparent 70%);
+}
+
+.bg-gradient-mesh {
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(204, 255, 255, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(153, 230, 230, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(230, 255, 255, 0.3) 0%, transparent 60%);
+}
+
+/* Scrollbar Styling - 浅色版 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(230, 255, 255, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(102, 204, 204, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 204, 204, 0.7);
+}
+
+/* Selection - 浅色版 */
+::selection {
+  background: rgba(102, 204, 204, 0.3);
+  color: #1a2b3c;
+}

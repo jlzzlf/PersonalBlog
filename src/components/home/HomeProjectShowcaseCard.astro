@@ -6,28 +6,65 @@ interface Props {
 }
 
 const { items } = Astro.props;
+const mainProject = items.find((item) => !item.isMore) ?? items[0];
+const moreProject = items.find((item) => item.isMore);
+const sideProjects = items.filter((item) => item !== mainProject && !item.isMore);
+const plannedProjects =
+	sideProjects.length > 0
+		? sideProjects
+		: [
+				{ title: '2D平台跳跃', href: '/projects/' },
+				{ title: '粒子特效系统', href: '/projects/' },
+				{ title: 'AI行为树', href: '/projects/' },
+			];
 ---
 
-<article class="surface-card panel project-showcase-card">
-	<p class="eyebrow">Project Showcase</p>
-	<h2>项目展示</h2>
-	<div class:list={['project-showcase-grid', { 'is-single': items.length === 1 }]} aria-label="项目展示">
-		{
-			items.map((item) => (
-				<a
-					class:list={['project-showcase-tile', { 'is-more': item.isMore }]}
-					href={item.href}
-					aria-label={item.title}
-				>
-					<div class="project-showcase-tile__meta">
-						<span>{item.meta}</span>
-					</div>
-					<div class="project-showcase-tile__body">
+<div class="project-showcase-grid" aria-label="项目展示">
+	{
+		mainProject && (
+			<article class="home-card project-feature-card home-reveal" data-reveal-card>
+				<div class="project-feature-card__meta">
+					<span>{mainProject.meta}</span>
+					<span class="project-feature-card__type">{mainProject.label}</span>
+				</div>
+				<div class="project-feature-card__body">
+					<h3>{mainProject.title}</h3>
+					<p>{mainProject.description}</p>
+					{
+						mainProject.keywords.length > 0 && (
+							<div class="project-feature-card__keywords" aria-label="项目技术关键词">
+								{mainProject.keywords.map((keyword) => <span>{keyword}</span>)}
+							</div>
+						)
+					}
+				</div>
+				<div class="project-feature-card__actions">
+					<a class="button button-primary" href={mainProject.href}>查看详情</a>
+					<a class="button button-secondary" href="/projects/">源代码</a>
+				</div>
+			</article>
+		)
+	}
+
+	<aside class="home-card project-more-card home-reveal" data-reveal-card style="--reveal-delay: 100ms">
+		<div class="project-more-card__header">
+			<span class="project-more-card__icon" aria-hidden="true">All</span>
+			<div>
+				<p class="section-kicker">Projects</p>
+				<h3>更多项目</h3>
+			</div>
+		</div>
+		<p>进入完整项目页，查看全部项目内容和后续更新。</p>
+		<div class="project-more-card__list">
+			{
+				plannedProjects.map((item) => (
+					<a class="project-more-card__item" href={item.href}>
+						<span aria-hidden="true">•</span>
 						<strong>{item.title}</strong>
-						<p>{item.description}</p>
-					</div>
-				</a>
-			))
-		}
-	</div>
-</article>
+					</a>
+				))
+			}
+		</div>
+		<a class="project-more-card__button" href={moreProject?.href ?? '/projects/'}>查看全部项目<span aria-hidden="true">→</span></a>
+	</aside>
+</div>

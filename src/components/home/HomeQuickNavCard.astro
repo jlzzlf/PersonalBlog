@@ -2,19 +2,23 @@
 import { quickNavItems } from '../../data/home/links';
 ---
 
-<article class="surface-card panel quick-nav-card">
-	<p class="eyebrow">Quick Nav</p>
-	<h2>快捷导航</h2>
+<article class="quick-nav-card">
+	<div class="section-heading section-heading--left home-reveal" data-reveal-card>
+		<p class="section-kicker">Quick Navigation</p>
+		<h2>快捷导航</h2>
+	</div>
 	<p class="quick-nav-copy">常用网站会以矩形模块的方式铺开，窗口变宽时会自动多排一点。</p>
 	<div class="quick-nav-grid" aria-label="快捷导航">
 		{
-			quickNavItems.map((item) => (
+			quickNavItems.map((item, index) => (
 				<a
-					class:list={['quick-nav-tile', item.thumbTheme, { 'is-more': item.kind === 'more' }]}
+					class:list={['home-card quick-nav-tile home-reveal', item.thumbTheme, { 'is-more': item.kind === 'more' }]}
 					href={item.href}
 					aria-label={item.label}
 					target={item.kind === 'site' ? '_blank' : undefined}
 					rel={item.kind === 'site' ? 'noreferrer' : undefined}
+					data-reveal-card
+					style={`--reveal-delay: ${(index + 1) * 50}ms`}
 				>
 					<div class="quick-nav-tile__top">
 						<div class:list={['quick-nav-thumb', item.thumbSrc ? 'has-image' : 'is-placeholder', item.thumbTheme]}>

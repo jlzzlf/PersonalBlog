@@ -27,6 +27,9 @@ const mountHomePage = () => {
 	const home = document.querySelector('[data-parallax-home]');
 	if (!(home instanceof HTMLElement)) return;
 
+	const cleanupHandlers: Array<() => void> = [];
+	const statAnimationFrames = new Set<number>();
+
 	const refreshHomeLayout = () => {
 		home.getBoundingClientRect();
 		window.requestAnimationFrame(() => {
@@ -35,8 +38,8 @@ const mountHomePage = () => {
 	};
 
 	refreshHomeLayout();
+
 	let clockTimer = 0;
-	const removeCopyHandlers: Array<() => void> = [];
 	const currentTime = home.querySelector('[data-current-time]');
 	if (currentTime instanceof HTMLElement) {
 		const updateClock = () => {
@@ -55,6 +58,93 @@ const mountHomePage = () => {
 				updateClock();
 			}
 		}, 1000);
+	}
+
+	const revealTargets = Array.from(home.querySelectorAll('[data-reveal-card]'));
+	let revealObserver: IntersectionObserver | null = null;
+	if ('IntersectionObserver' in window) {
+		revealObserver = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting) continue;
+					if (entry.target instanceof HTMLElement) {
+						entry.target.classList.add('is-visible');
+					}
+					revealObserver?.unobserve(entry.target);
+				}
+			},
+			{ threshold: 0.1 },
+		);
+
+		for (const target of revealTargets) {
+			revealObserver.observe(target);
+		}
+	} else {
+		for (const target of revealTargets) {
+			if (target instanceof HTMLElement) {
+				target.classList.add('is-visible');
+			}
+		}
+	}
+
+	const animateStat = (element: HTMLElement) => {
+		const targetRaw = element.dataset.statCount;
+		if (!targetRaw || element.dataset.statAnimated === 'true') return;
+
+		const target = Number.parseFloat(targetRaw);
+		if (!Number.isFinite(target)) return;
+
+		element.dataset.statAnimated = 'true';
+		const precision = Math.max(0, Number.parseInt(element.dataset.statPrecision ?? '0', 10) || 0);
+		const duration = 2000;
+		const start = performance.now();
+
+		const tick = (time: number) => {
+			const progress = Math.min(1, (time - start) / duration);
+			const eased = 1 - Math.pow(1 - progress, 3);
+			const nextValue = target * eased;
+			element.textContent = precision > 0 ? nextValue.toFixed(precision) : String(Math.floor(nextValue));
+
+			if (progress < 1) {
+				const animationFrame = window.requestAnimationFrame(tick);
+				statAnimationFrames.add(animationFrame);
+			} else {
+				element.textContent = precision > 0 ? target.toFixed(precision) : String(Math.round(target));
+			}
+		};
+
+		const animationFrame = window.requestAnimationFrame(tick);
+		statAnimationFrames.add(animationFrame);
+	};
+
+	const statCards = Array.from(home.querySelectorAll('[data-stat-card]'));
+	let statObserver: IntersectionObserver | null = null;
+	if ('IntersectionObserver' in window) {
+		statObserver = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) continue;
+					const counters = entry.target.querySelectorAll('[data-stat-count]');
+					for (const counter of counters) {
+						if (counter instanceof HTMLElement) {
+							animateStat(counter);
+						}
+					}
+					statObserver?.unobserve(entry.target);
+				}
+			},
+			{ threshold: 0.35 },
+		);
+
+		for (const card of statCards) {
+			statObserver.observe(card);
+		}
+	} else {
+		for (const counter of home.querySelectorAll('[data-stat-count]')) {
+			if (counter instanceof HTMLElement) {
+				animateStat(counter);
+			}
+		}
 	}
 
 	const copyButtons = Array.from(home.querySelectorAll('[data-copy-text]'));
@@ -88,7 +178,7 @@ const mountHomePage = () => {
 		};
 
 		button.addEventListener('click', handleClick);
-		removeCopyHandlers.push(() => {
+		cleanupHandlers.push(() => {
 			button.removeEventListener('click', handleClick);
 			if (resetTimer) {
 				window.clearTimeout(resetTimer);
@@ -105,8 +195,16 @@ const mountHomePage = () => {
 			clockTimer = 0;
 		}
 
-		for (const removeHandler of removeCopyHandlers) {
-			removeHandler();
+		revealObserver?.disconnect();
+		statObserver?.disconnect();
+
+		for (const animationFrame of statAnimationFrames) {
+			window.cancelAnimationFrame(animationFrame);
+		}
+		statAnimationFrames.clear();
+
+		for (const cleanupHandler of cleanupHandlers) {
+			cleanupHandler();
 		}
 	};
 };

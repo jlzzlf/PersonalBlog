@@ -6,18 +6,52 @@ interface Props {
 }
 
 const { stats } = Astro.props;
+const iconLabels = ['文', '天', '更', '字'];
+
+const splitStatValue = (value: string) => {
+	const match = value.match(/^(\d+(?:\.\d+)?)(.*)$/);
+	if (!match) {
+		return {
+			target: '',
+			initialValue: value,
+			suffix: '',
+		};
+	}
+
+	return {
+		target: match[1],
+		initialValue: '0',
+		suffix: match[2].trimStart(),
+	};
+};
 ---
 
-<article class="surface-card panel stats-card">
-	<p class="eyebrow">Site Stats</p>
-	<dl class="stats-list" aria-label="站点统计">
-		{
-			stats.map((stat) => (
-				<div class="stats-row">
-					<dt>{stat.label}</dt>
-					<dd>{stat.value}</dd>
+<dl class="stats-grid" aria-label="站点统计">
+	{
+		stats.map((stat, index) => {
+			const value = splitStatValue(stat.value);
+			return (
+				<div
+					class="home-card stat-card home-reveal"
+					data-reveal-card
+					data-stat-card
+					style={`--reveal-delay: ${index * 100}ms`}
+				>
+					<dt>
+						<span class="stat-card__icon" aria-hidden="true">{iconLabels[index] ?? '数'}</span>
+						<span>{stat.label}</span>
+					</dt>
+					<dd>
+						<span
+							data-stat-count={value.target}
+							data-stat-precision={value.target.includes('.') ? '1' : '0'}
+						>
+							{value.initialValue}
+						</span>
+						{value.suffix && <small>{value.suffix}</small>}
+					</dd>
 				</div>
-			))
-		}
-	</dl>
-</article>
+			);
+		})
+	}
+</dl>

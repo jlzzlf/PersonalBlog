@@ -13,7 +13,7 @@ const navItems = [
 const isActive = (href: string) => href === pathname || href === '/' + (currentSection || '');
 ---
 
-<header class="site-header">
+<header class="site-header" data-site-header>
 	<nav class="header-shell" aria-label="主导航">
 		<a class="brand" href="/">
 			<span class="brand-mark">MB</span>
@@ -39,26 +39,45 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 
 <style>
 	.site-header {
-		position: sticky;
+		position: fixed;
 		top: 0;
-		z-index: 20;
+		right: 0;
+		left: 0;
+		z-index: 30;
 		width: 100%;
-		border-bottom: 1px solid rgba(224, 242, 247, 0.95);
-		background: linear-gradient(180deg, rgba(248, 254, 255, 0.94), rgba(255, 255, 255, 0.82));
-		backdrop-filter: blur(22px);
-		-webkit-backdrop-filter: blur(22px);
-		box-shadow: 0 12px 34px rgba(112, 159, 176, 0.08);
+		border-bottom: 1px solid transparent;
+		background: transparent;
+		box-shadow: none;
+		transition:
+			padding 500ms ease,
+			border-color 500ms ease,
+			background-color 500ms ease,
+			box-shadow 500ms ease,
+			backdrop-filter 500ms ease;
+	}
+
+	.site-header.is-home-scrolled {
+		border-bottom-color: rgba(204, 255, 255, 0.5);
+		background: rgba(255, 255, 255, 0.85);
+		backdrop-filter: blur(30px);
+		-webkit-backdrop-filter: blur(30px);
+		box-shadow: 0 8px 32px rgba(102, 204, 204, 0.15);
 	}
 
 	.header-shell {
 		display: grid;
-		grid-template-columns: minmax(14rem, 1fr) auto minmax(14rem, 1fr);
+		grid-template-columns: minmax(14rem, 1fr) auto;
 		align-items: center;
 		gap: 1rem;
 		width: min(1360px, calc(100% - 2rem));
 		margin: 0 auto;
-		padding: 0.9rem 0;
+		padding: 1.1rem 0;
 		min-height: 4.6rem;
+		transition: padding 500ms ease;
+	}
+
+	.site-header.is-home-scrolled .header-shell {
+		padding-block: 0.72rem;
 	}
 
 	.brand {
@@ -73,13 +92,13 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		width: 2.75rem;
-		height: 2.75rem;
-		border-radius: 999px;
-		background: linear-gradient(135deg, rgba(204, 255, 255, 0.92), rgba(255, 214, 232, 0.64));
-		color: var(--color-link-hover);
+		width: 2.55rem;
+		height: 2.55rem;
 		border: 1px solid rgba(153, 230, 255, 0.4);
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+		border-radius: 0.85rem;
+		background: linear-gradient(135deg, #ccffff, #66cccc);
+		color: var(--color-link-hover);
+		box-shadow: 0 4px 20px rgba(102, 204, 204, 0.25);
 		font-size: 0.82rem;
 		font-weight: 700;
 		letter-spacing: 0.12em;
@@ -91,7 +110,11 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 	}
 
 	.brand-copy strong {
+		color: #f4ffff;
 		font-size: 1rem;
+		text-shadow:
+			0 1px 10px rgba(15, 76, 92, 0.78),
+			0 0 2px rgba(15, 76, 92, 0.72);
 	}
 
 	.brand-copy small {
@@ -116,8 +139,8 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		align-items: center;
 		justify-content: center;
 		padding: 0.7rem 1rem;
-		border-radius: 999px;
 		border: 1px solid transparent;
+		border-radius: 999px;
 		background: transparent;
 		color: var(--color-text);
 		font-size: 0.95rem;
@@ -146,7 +169,7 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 	}
 
 	.settings-button {
-		display: inline-flex;
+		display: none;
 		align-items: center;
 		justify-content: center;
 		width: 2.9rem;
@@ -182,10 +205,10 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 
 	@media (max-width: 720px) {
 		.header-shell {
-			grid-template-columns: auto auto;
+			grid-template-columns: 1fr;
 			grid-template-areas:
-				'brand settings'
-				'links links';
+				'brand'
+				'links';
 			align-items: start;
 			gap: 0.9rem;
 			width: calc(100% - 1rem);
@@ -219,3 +242,47 @@ const isActive = (href: string) => href === pathname || href === '/' + (currentS
 		}
 	}
 </style>
+
+<script>
+	const HEADER_STATE_KEY = '__joylifeSiteHeaderState';
+
+	const mountSiteHeader = () => {
+		const windowWithState = window as typeof window & Record<string, unknown>;
+		const previousCleanup = windowWithState[HEADER_STATE_KEY];
+		if (typeof previousCleanup === 'function') {
+			previousCleanup();
+		}
+
+		const header = document.querySelector('[data-site-header]');
+		if (!(header instanceof HTMLElement)) return;
+
+		const syncHeaderState = () => {
+			header.classList.toggle('is-home-scrolled', window.scrollY > 50);
+		};
+
+		syncHeaderState();
+		window.addEventListener('scroll', syncHeaderState, { passive: true });
+
+		windowWithState[HEADER_STATE_KEY] = () => {
+			window.removeEventListener('scroll', syncHeaderState);
+			header.classList.remove('is-home-scrolled');
+		};
+	};
+
+	document.addEventListener('astro:page-load', mountSiteHeader);
+	document.addEventListener('astro:before-swap', () => {
+		const windowWithState = window as typeof window & Record<string, unknown>;
+		const cleanup = windowWithState[HEADER_STATE_KEY];
+		if (typeof cleanup === 'function') {
+			cleanup();
+			delete windowWithState[HEADER_STATE_KEY];
+		}
+	});
+	window.addEventListener('pageshow', (event) => {
+		if (event.persisted) {
+			mountSiteHeader();
+		}
+	});
+
+	mountSiteHeader();
+</script>

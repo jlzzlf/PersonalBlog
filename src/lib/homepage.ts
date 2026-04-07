@@ -7,6 +7,10 @@ export interface HomeRecentPost {
 	href: string;
 	description: string;
 	pubDateLabel: string;
+	dateTime: string;
+	readTimeLabel: string;
+	tags: string[];
+	featured: boolean;
 }
 
 export interface HomeSiteStat {
@@ -42,6 +46,11 @@ const formatCompactCount = (value: number) =>
 		notation: 'compact',
 		maximumFractionDigits: 1,
 	}).format(value).toLowerCase();
+
+const formatReadTime = (content: string) => {
+	const units = countContentUnits(content);
+	return `${Math.max(1, Math.ceil(units / 450))} 分钟`;
+};
 
 const formatRelativeTime = (date: Date, reference = new Date()) => {
 	const relativeTimeFormatter = new Intl.RelativeTimeFormat('zh-CN', {
@@ -102,11 +111,15 @@ export const buildHomePageViewModel = (posts: BlogPost[]) => {
 		}, new Map<string, BlogPost[]>()),
 	);
 
-	const recentPosts: HomeRecentPost[] = posts.slice(0, 2).map((post) => ({
+	const recentPosts: HomeRecentPost[] = posts.slice(0, 3).map((post, index) => ({
 		title: post.data.title,
 		href: `/blog/${post.id}/`,
 		description: post.data.description,
 		pubDateLabel: formatArchiveDate(post.data.pubDate),
+		dateTime: post.data.pubDate.toISOString(),
+		readTimeLabel: formatReadTime(post.body),
+		tags: post.data.tags.length > 0 ? post.data.tags : [post.data.category],
+		featured: index === 0,
 	}));
 
 	const launchPost = posts.find((post) => post.id === 'first-post') ?? posts[posts.length - 1];
