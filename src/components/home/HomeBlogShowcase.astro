@@ -7,55 +7,27 @@ interface Props {
 
 const { posts } = Astro.props;
 const featuredPost = posts.find((post) => post.featured) ?? posts[0];
-const regularPosts = posts.filter((post) => post !== featuredPost);
+const regularPosts = featuredPost ? posts.filter((post) => post !== featuredPost) : [];
+const visiblePosts = featuredPost ? [featuredPost, ...regularPosts] : [];
 ---
 
 <div class="blog-showcase-grid" aria-label="博客文章">
 	{
-		featuredPost && (
-			<article class="home-card blog-feature-card home-reveal" data-reveal-card>
-				<span class="blog-feature-card__badge">精选文章</span>
-				<div class="blog-feature-card__icon" aria-hidden="true">Read</div>
-				<div class="blog-feature-card__body">
-					<h3>{featuredPost.title}</h3>
-					<p>{featuredPost.description}</p>
-				</div>
+		visiblePosts.map((post, index) => (
+			<article
+				class:list={['home-card blog-entry-card home-reveal', { 'is-featured': post === featuredPost }]}
+				data-reveal-card
+				style={`--reveal-delay: ${(index + 1) * 80}ms`}
+			>
 				<div class="blog-card-meta">
-					<time datetime={featuredPost.dateTime}>{featuredPost.pubDateLabel}</time>
-					<span>{featuredPost.readTimeLabel}</span>
+					<time datetime={post.dateTime}>{post.pubDateLabel}</time>
 				</div>
-				<div class="blog-tags" aria-label="文章标签">
-					{featuredPost.tags.slice(0, 3).map((tag) => <span>{tag}</span>)}
-				</div>
-				<a class="blog-card-link" href={featuredPost.href}>阅读全文<span aria-hidden="true">→</span></a>
-			</article>
-		)
-	}
-
-	<div class="blog-regular-list">
-		{
-			regularPosts.map((post, index) => (
-				<article
-					class="home-card blog-regular-card home-reveal"
-					data-reveal-card
-					style={`--reveal-delay: ${(index + 2) * 100}ms`}
-				>
-					<div class="blog-card-meta">
-						<time datetime={post.dateTime}>{post.pubDateLabel}</time>
-						<span>{post.readTimeLabel}</span>
-					</div>
+				<div class="blog-entry-card__copy">
 					<h3>{post.title}</h3>
 					<p>{post.description}</p>
-					<div class="blog-regular-card__footer">
-						<div class="blog-tags" aria-label="文章标签">
-							{post.tags.slice(0, 2).map((tag) => <span>{tag}</span>)}
-						</div>
-						<a class="blog-card-link is-icon" href={post.href} aria-label={`阅读${post.title}`}>
-							<span aria-hidden="true">→</span>
-						</a>
-					</div>
-				</article>
-			))
-		}
-	</div>
+				</div>
+				<a class="blog-card-link" href={post.href}>阅读全文<span aria-hidden="true">→</span></a>
+			</article>
+		))
+	}
 </div>

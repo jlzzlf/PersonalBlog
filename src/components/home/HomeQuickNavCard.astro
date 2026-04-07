@@ -1,5 +1,13 @@
 ---
 import { quickNavItems } from '../../data/home/links';
+
+const quickNavCards = quickNavItems.map((item) => ({
+	thumbAlt: '',
+	thumbSrc: '',
+	thumbText: '',
+	thumbTheme: '',
+	...item,
+}));
 ---
 
 <article class="quick-nav-card">
@@ -7,12 +15,11 @@ import { quickNavItems } from '../../data/home/links';
 		<p class="section-kicker">Quick Navigation</p>
 		<h2>快捷导航</h2>
 	</div>
-	<p class="quick-nav-copy">常用网站会以矩形模块的方式铺开，窗口变宽时会自动多排一点。</p>
 	<div class="quick-nav-grid" aria-label="快捷导航">
 		{
-			quickNavItems.map((item, index) => (
+			quickNavCards.map((item, index) => (
 				<a
-					class:list={['home-card quick-nav-tile home-reveal', item.thumbTheme, { 'is-more': item.kind === 'more' }]}
+					class:list={['home-card quick-nav-tile home-reveal', { 'is-more': item.kind === 'more' }]}
 					href={item.href}
 					aria-label={item.label}
 					target={item.kind === 'site' ? '_blank' : undefined}
