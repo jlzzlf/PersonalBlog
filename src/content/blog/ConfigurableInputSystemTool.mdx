@@ -1,0 +1,65 @@
+---
+title: 'InputSystem工具'
+description: '基于 Unity Input System 封装的一套轻量级输入管理工具，通过 ScriptableObject 配置驱动，实现输入资产与业务逻辑解耦'
+category: '技术笔记'
+tags:
+  - InputSystem
+pubDate: '2026-4-7'
+---
+
+> ## 项目地址
+https://github.com/jlzzlf/ConfigurableInputSystemTool
+> ## 项目功能
+### 1.不让业务代码直接去找Action
+```csharp
+var move = actions.FindAction("Player/Move");
+var jump = actions.FindAction("Player/Jump");
+```
+这样会有几个麻烦：  
+- 路径字符串散落一地，容易写错
+- 后面改 Map/Action 名字，很多地方都要跟着改
+- 每个脚本都直接依赖 .inputactions 资产，耦合比较重
+### 2.使用ScriptableObject配置输入
+在不同的项目中，通过换不同的InputActionAsset和路径来快速配置
+### 3.统一管理ActionMap的启停
+提供启动时按配置启动某些Map，例如：打开菜单时只启用UI Map  
+### 4.给外部脚本提供更简单的输入接口
+### **值缓存**
+- Move
+- Look  
+外部脚本直接读属性
+### **事件**
+- JumpPerformed
+- InteractPerformed  
+外部脚本订阅事件
+> ## 使用方法
+- 将包拖入Unity中。
+- 在包管理器中安装InputSystem
+- 在Project Settings-Player-Active Input Handing中改为Input System Package或者Both
+- 在Input Actions中新建一个Actions（建议），或者在Project窗口中右键新建一个Actions
+- 把这个Actions拖入Input Config中，并填写相应内容
+- 场景里放一个InputService对象并挂载
+- 调用，例：  
+```csharp
+//角色移动
+Vector2 move=InputService.Instance.Move;
+//跳跃
+private void OnEnable()
+{
+    InputService.Instance.JumpPerformed += OnJump;
+}
+private void OnDisable()
+{
+    if (InputService.Instance != null)
+        InputService.Instance.JumpPerformed -= OnJump;
+}
+private void OnJump()
+{
+    // 跳跃逻辑
+}
+//打开菜单时切换输入
+InputService.Instance.SwitchToOnlyMap("UI");
+//关闭菜单时切回
+InputService.Instance.SwitchToOnlyMap("Gameplay");
+```
+> ### **此方案不必生成.inputactions的C# Class**
