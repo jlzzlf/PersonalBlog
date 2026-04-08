@@ -28,64 +28,59 @@ const resolvedHeroImage =
 		<Header />
 		<main class="project-post-page__main">
 			<article class="project-post-layout">
-				<section class="surface-card project-post-hero">
-					<div class="project-post-hero__copy">
-						<p class="eyebrow">Project Detail</p>
-						<h1>{title}</h1>
-						<p class="project-post-summary">{summary}</p>
-						{teaser && <p class="project-post-teaser">{teaser}</p>}
+				<header class="project-post-header">
+					<nav class="project-post-breadcrumb" aria-label="面包屑">
+						<a href="/projects/">项目</a>
+						<span aria-hidden="true">/</span>
+						<span>{status}</span>
+					</nav>
+
+					<h1>{title}</h1>
+					<p class="project-post-summary">{summary}</p>
+					{teaser && <p class="project-post-teaser">{teaser}</p>}
+
+					<div class="project-post-meta" aria-label="项目信息">
+						<span>{status}</span>
+						<span aria-hidden="true">·</span>
+						<span>{year}</span>
+						<span aria-hidden="true">·</span>
+						<span>{role}</span>
 						{
-							tags.length > 0 && (
-								<div class="project-post-tags" aria-label="项目标签">
-									{tags.map((tag) => <span class="project-post-tag">{tag}</span>)}
-								</div>
+							stack.length > 0 && (
+								<>
+									<span aria-hidden="true">·</span>
+									<span>{stack.join(' / ')}</span>
+								</>
 							)
 						}
 					</div>
 
 					{
-						resolvedHeroImage && (
-							<figure class="project-post-hero__media">
-								<img
-									src={resolvedHeroImage.src}
-									width={resolvedHeroImage.width}
-									height={resolvedHeroImage.height}
-									alt={title}
-									loading="eager"
-									decoding="async"
-								/>
-							</figure>
+						tags.length > 0 && (
+							<div class="project-post-tags" aria-label="项目标签">
+								{tags.map((tag) => <span class="project-post-tag">{tag}</span>)}
+							</div>
 						)
 					}
-				</section>
+				</header>
 
-				<section class="project-post-grid">
-					<aside class="surface-card project-post-meta">
-						<p class="project-post-meta__eyebrow">Snapshot</p>
-						<h2>项目信息</h2>
-						<dl class="project-post-facts">
-							<div>
-								<dt>当前状态</dt>
-								<dd>{status}</dd>
-							</div>
-							<div>
-								<dt>项目年份</dt>
-								<dd>{year}</dd>
-							</div>
-							<div>
-								<dt>开发方式</dt>
-								<dd>{role}</dd>
-							</div>
-							<div>
-								<dt>技术栈</dt>
-								<dd>{stack.join(' / ') || '待补充'}</dd>
-							</div>
-						</dl>
-					</aside>
+				{
+					resolvedHeroImage && (
+						<figure class="project-post-cover">
+							<img
+								src={resolvedHeroImage.src}
+								width={resolvedHeroImage.width}
+								height={resolvedHeroImage.height}
+								alt={title}
+								loading="eager"
+								decoding="async"
+							/>
+						</figure>
+					)
+				}
 
-					<section class="surface-card project-post-content prose">
-						<slot />
-					</section>
+				<section class="project-post-content prose">
+					<slot />
 				</section>
 			</article>
 		</main>
@@ -95,174 +90,137 @@ const resolvedHeroImage =
 
 <style>
 	.project-post-page__main {
-		width: min(1120px, calc(100% - 1.2rem));
+		--project-post-content-width: min(760px, calc(100vw - 2rem));
+		--project-post-radius: 8px;
+		--project-post-border: rgba(15, 23, 42, 0.1);
+		width: var(--project-post-content-width);
 		margin: 0 auto;
-		padding-top: 1.4rem;
+		padding-top: clamp(1.5rem, 3vw, 2.8rem);
 	}
 
 	.project-post-layout {
 		display: grid;
-		gap: 1rem;
+		gap: clamp(1.7rem, 3vw, 2.5rem);
 	}
 
-	.project-post-hero,
-	.project-post-meta,
-	.project-post-content {
-		padding: clamp(1.35rem, 2.2vw, 1.9rem);
-	}
-
-	.project-post-hero {
+	.project-post-header {
 		display: grid;
-		grid-template-columns: minmax(0, 1.05fr) minmax(18rem, 0.95fr);
-		gap: 1rem;
-		align-items: stretch;
+		gap: 0.85rem;
+		padding-bottom: clamp(1.4rem, 3vw, 2rem);
+		border-bottom: 1px solid rgba(15, 23, 42, 0.1);
 	}
 
-	.project-post-hero__copy {
-		display: grid;
-		gap: 0.9rem;
-		align-content: start;
+	.project-post-header h1 {
+		margin: 0;
+		color: #111827;
+		font-size: clamp(2rem, 4.6vw, 3rem);
+		font-weight: 700;
+		line-height: 1.2;
+		letter-spacing: 0;
+		text-wrap: balance;
 	}
 
-	.project-post-hero__copy h1 {
-		margin-bottom: 0;
+	.project-post-breadcrumb,
+	.project-post-meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem;
+		margin: 0;
+		color: #6b7280;
+		font-size: 0.86rem;
+		line-height: 1.35;
+	}
+
+	.project-post-breadcrumb a {
+		color: var(--color-link-hover);
+		text-decoration: none;
+	}
+
+	.project-post-breadcrumb a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
 	}
 
 	.project-post-summary,
 	.project-post-teaser {
+		max-width: 42rem;
 		margin: 0;
-		color: var(--color-subtext);
+		color: #4b5563;
+		text-wrap: pretty;
 	}
 
 	.project-post-summary {
-		font-size: 1.04rem;
-		line-height: 1.72;
+		font-size: clamp(1.02rem, 1.3vw, 1.12rem);
+		line-height: 1.7;
 	}
 
 	.project-post-teaser {
-		line-height: 1.7;
+		font-size: 0.98rem;
+		line-height: 1.68;
 	}
 
 	.project-post-tags {
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.45rem;
+		margin-top: 0.15rem;
 	}
 
 	.project-post-tag {
 		display: inline-flex;
 		align-items: center;
-		padding: 0.36rem 0.72rem;
-		border: 1px solid var(--color-border);
+		padding: 0.26rem 0.58rem;
+		border: 1px solid rgba(15, 23, 42, 0.1);
 		border-radius: 999px;
-		background: rgba(230, 250, 255, 0.84);
+		background: #fff;
 		color: var(--color-link-hover);
-		font-size: 0.84rem;
+		font-size: 0.78rem;
 		font-weight: 700;
 		line-height: 1.2;
 	}
 
-	.project-post-hero__media {
+	.project-post-cover {
 		margin: 0;
 		overflow: hidden;
-		border-radius: 24px;
-		background: linear-gradient(135deg, rgba(204, 255, 255, 0.62), rgba(255, 214, 232, 0.34));
+		border: 1px solid var(--project-post-border);
+		border-radius: var(--project-post-radius);
+		background: #fff;
 	}
 
-	.project-post-hero__media img {
+	.project-post-cover img {
 		display: block;
 		width: 100%;
-		height: 100%;
-		min-height: 100%;
+		height: auto;
+		aspect-ratio: 16 / 9;
 		object-fit: cover;
-	}
-
-	.project-post-grid {
-		display: grid;
-		grid-template-columns: minmax(16rem, 18rem) minmax(0, 1fr);
-		gap: 1rem;
-		align-items: start;
-	}
-
-	.project-post-meta {
-		display: grid;
-		gap: 0.9rem;
-		position: sticky;
-		top: 6rem;
-	}
-
-	.project-post-meta h2,
-	.project-post-content :global(h2:first-child) {
-		margin-top: 0;
-	}
-
-	.project-post-meta__eyebrow {
-		margin: 0;
-		font-size: 0.82rem;
-		font-weight: 700;
-		letter-spacing: 0.12em;
-		text-transform: uppercase;
-		color: var(--color-subtext);
-	}
-
-	.project-post-facts {
-		display: grid;
-		gap: 0.8rem;
-		margin: 0;
-	}
-
-	.project-post-facts div {
-		display: grid;
-		gap: 0.22rem;
-		padding: 0.85rem 0.95rem;
-		border: 1px solid var(--color-border);
-		border-radius: 20px;
-		background: rgba(255, 255, 255, 0.76);
-	}
-
-	.project-post-facts dt {
-		font-size: 0.8rem;
-		font-weight: 700;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--color-subtext);
-	}
-
-	.project-post-facts dd {
-		margin: 0;
-		color: var(--color-text);
-		font-weight: 700;
+		border-radius: inherit;
 	}
 
 	.project-post-content {
+		width: var(--project-post-content-width);
 		min-width: 0;
+		margin: 0 auto;
+		padding: 0 0 0.35rem;
 	}
 
-	@media (max-width: 920px) {
-		.project-post-hero,
-		.project-post-grid {
-			grid-template-columns: 1fr;
-		}
+	:global(body.project-post-page) {
+		background: #fff;
+	}
 
-		.project-post-meta {
-			position: static;
-		}
-
-		.project-post-hero__media img {
-			aspect-ratio: 16 / 9;
-		}
+	:global(body.project-post-page::before) {
+		display: none;
 	}
 
 	@media (max-width: 720px) {
 		.project-post-page__main {
-			width: calc(100% - 1rem);
+			--project-post-content-width: calc(100vw - 1.15rem);
+			width: var(--project-post-content-width);
 			padding-top: 1rem;
 		}
 
-		.project-post-hero,
-		.project-post-meta,
-		.project-post-content {
-			padding: 1.15rem;
+		.project-post-header h1 {
+			font-size: clamp(1.82rem, 8vw, 2.35rem);
 		}
 	}
 </style>
