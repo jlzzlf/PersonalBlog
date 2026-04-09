@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>C# / Unity Cheat Sheet</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="sheet-page">
+      <header class="toolbar">
+        <div class="toolbar-main">
+          <p class="eyebrow">Learning Reference Card</p>
+          <h1>C# / Unity Cheat Sheet</h1>
+          <p class="toolbar-note">
+            卡片数据已拆分到独立文件，右上角手柄可拖拽排序并保存在本地。
+          </p>
+        </div>
+
+        <div class="toolbar-actions">
+          <label class="search-wrap" for="searchInput">
+            <span class="search-label">搜索</span>
+            <input
+              id="searchInput"
+              class="search-input"
+              type="search"
+              placeholder="按标题、分类、关键词检索"
+              autocomplete="off"
+            />
+          </label>
+
+          <button id="clearSearchBtn" class="tool-button" type="button">
+            清空搜索
+          </button>
+          <button
+            id="resetOrderBtn"
+            class="tool-button tool-button-strong"
+            type="button"
+          >
+            恢复默认顺序
+          </button>
+        </div>
+
+        <div class="toolbar-meta">
+          <span id="resultCount">加载中...</span>
+          <span id="statusText">默认顺序</span>
+        </div>
+      </header>
+
+      <main class="sheet-shell">
+        <section id="cardGrid" class="sheet-grid" aria-live="polite"></section>
+      </main>
+    </div>
+
+    <noscript>
+      <div class="noscript-banner">
+        此页面需要启用 JavaScript 才能渲染卡片与拖拽排序。
+      </div>
+    </noscript>
+
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"
+    ></script>
+    <script defer src="cards-data.js"></script>
+    <script defer src="script.js"></script>
+  </body>
+</html>
