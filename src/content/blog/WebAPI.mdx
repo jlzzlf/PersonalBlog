@@ -1,0 +1,454 @@
+---
+title: 'Unity 后端入门笔记'
+description: '注册接口 + SQL + Web API 基础'
+category: '学习记录'
+tags:
+  - 后端
+  - SQL
+  - Web API
+pubDate: '2026-4-9'
+---
+#  Unity 后端入门笔记：注册接口 + SQL + Web API 基础
+
+---
+
+# 一、项目目标
+
+实现一个最小后端闭环（当前进度：注册接口）
+
+## 已完成
+
+* ASP.NET Core Web API（Controller 模式）
+* SQLite 数据库（手动建表）
+* 注册接口 `POST /api/auth/register`
+* 数据成功写入数据库
+* 密码使用 Hash 存储
+
+---
+
+# 二、核心技术选型（当前阶段）
+
+| 技术                    | 用途        |
+| --------------------- | --------- |
+| ASP.NET Core Web API  | 后端框架      |
+| Controller            | 接口实现方式    |
+| SQLite                | 数据库       |
+| Microsoft.Data.Sqlite | 原生 SQL 操作 |
+| PasswordHasher        | 密码安全处理    |
+
+---
+
+# 三、数据库设计（手动建表）
+
+## schema.sql
+
+```sql
+CREATE TABLE IF NOT EXISTS Users (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserName TEXT NOT NULL UNIQUE,
+    PasswordHash TEXT NOT NULL,
+    CreatedAt TEXT NOT NULL
+);
+```
+
+## 关键点
+
+* `UNIQUE`：防止重复用户名
+* 不存明文密码，只存 `PasswordHash`
+* 时间用字符串（ISO 格式）即可
+
+---
+
+# 四、项目结构（当前推荐）
+
+```text
+Controllers/
+  AuthController.cs
+
+Data/
+  UserRepository.cs
+
+Dtos/
+  RegisterRequest.cs
+
+sql/
+  001_create_users.sql
+
+Program.cs
+game.db
+```
+
+---
+
+# 五、DTO / Entity / Model 概念
+
+## 1️⃣ DTO（Data Transfer Object）
+
+ 用于“接口传输数据”
+
+### 示例
+
+```csharp
+public class RegisterRequest
+{
+    public string UserName { get; set; } = "";
+    public string Password { get; set; } = "";
+}
+```
+
+### 特点
+
+* 面向接口
+* 表示“客户端需要传什么”
+* 不等于数据库结构
+
+---
+
+## 2️⃣ Entity（实体）
+
+👉 表示数据库中的数据结构
+
+```csharp
+public class User
+{
+    public int Id { get; set; }
+    public string UserName { get; set; } = "";
+    public string PasswordHash { get; set; } = "";
+    public string CreatedAt { get; set; } = "";
+}
+```
+
+### 特点
+
+* 和数据库字段一一对应
+* 包含内部数据（可能敏感）
+
+---
+
+## 3️⃣ Model（泛称）
+
+👉 不要死记定义
+
+可能指：
+
+* DTO
+* Entity
+* 任意数据类
+
+📌 结论：看到 Model 要看上下文
+
+---
+
+## 4️⃣ ViewModel（了解即可）
+
+ 用于界面展示的数据结构
+
+当前 Web API 阶段不是重点
+
+---
+
+# 六、DTO vs Entity 核心区别
+
+| 项目       | DTO  | Entity |
+| -------- | ---- | ------ |
+| 用途       | 接口传输 | 数据库存储  |
+| 是否暴露给前端  | 是    | 不一定    |
+| 字段是否一致   | 不一定  | 通常一致   |
+| 是否包含敏感数据 | 不应该  | 可能有    |
+
+---
+
+# 七、Repository（数据库操作层）
+
+## 示例：UserRepository
+
+```csharp
+public class UserRepository
+{
+    private const string ConnectionString = "Data Source=game.db";
+
+    public bool UserExists(string userName)
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        const string sql = "SELECT COUNT(1) FROM Users WHERE UserName = @UserName";
+
+        using var command = new SqliteCommand(sql, connection);
+        command.Parameters.AddWithValue("@UserName", userName);
+
+        long count = (long)command.ExecuteScalar()!;
+        return count > 0;
+    }
+
+    public int CreateUser(string userName, string passwordHash)
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        const string sql = @"
+INSERT INTO Users (UserName, PasswordHash, CreatedAt)
+VALUES (@UserName, @PasswordHash, @CreatedAt);
+SELECT last_insert_rowid();
+";
+
+        using var command = new SqliteCommand(sql, connection);
+        command.Parameters.AddWithValue("@UserName", userName);
+        command.Parameters.AddWithValue("@PasswordHash", passwordHash);
+        command.Parameters.AddWithValue("@CreatedAt", DateTime.UtcNow.ToString("o"));
+
+        long newId = (long)command.ExecuteScalar()!;
+        return (int)newId;
+    }
+}
+```
+
+---
+
+# 八、SQL 核心知识点（本阶段）
+
+## 1️⃣ 查重
+
+```sql
+SELECT COUNT(1) FROM Users WHERE UserName = @UserName
+```
+
+## 2️⃣ 插入
+
+```sql
+INSERT INTO Users (...)
+VALUES (...)
+```
+
+## 3️⃣ 获取自增 ID
+
+```sql
+SELECT last_insert_rowid()
+```
+
+---
+
+## 重要原则
+
+### ❗必须使用参数化查询
+
+```csharp
+command.Parameters.AddWithValue("@UserName", userName);
+```
+
+🚫 不要拼接字符串（防 SQL 注入）
+
+---
+
+# 九、Controller（接口实现）
+
+## AuthController（注册）
+
+```csharp
+[HttpPost("register")]
+public IActionResult Register(RegisterRequest request)
+{
+    if (string.IsNullOrWhiteSpace(request.UserName))
+        return BadRequest(new { message = "用户名不能为空" });
+
+    if (string.IsNullOrWhiteSpace(request.Password))
+        return BadRequest(new { message = "密码不能为空" });
+
+    if (request.Password.Length < 6)
+        return BadRequest(new { message = "密码长度不能少于 6 位" });
+
+    if (_userRepository.UserExists(request.UserName))
+        return BadRequest(new { message = "用户名已存在" });
+
+    string passwordHash = _passwordHasher.HashPassword(new object(), request.Password);
+    int userId = _userRepository.CreateUser(request.UserName, passwordHash);
+
+    return Ok(new
+    {
+        message = "注册成功",
+        userId,
+        userName = request.UserName
+    });
+}
+```
+
+---
+
+# 十、什么是“接口”（重要理解）
+
+## ❌ 不是 C# 的 interface
+
+```csharp
+public interface IUserRepository {}
+```
+
+---
+
+## ✅ Web API 中的“接口”
+
+指的是：
+
+```
+POST /api/auth/register
+```
+
+ 是一个 HTTP 访问入口
+
+---
+
+## 调用流程
+
+```
+客户端请求
+   ↓
+路由匹配
+   ↓
+Controller 方法执行
+   ↓
+返回 JSON
+```
+
+---
+
+## 关键理解
+
+| 视角  | 在做什么 |
+| --- | ---- |
+| 客户端 | 调接口  |
+| 后端  | 执行方法 |
+
+---
+
+# 十一、参数校验：if vs 正则
+
+## 推荐策略
+
+###  简单规则 → 普通判断
+
+```csharp
+string.IsNullOrWhiteSpace(...)
+Length
+```
+
+---
+
+###  格式规则 → 正则
+
+```csharp
+Regex.IsMatch(userName, @"^[a-zA-Z0-9_]+$")
+```
+
+---
+
+## 不要滥用正则
+
+坏例子：
+
+```csharp
+^.{6,}$
+```
+
+ 可读性差
+
+---
+
+## 推荐写法（组合）
+
+```csharp
+if (string.IsNullOrWhiteSpace(request.UserName))
+    ...
+
+if (request.UserName.Length < 3 || request.UserName.Length > 20)
+    ...
+
+if (!Regex.IsMatch(request.UserName, @"^[a-zA-Z0-9_]+$"))
+    ...
+```
+
+---
+
+# 十二、当前阶段架构理解
+
+```
+Controller
+  ↓
+Repository（SQL）
+  ↓
+SQLite
+```
+
+---
+
+## 各层职责
+
+### Controller
+
+* 接收请求
+* 校验数据
+* 返回结果
+
+### Repository
+
+* 写 SQL
+* 操作数据库
+
+### DTO
+
+* 定义接口数据结构
+
+---
+
+# 十三、关键学习总结
+
+## 1️⃣ 接口本质
+
+ HTTP + 路由 + 方法
+
+---
+
+## 2️⃣ DTO 的本质
+
+ “接口数据载体”
+
+---
+
+## 3️⃣ Entity 的本质
+
+ “数据库数据映射”
+
+---
+
+## 4️⃣ SQL 学到的核心
+
+* SELECT
+* INSERT
+* 参数化查询
+* last_insert_rowid
+
+---
+
+## 5️⃣ 当前架构目标
+
+ 不追求复杂，只保证：
+
+* 清晰
+* 可跑
+* 可扩展
+
+---
+
+# 十四、下一步（未来）
+
+当注册稳定后：
+
+1. 登录接口（SELECT + 验证密码）
+2. 分数表（Scores）
+3. 排行榜（ORDER BY + LIMIT）
+
+---
+
+#  一句话总总结
+
+ 当前阶段目标：
+
+**用最少结构，打通“请求 → SQL → 数据库 → 返回”这一整条链路**
