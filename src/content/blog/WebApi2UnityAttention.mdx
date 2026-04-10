@@ -1,0 +1,62 @@
+---
+title: '今日记录'
+description: 'Unity SDK 联调注意事项（速查版）'
+category: '学习记录'
+tags:
+  - 后端
+  - SDK
+  - Web API
+pubDate: '2026-4-10'
+---
+# Unity SDK 联调注意事项（速查版）
+
+## 🔌 请求相关
+
+* 必须设置 `Content-Type: application/json`
+* 确认请求方式（POST / GET）与后端一致
+* Unity 与 Postman 请求要逐项对比（URL / Body / Header）
+
+## 📦 JSON 解析（JsonUtility）
+
+* 必须使用 `[Serializable]`
+* 只能用 **字段（field）**，不能用属性（get/set）
+* JSON 键名必须与字段名一致（建议大小写完全一致）
+* 泛型解析不稳定，优先用具体类
+
+## 🧩 数据结构
+
+* 后端返回结构 ≠ 客户端使用结构
+* 建议分两层：
+
+  * RawModel（贴合后端）
+  * DomainModel（给业务用）
+* 一个接口对应一个 Response 类
+
+## 🧠 错误排查顺序
+
+1. 打印 `responseText`
+2. 判断 `apiResponse == null`
+3. 判断 `apiResponse.data == null`
+4. 再访问字段
+
+## 🚨 常见问题
+
+* 400 ≠ 网络错误，多半是参数或业务校验失败
+* Postman 能用 ≠ Unity 一定能用
+* 字段大小写不一致会导致解析失败
+
+## 🎯 SDK 职责
+
+* 不直接暴露后端结构
+* 负责“解析 + 转换 + 统一返回”
+* 对外统一返回 `SdkResult<T>`
+
+## 🚀 联调核心
+
+* 验证请求是否正确
+* 对齐接口协议（JSON结构）
+* 处理成功 / 失败 / 异常
+
+---
+
+👉 核心一句话：**后端不可控，但客户端结构必须可控**
