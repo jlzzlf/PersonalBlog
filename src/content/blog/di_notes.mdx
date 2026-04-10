@@ -1,0 +1,311 @@
+---
+title: '依赖注入（Dependency Injection）笔记'
+description: 'ASP.NET Core & Unity 依赖注入（DI）完整学习笔记'
+category: '学习记录'
+tags:
+  - DI
+  - ASP.NET Core
+  - CSharp
+pubDate: '2026-4-10'
+coverImage: '../../assets/ChatGPT Image 2026年4月10日 09_53_02.png'
+---
+
+#  依赖注入（Dependency Injection）完整学习笔记
+
+> 这是一份从“概念 → 原理 → ASP.NET Core → Unity实践”的完整整理，适合作为长期复习与博客内容。
+
+---
+
+# 一、DI 的本质
+
+##  核心一句话
+
+> 对象不自己创建依赖，而是由外部提供依赖。
+
+---
+
+##  传统写法（强耦合）
+
+```csharp
+public class UserService
+{
+    private readonly UserRepository _repo = new UserRepository();
+}
+```
+
+问题：
+
+- 强耦合
+- 不可替换
+- 难测试
+
+---
+
+##  DI 写法（解耦）
+
+```csharp
+public class UserService
+{
+    private readonly IUserRepository _repo;
+
+    public UserService(IUserRepository repo)
+    {
+        _repo = repo;
+    }
+}
+```
+
+---
+
+# 二、DI 容器原理
+
+##  三大职责
+
+### 1️⃣ 注册映射
+
+```text
+IUserRepository -> UserRepository
+```
+
+---
+
+### 2️⃣ 自动装配（递归创建）
+
+```text
+AuthService
+ ├── IUserRepository
+ └── IPasswordHasher
+```
+
+---
+
+### 3️⃣ 生命周期管理
+
+| 生命周期 | 含义 |
+|--------|------|
+| Singleton | 全局唯一 |
+| Scoped | 每请求一个 |
+| Transient | 每次新建 |
+
+---
+
+##  极简实现思路（核心理解）
+
+```csharp
+object Resolve(Type type)
+{
+    var ctor = type.GetConstructors()[0];
+    var parameters = ctor.GetParameters();
+
+    var args = new object[parameters.Length];
+    for (int i = 0; i < parameters.Length; i++)
+    {
+        args[i] = Resolve(parameters[i].ParameterType);
+    }
+
+    return Activator.CreateInstance(type, args);
+}
+```
+
+---
+
+# 三、ASP.NET Core 中的 DI
+
+---
+
+##  核心结构
+
+| 名称 | 作用 |
+|------|------|
+| builder.Services | 注册表（不是容器） |
+| builder.Build() | 构建容器 |
+| app.Services | 真正容器 |
+
+---
+
+##  示例
+
+```csharp
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+var app = builder.Build();
+```
+
+---
+
+##  关键理解
+
+> builder.Services ≠ 容器  
+> IServiceProvider 才是容器
+
+---
+
+## Controller 注入
+
+```csharp
+public class AuthController : ControllerBase
+{
+    public AuthController(IUserRepository repo) {}
+}
+```
+
+运行时：
+
+- 框架向容器要 Controller
+- 容器自动构造
+
+---
+
+# 四、Service vs 容器
+
+##  错误理解
+
+> Services 是容器
+
+##  正确
+
+- Services = 注册规则
+- ServiceProvider = 容器
+
+---
+
+# 五、Unity 中的 DI
+
+---
+
+##  核心限制
+
+> MonoBehaviour 不是容器创建的
+
+---
+
+##  构造函数注入不可用
+
+```csharp
+public class Player : MonoBehaviour
+{
+    public Player(IInputService input) ❌
+}
+```
+
+---
+
+##  判断标准
+
+| 创建者 | 是否支持 DI |
+|--------|------------|
+| 容器 | ✅ |
+| Unity | ❌ |
+
+---
+
+# 六、Unity 正确用法
+
+---
+
+##  Init 注入
+
+```csharp
+public void Init(IInputService input)
+{
+    _input = input;
+}
+```
+
+---
+
+##  Bootstrap
+
+```csharp
+var input = new InputService();
+player.Init(input);
+```
+
+---
+
+##  分层结构（推荐）
+
+```text
+MonoBehaviour（表现层）
+    ↓
+Controller / Service（纯C#逻辑）
+```
+
+---
+
+# 七、什么时候用 DI
+
+---
+
+##  适合
+
+- 后端开发（ASP.NET Core）
+- 复杂依赖链
+- 可测试需求
+
+---
+
+##  不适合
+
+- Unity简单脚本
+- 依赖少
+- 小项目
+
+---
+
+# 八、手动注入 vs DI
+
+---
+
+## 手动注入
+
+```csharp
+player.Init(inputService);
+```
+
+优点：
+
+- 简单
+- 可控
+- 清晰
+
+---
+
+## DI 容器
+
+```csharp
+container.Resolve<PlayerController>();
+```
+
+优点：
+
+- 自动装配
+- 解耦强
+
+---
+
+# 九、最终总结
+
+---
+
+##  DI
+
+> 不自己造依赖，只声明需要
+
+---
+
+##  DI 容器
+
+> 自动帮你创建 + 注入 + 管理生命周期
+
+---
+
+##  Unity现实
+
+> MonoBehaviour 不归容器管
+
+---
+
+#  终极一句话
+
+> DI 让你不用再关心“怎么造对象”，只关心“我需要什么”。
