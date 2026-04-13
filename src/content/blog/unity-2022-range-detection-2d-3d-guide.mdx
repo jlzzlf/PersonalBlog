@@ -1,0 +1,1303 @@
+---
+title: Unity 2022 范围检测详解：2D 与 3D 的思路、API、性能与实战
+description: 一篇面向 Unity 2022 的范围检测实战文章，系统讲清楚 2D 与 3D 中的 Overlap、Cast、Trigger、LayerMask、性能优化与可复用写法。
+category: '学习记录'
+tags:
+  - Unity
+  - Physics
+  - Physics2D
+  - 范围检测
+pubDate: 2026-04-13
+---
+
+# Unity 2022 范围检测详解：2D 与 3D 的思路、API、性能与实战
+
+在做游戏功能时，**范围检测**几乎到处都是：
+
+- 自动索敌
+- 怪物警戒范围
+- 拾取物吸附
+- 爆炸伤害
+- 技能命中判定
+- 角色前方是否有障碍
+- 近战攻击扇形/盒形检测
+
+很多人刚接触时，会把它们都混成一锅热汤，只知道“打个射线试试”。  
+但实际上，Unity 里的范围检测大致可以分成几类，而且 **2D 与 3D 的 API 命名规律非常接近**。只要把脑子里的地图搭起来，后面写功能会顺很多。
+
+这篇文章基于 **Unity 2022**，从实战角度系统讲清楚：
+
+1. 范围检测到底在检测什么  
+2. 2D 和 3D 常见 API 分别适合什么场景  
+3. Overlap、Cast、Trigger 的区别  
+4. LayerMask、Trigger、NonAlloc、ContactFilter2D 这些常见细节  
+5. 如何写出更稳、更省 GC、更容易复用的检测代码
+
+---
+
+## 一、先建立脑图：范围检测不是一种东西，而是一组工具
+
+很多“范围检测”其实不是同一种查询。
+
+### 1. Overlap：查“某个区域里现在有什么”
+
+它更像是：
+
+> 以某个形状为模板，在当前这一帧的空间里盖一下章，看看盖到了谁。
+
+常见用途：
+
+- 爆炸半径内有哪些敌人
+- 玩家周围可拾取物有哪些
+- 怪物警戒圈内是否有目标
+- 某个盒形区域里是否有单位
+
+2D 常见：
+
+- `Physics2D.OverlapCircle`
+- `Physics2D.OverlapBox`
+- `Physics2D.OverlapCapsule`
+
+3D 常见：
+
+- `Physics.OverlapSphere`
+- `Physics.OverlapBox`
+- `Physics.OverlapCapsule`
+
+**特点：**
+
+- 检测“当前已经重叠/位于区域中”的对象
+- 不关心“从哪里扫过去”
+- 很适合做“周围目标收集”
+
+---
+
+### 2. Cast：查“沿着某个方向扫过去会碰到什么”
+
+它更像是：
+
+> 把一根线，或者一个带体积的形状，朝某个方向推过去，看看路上撞到了谁。
+
+常见用途：
+
+- 前方障碍探测
+- 子弹路径探测
+- 冲刺前检查路径
+- 角色移动前做碰撞预测
+- 武器前方的厚射线判定
+
+2D 常见：
+
+- `Physics2D.Raycast`
+- `Physics2D.CircleCast`
+- `Physics2D.BoxCast`
+
+3D 常见：
+
+- `Physics.Raycast`
+- `Physics.SphereCast`
+- `Physics.BoxCast`
+
+**特点：**
+
+- 有起点
+- 有方向
+- 有距离
+- 很适合做“前方预测”
+
+---
+
+### 3. Trigger：查“谁进入了我这个碰撞区”
+
+它更像是：
+
+> 我先放一个长期存在的感应器，等别人走进来时，通过事件告诉我。
+
+常见用途：
+
+- 警戒区
+- 拾取范围
+- 门的感应开关
+- 持续伤害区域
+- 长时间驻留检测
+
+2D 用：
+
+- `OnTriggerEnter2D`
+- `OnTriggerStay2D`
+- `OnTriggerExit2D`
+
+3D 用：
+
+- `OnTriggerEnter`
+- `OnTriggerStay`
+- `OnTriggerExit`
+
+**特点：**
+
+- 更偏事件驱动
+- 不需要每帧主动 query
+- 很适合长期存在的区域感知
+
+---
+
+## 二、2D 与 3D 的核心差异
+
+虽然名字很像，但 2D 和 3D 是 **两套物理系统**，别串台。
+
+### 1. 命名空间不同
+
+- 3D 物理：`UnityEngine.Physics`
+- 2D 物理：`UnityEngine.Physics2D`
+
+### 2. 碰撞体不同
+
+- 3D：`Collider`
+- 2D：`Collider2D`
+
+### 3. 命中结果不同
+
+- 3D：`RaycastHit`
+- 2D：`RaycastHit2D`
+
+### 4. 过滤方式略有差异
+
+- 3D 常用：`LayerMask`、`QueryTriggerInteraction`
+- 2D 除了 `layerMask`，还经常会用：`ContactFilter2D`
+
+`ContactFilter2D` 很好用，它像一个过滤器工具箱，可以把层、深度、Trigger 等筛选逻辑提前交给物理系统，而不是查出来后再手动 for 循环过滤。
+
+---
+
+## 三、最常用的范围检测分类表
+
+| 场景 | 2D 推荐 | 3D 推荐 | 说明 |
+|---|---|---|---|
+| 查周围敌人 | `OverlapCircle` / `OverlapBox` | `OverlapSphere` / `OverlapBox` | 收集区域内目标 |
+| 查前方第一个障碍 | `Raycast` | `Raycast` | 最轻量 |
+| 查前方较宽路径 | `CircleCast` / `BoxCast` | `SphereCast` / `BoxCast` | 比射线更“厚” |
+| 长期警戒区 | Trigger | Trigger | 事件式处理 |
+| 爆炸伤害 | `OverlapCircle` | `OverlapSphere` | 最典型 |
+| 近战盒形攻击 | `OverlapBox` | `OverlapBox` | 方便直观 |
+| 与自身碰撞体同形状检测 | `OverlapCollider` | 常见做法是 `OverlapBox/Sphere/Capsule` 或 `Collider` 配合其他策略 | 2D 中 `OverlapCollider` 很顺手 |
+
+---
+
+## 四、什么时候该用 Overlap，什么时候该用 Cast，什么时候该用 Trigger？
+
+这个问题非常关键。
+
+### 用 Overlap 的时机
+
+你关心的是：
+
+- “现在我周围有哪些目标？”
+- “这个区域里目前有没有人？”
+- “爆炸这一瞬间炸到了谁？”
+
+这时候优先考虑 **Overlap**。
+
+---
+
+### 用 Cast 的时机
+
+你关心的是：
+
+- “我朝前面走，会不会撞墙？”
+- “这把武器往前挥出去，路径上先打到谁？”
+- “冲刺一段距离，中途会不会碰到东西？”
+
+这时候优先考虑 **Cast**。
+
+---
+
+### 用 Trigger 的时机
+
+你关心的是：
+
+- “谁进入了我的警戒范围？”
+- “谁离开了拾取范围？”
+- “只要待在区域内就持续扣血”
+
+这时候优先考虑 **Trigger**。
+
+---
+
+### 一个特别实用的判断法
+
+你可以直接这样记：
+
+- **查当前区域里有谁** → `Overlap`
+- **查前方扫过去会碰到谁** → `Cast`
+- **查谁进来了、谁离开了** → `Trigger`
+
+这三句话基本能覆盖大多数需求。
+
+---
+
+## 五、2D 范围检测详解
+
+---
+
+## 5.1 `Physics2D.OverlapCircle`：最常见的 2D 范围检测
+
+这是 2D 自动索敌、拾取范围、爆炸判定里非常常见的 API。
+
+### 典型用途
+
+- 角色周围半径内找最近敌人
+- 拾取半径内找经验球
+- 生成点附近检查是否有障碍
+
+### 示例：查找半径内所有敌人
+
+```csharp
+using UnityEngine;
+
+public class RangeScan2D : MonoBehaviour
+{
+    [SerializeField] private float radius = 5f;
+    [SerializeField] private LayerMask targetMask;
+
+    private readonly Collider2D[] _results = new Collider2D[32];
+    private ContactFilter2D _filter;
+
+    private void Awake()
+    {
+        _filter = new ContactFilter2D();
+        _filter.useLayerMask = true;
+        _filter.layerMask = targetMask;
+        _filter.useTriggers = true;
+    }
+
+    public int Scan()
+    {
+        return Physics2D.OverlapCircle(
+            (Vector2)transform.position,
+            radius,
+            _filter,
+            _results
+        );
+    }
+
+    public Transform FindClosestTarget()
+    {
+        int count = Scan();
+        Transform best = null;
+        float bestSqrDistance = float.MaxValue;
+        Vector2 origin = transform.position;
+
+        for (int i = 0; i < count; i++)
+        {
+            Collider2D col = _results[i];
+            if (col == null) continue;
+
+            float sqrDistance = ((Vector2)col.transform.position - origin).sqrMagnitude;
+            if (sqrDistance < bestSqrDistance)
+            {
+                bestSqrDistance = sqrDistance;
+                best = col.transform;
+            }
+        }
+
+        return best;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, radius);
+    }
+}
+```
+
+### 这里的重点
+
+#### 1）用数组复用结果，减少 GC
+
+很多人上来就用 `OverlapCircleAll`，能用，但它会直接返回新数组。  
+如果你是**高频调用**，比如每 0.1 秒扫一次，长期下来会制造垃圾回收压力。
+
+这也是为什么上面用的是：
+
+- `ContactFilter2D`
+- 复用 `Collider2D[] _results`
+
+这样更适合实际项目。
+
+---
+
+#### 2）距离比较用 `sqrMagnitude`
+
+如果你只是想比较谁更近，不需要真的开平方根。
+
+```csharp
+float sqrDistance = (targetPos - origin).sqrMagnitude;
+```
+
+比：
+
+```csharp
+float distance = Vector2.Distance(targetPos, origin);
+```
+
+更适合大量比较场景。
+
+---
+
+#### 3）2D 明明叫 OverlapCircle，却仍然可以用 3D Gizmos 画球
+
+这里别被名字吓到。  
+`Gizmos.DrawWireSphere` 在 Scene 里画可视化很方便，2D 项目里照样常用，因为它本质是编辑器可视化，不是 3D 物理检测。
+
+---
+
+## 5.2 `Physics2D.CircleCast`：更像一个“会移动的圆”
+
+如果你不是想查“当前圆里有什么”，而是想查：
+
+> 这个圆沿着某个方向推一段距离，路上先碰到谁？
+
+那就该用 `CircleCast`。
+
+### 典型用途
+
+- 玩家前方一小段距离内是否有墙
+- 角色移动前做厚度碰撞预测
+- 比普通射线更稳的前方检测
+
+### 示例：检测前方障碍
+
+```csharp
+using UnityEngine;
+
+public class ForwardCheck2D : MonoBehaviour
+{
+    [SerializeField] private float castRadius = 0.35f;
+    [SerializeField] private float castDistance = 1.5f;
+    [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private Vector2 direction = Vector2.right;
+
+    public bool HasObstacleAhead(out RaycastHit2D hit)
+    {
+        Vector2 origin = transform.position;
+        Vector2 dir = direction.normalized;
+
+        hit = Physics2D.CircleCast(origin, castRadius, dir, castDistance, obstacleMask);
+        return hit.collider != null;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+
+        Vector3 origin = transform.position;
+        Vector3 dir = new Vector3(direction.x, direction.y, 0f).normalized;
+        Vector3 end = origin + dir * castDistance;
+
+        Gizmos.DrawWireSphere(origin, castRadius);
+        Gizmos.DrawWireSphere(end, castRadius);
+        Gizmos.DrawLine(origin, end);
+    }
+}
+```
+
+### 什么时候 CircleCast 比 Raycast 更合适？
+
+当你发现普通射线太细，容易漏检时。
+
+比如角色有体积，但你只打了一根中心射线。  
+那么角色边缘擦墙时，射线可能没打到，可视觉上已经撞上了，这时候就会出现“看起来穿模了”的怪味。
+
+这时 `CircleCast` 会稳很多，因为它不是针，是带厚度的棒棒糖杆。
+
+---
+
+## 5.3 `Physics2D.OverlapBox`：做矩形攻击和前方区域检测很好用
+
+有些攻击形状不是圆，而是矩形，比如：
+
+- 剑气前方一块区域
+- 近战攻击盒
+- 面向前方的扇区近似矩形判定
+- 门口感应区
+
+### 示例：前方盒形攻击
+
+```csharp
+using UnityEngine;
+
+public class BoxAttack2D : MonoBehaviour
+{
+    [SerializeField] private Vector2 boxSize = new Vector2(2f, 1f);
+    [SerializeField] private Vector2 localOffset = new Vector2(1f, 0f);
+    [SerializeField] private LayerMask targetMask;
+
+    private readonly Collider2D[] _results = new Collider2D[16];
+    private ContactFilter2D _filter;
+
+    private void Awake()
+    {
+        _filter = new ContactFilter2D();
+        _filter.useLayerMask = true;
+        _filter.layerMask = targetMask;
+        _filter.useTriggers = true;
+    }
+
+    public int HitTargets()
+    {
+        Vector2 center = (Vector2)transform.position + localOffset;
+        return Physics2D.OverlapBox(center, boxSize, 0f, _filter, _results);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Vector3 center = transform.position + (Vector3)localOffset;
+        Gizmos.matrix = Matrix4x4.TRS(center, Quaternion.identity, Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, boxSize);
+    }
+}
+```
+
+### 注意点
+
+如果角色会旋转，`localOffset` 就不能直接简单相加了。  
+你需要把局部偏移转换到世界空间，例如：
+
+```csharp
+Vector2 center = (Vector2)transform.TransformPoint(localOffset);
+```
+
+这样盒形区域才能跟着角色朝向转。
+
+---
+
+## 5.4 `Physics2D.OverlapCollider`：当你想“用自身碰撞体的形状”做检测时
+
+这是个很实用但容易被忽略的 API。
+
+它适合这样的场景：
+
+- 我已经有一个 `Collider2D`
+- 我希望直接拿这个碰撞体当前的形状去查重叠对象
+- 不想手动再算圆心、盒体大小、角度
+
+### 示例
+
+```csharp
+using UnityEngine;
+
+[RequireComponent(typeof(Collider2D))]
+public class SelfShapeDetector2D : MonoBehaviour
+{
+    [SerializeField] private LayerMask targetMask;
+
+    private Collider2D _selfCollider;
+    private readonly Collider2D[] _results = new Collider2D[16];
+    private ContactFilter2D _filter;
+
+    private void Awake()
+    {
+        _selfCollider = GetComponent<Collider2D>();
+
+        _filter = new ContactFilter2D();
+        _filter.useLayerMask = true;
+        _filter.layerMask = targetMask;
+        _filter.useTriggers = true;
+    }
+
+    public int Scan()
+    {
+        return _selfCollider.OverlapCollider(_filter, _results);
+    }
+}
+```
+
+这个 API 很适合做“当前攻击判定盒已挂在物体上”的情况。  
+你把碰撞体形状在编辑器里调好，代码只负责查结果，挺省心。
+
+---
+
+## 六、3D 范围检测详解
+
+---
+
+## 6.1 `Physics.OverlapSphere`：3D 里的范围扫描主力
+
+3D 里最常见的范围检测之一。
+
+### 典型用途
+
+- 角色周围找怪
+- 爆炸伤害
+- AI 感知
+- 某个点附近找可交互物
+
+### 示例：查找球形范围内所有目标
+
+```csharp
+using UnityEngine;
+
+public class RangeScan3D : MonoBehaviour
+{
+    [SerializeField] private float radius = 5f;
+    [SerializeField] private LayerMask targetMask;
+    [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+
+    private readonly Collider[] _results = new Collider[32];
+
+    public int Scan()
+    {
+        return Physics.OverlapSphereNonAlloc(
+            transform.position,
+            radius,
+            _results,
+            targetMask,
+            triggerInteraction
+        );
+    }
+
+    public Transform FindClosestTarget()
+    {
+        int count = Scan();
+        Transform best = null;
+        float bestSqrDistance = float.MaxValue;
+        Vector3 origin = transform.position;
+
+        for (int i = 0; i < count; i++)
+        {
+            Collider col = _results[i];
+            if (col == null) continue;
+
+            float sqrDistance = (col.transform.position - origin).sqrMagnitude;
+            if (sqrDistance < bestSqrDistance)
+            {
+                bestSqrDistance = sqrDistance;
+                best = col.transform;
+            }
+        }
+
+        return best;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, radius);
+    }
+}
+```
+
+### 为什么这里直接用 `OverlapSphereNonAlloc`？
+
+因为 3D 高频范围扫描特别常见。  
+比如 AI 每隔一小段时间扫一次，或者大量单位做感知，如果总是分配新数组，GC 很容易像猫踩键盘一样突然跳出来。
+
+所以在 3D 项目里，**高频扫描优先考虑 NonAlloc 版本**，基本是很常见的做法。
+
+---
+
+## 6.2 `Physics.SphereCast`：比 Raycast 更厚的 3D 路径检测
+
+这个 API 很适合做：
+
+- 角色前方障碍预测
+- 摄像机防穿墙
+- 子弹体积检测
+- “某个半径的东西往前推进”这样的路径检测
+
+### 示例：检测前方是否会撞上物体
+
+```csharp
+using UnityEngine;
+
+public class ForwardCheck3D : MonoBehaviour
+{
+    [SerializeField] private float radius = 0.5f;
+    [SerializeField] private float distance = 2f;
+    [SerializeField] private LayerMask obstacleMask;
+    [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+
+    public bool HasObstacleAhead(out RaycastHit hit)
+    {
+        Vector3 origin = transform.position;
+        Vector3 dir = transform.forward;
+
+        return Physics.SphereCast(
+            origin,
+            radius,
+            dir,
+            out hit,
+            distance,
+            obstacleMask,
+            triggerInteraction
+        );
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Vector3 origin = transform.position;
+        Vector3 end = origin + transform.forward * distance;
+
+        Gizmos.DrawWireSphere(origin, radius);
+        Gizmos.DrawWireSphere(end, radius);
+        Gizmos.DrawLine(origin, end);
+    }
+}
+```
+
+### 它和 Raycast 的区别
+
+`Raycast` 是一根线。  
+`SphereCast` 是一个带半径的球沿着方向移动。  
+
+当对象本身有体积时，`SphereCast` 往往比 `Raycast` 更符合“真实占位”。
+
+---
+
+## 6.3 `Physics.OverlapBox`：盒形范围检测在 3D 里也很好用
+
+适合做：
+
+- 近战攻击盒
+- 房间内目标收集
+- 前方大块区域检测
+- 某个长方体体积中的单位统计
+
+### 示例：盒形范围收集目标
+
+```csharp
+using UnityEngine;
+
+public class BoxDetector3D : MonoBehaviour
+{
+    [SerializeField] private Vector3 halfExtents = new Vector3(1f, 1f, 2f);
+    [SerializeField] private Vector3 localOffset = new Vector3(0f, 0f, 1.5f);
+    [SerializeField] private LayerMask targetMask;
+    [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+
+    private readonly Collider[] _results = new Collider[32];
+
+    public int Scan()
+    {
+        Vector3 center = transform.TransformPoint(localOffset);
+
+        return Physics.OverlapBoxNonAlloc(
+            center,
+            halfExtents,
+            _results,
+            transform.rotation,
+            targetMask,
+            triggerInteraction
+        );
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+
+        Vector3 center = transform.TransformPoint(localOffset);
+        Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
+        Gizmos.DrawWireCube(Vector3.zero, halfExtents * 2f);
+    }
+}
+```
+
+### 注意：`halfExtents` 不是完整尺寸
+
+这点经常绊人一跤。  
+3D 里的 `OverlapBox` / `BoxCast` 常常用的是**半尺寸**，也就是盒子每个方向的一半长度。
+
+如果你想要一个 `2 x 2 x 4` 的盒子，那么：
+
+```csharp
+halfExtents = new Vector3(1f, 1f, 2f);
+```
+
+---
+
+## 七、LayerMask、Trigger 与过滤规则
+
+范围检测最容易出 bug 的地方，不是 API 本身，而是**过滤条件没配对**。
+
+---
+
+## 7.1 `LayerMask`：先把不该查的东西挡在门外
+
+这是最先该用的过滤手段。
+
+### 为什么重要？
+
+因为你通常并不想查到：
+
+- 地板
+- 自己
+- 特效物体
+- UI 射线层
+- 其他无关对象
+
+如果不做层过滤，你的检测结果就会像超市购物车里突然混进一把扳手，逻辑会脏得很。
+
+### 示例
+
+```csharp
+[SerializeField] private LayerMask targetMask;
+```
+
+然后传给查询：
+
+```csharp
+Physics.OverlapSphereNonAlloc(position, radius, results, targetMask, QueryTriggerInteraction.Ignore);
+```
+
+或者：
+
+```csharp
+_filter.layerMask = targetMask;
+```
+
+---
+
+## 7.2 3D 里的 `QueryTriggerInteraction`
+
+3D 查询经常会遇到 Trigger 是否参与的问题。
+
+常见选项：
+
+- `UseGlobal`
+- `Ignore`
+- `Collide`
+
+### 推荐经验
+
+#### 明确需要 Trigger 时，再用 `Collide`
+
+比如：
+
+- 感应区
+- 受击区
+- 可交互检测区
+
+#### 不需要 Trigger 时，直接 `Ignore`
+
+比如：
+
+- 查实际障碍物
+- 查实体敌人
+- 做导航碰撞预测
+
+不要偷懒总写 `UseGlobal`，因为一旦项目里全局设置变化，你会遇到一种很诡异的情况：
+
+> 代码没改，检测结果变了。
+
+这种 bug 往往像地板下的乐高，踩到才知道疼。
+
+---
+
+## 7.3 2D 里的 `ContactFilter2D`
+
+2D 里我很建议早点熟悉 `ContactFilter2D`。
+
+因为它可以把这些条件直接交给物理系统：
+
+- LayerMask
+- Trigger
+- 深度（`minDepth` / `maxDepth`）
+- 其他过滤规则
+
+### 示例
+
+```csharp
+private ContactFilter2D _filter;
+
+private void Awake()
+{
+    _filter = new ContactFilter2D();
+    _filter.useLayerMask = true;
+    _filter.layerMask = targetMask;
+    _filter.useTriggers = false;
+}
+```
+
+### 它的好处
+
+不是“先查一堆回来再手动过滤”，而是“查询阶段就尽量少拿无关结果”。  
+通常更干净，也更适合高频调用。
+
+---
+
+## 八、性能：范围检测最容易踩的几个坑
+
+---
+
+## 8.1 高频调用时，优先考虑 NonAlloc 或复用容器
+
+### 容易产生 GC 的写法
+
+```csharp
+Collider[] cols = Physics.OverlapSphere(transform.position, radius, targetMask);
+```
+
+或：
+
+```csharp
+Collider2D[] cols = Physics2D.OverlapCircleAll(transform.position, radius, targetMask);
+```
+
+这种写法很方便，但每次都可能创建新数组。
+
+---
+
+### 更适合项目中的写法
+
+3D：
+
+```csharp
+private readonly Collider[] _results = new Collider[32];
+
+int count = Physics.OverlapSphereNonAlloc(
+    transform.position,
+    radius,
+    _results,
+    targetMask,
+    QueryTriggerInteraction.Ignore
+);
+```
+
+2D：
+
+```csharp
+private readonly Collider2D[] _results = new Collider2D[32];
+private ContactFilter2D _filter;
+
+int count = Physics2D.OverlapCircle(
+    transform.position,
+    radius,
+    _filter,
+    _results
+);
+```
+
+---
+
+## 8.2 不要每帧都扫，能降频就降频
+
+很多“索敌”“感知”逻辑根本不需要 `Update()` 每帧扫。
+
+例如：
+
+- 自动索敌每 0.1 秒扫一次
+- AI 感知每 0.2 秒扫一次
+- 大量单位可错帧轮询
+
+### 示例：每 0.2 秒扫描一次
+
+```csharp
+using UnityEngine;
+
+public class TimedScanner3D : MonoBehaviour
+{
+    [SerializeField] private float interval = 0.2f;
+    private float _timer;
+
+    private void Update()
+    {
+        _timer -= Time.deltaTime;
+        if (_timer > 0f) return;
+
+        _timer = interval;
+        Scan();
+    }
+
+    private void Scan()
+    {
+        // 在这里做范围检测
+    }
+}
+```
+
+这类优化非常朴素，但很有效。
+
+---
+
+## 8.3 结果数组太小会被截断
+
+这也是很常见的坑。
+
+例如你写了：
+
+```csharp
+private readonly Collider[] _results = new Collider[8];
+```
+
+但范围里实际有 20 个对象，那么后面的结果就拿不到了。  
+物理系统不会帮你自动扩容 NonAlloc 数组。
+
+### 建议做法
+
+- 根据场景预估上限
+- 保守一点留余量
+- 调试阶段统计最大命中数
+- 必要时做“命中数量接近数组长度”的警告日志
+
+例如：
+
+```csharp
+if (count == _results.Length)
+{
+    Debug.LogWarning("结果数组可能装满了，考虑增大容量。");
+}
+```
+
+---
+
+## 8.4 不要把“查目标”和“排序策略”绑死在一起
+
+很多初学代码会写成：
+
+- 扫描
+- 过滤
+- 选最近
+- 直接攻击
+
+全部揉在一个方法里。  
+能跑，但后面会越来越难改。
+
+更稳一点的思路是拆成三步：
+
+1. **查到候选集**
+2. **决定选谁**
+3. **执行行为**
+
+比如：
+
+- 最近目标
+- 最低血量目标
+- 随机目标
+- 朝向夹角最小目标
+
+这些应该是“选目标策略”的事，而不是“范围检测 API”的事。
+
+这个拆法很适合你后面扩展武器系统、AI 系统、拾取系统。
+
+---
+
+## 九、一个适合项目复用的简单写法
+
+这里给一个**不过度设计，但很适合中小项目复用**的思路：
+
+- 检测器负责“查”
+- 调用方负责“怎么选”
+- 结果通过缓存数组返回
+
+---
+
+## 9.1 2D 检测器
+
+```csharp
+using UnityEngine;
+
+public class CircleRangeDetector2D : MonoBehaviour
+{
+    [SerializeField] private float radius = 5f;
+    [SerializeField] private LayerMask targetMask;
+    [SerializeField] private bool includeTriggers = true;
+    [SerializeField] private int bufferSize = 32;
+
+    private Collider2D[] _results;
+    private ContactFilter2D _filter;
+
+    private void Awake()
+    {
+        _results = new Collider2D[bufferSize];
+
+        _filter = new ContactFilter2D();
+        _filter.useLayerMask = true;
+        _filter.layerMask = targetMask;
+        _filter.useTriggers = includeTriggers;
+    }
+
+    public int Scan(Vector2 center, Collider2D[] results)
+    {
+        return Physics2D.OverlapCircle(center, radius, _filter, results);
+    }
+
+    public int ScanSelf()
+    {
+        return Physics2D.OverlapCircle((Vector2)transform.position, radius, _filter, _results);
+    }
+
+    public Collider2D GetResult(int index)
+    {
+        if (index < 0 || index >= _results.Length) return null;
+        return _results[index];
+    }
+}
+```
+
+---
+
+## 9.2 3D 检测器
+
+```csharp
+using UnityEngine;
+
+public class SphereRangeDetector3D : MonoBehaviour
+{
+    [SerializeField] private float radius = 5f;
+    [SerializeField] private LayerMask targetMask;
+    [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
+    [SerializeField] private int bufferSize = 32;
+
+    private Collider[] _results;
+
+    private void Awake()
+    {
+        _results = new Collider[bufferSize];
+    }
+
+    public int Scan(Vector3 center, Collider[] results)
+    {
+        return Physics.OverlapSphereNonAlloc(
+            center,
+            radius,
+            results,
+            targetMask,
+            triggerInteraction
+        );
+    }
+
+    public int ScanSelf()
+    {
+        return Physics.OverlapSphereNonAlloc(
+            transform.position,
+            radius,
+            _results,
+            targetMask,
+            triggerInteraction
+        );
+    }
+
+    public Collider GetResult(int index)
+    {
+        if (index < 0 || index >= _results.Length) return null;
+        return _results[index];
+    }
+}
+```
+
+这两个类都很轻，重点是：
+
+- API 简单
+- 可以被武器、AI、拾取系统复用
+- 不强绑“选最近”或“攻击谁”的业务逻辑
+
+这种拆法一般比“一切写在武器脚本里”更耐用。
+
+---
+
+## 十、可视化调试：不画 Gizmos，范围检测很容易像在黑屋里抓猫
+
+范围检测最怕一种情况：
+
+> 你以为检测范围在这里，实际上它在那边。
+
+所以调试时，**一定尽量把检测范围画出来**。
+
+---
+
+## 10.1 圆形/球形检测的 Gizmos
+
+```csharp
+private void OnDrawGizmosSelected()
+{
+    Gizmos.color = Color.cyan;
+    Gizmos.DrawWireSphere(transform.position, radius);
+}
+```
+
+---
+
+## 10.2 盒形检测的 Gizmos
+
+2D 盒形也常用 `DrawWireCube` 画：
+
+```csharp
+private void OnDrawGizmosSelected()
+{
+    Gizmos.color = Color.red;
+    Vector3 center = transform.TransformPoint(localOffset);
+    Gizmos.matrix = Matrix4x4.TRS(center, transform.rotation, Vector3.one);
+    Gizmos.DrawWireCube(Vector3.zero, boxSize);
+}
+```
+
+3D 也是同理，只不过尺寸含义要注意是不是 half extents。
+
+---
+
+## 十一、常见误区总结
+
+---
+
+### 误区 1：想查周围目标，却用了 Raycast
+
+`Raycast` 更适合“沿方向查”，不是“查区域里有谁”。  
+要查周围目标，通常优先 `OverlapCircle / OverlapSphere`。
+
+---
+
+### 误区 2：明明对象有体积，却只打一根细射线
+
+这会导致漏检，尤其在移动和墙体边缘判定上很明显。  
+对象有体积时，优先考虑：
+
+- 2D：`CircleCast` / `BoxCast`
+- 3D：`SphereCast` / `BoxCast`
+
+---
+
+### 误区 3：结果查出来以后才开始大量过滤
+
+如果物理系统本来就支持过滤，就尽量提前过滤：
+
+- 3D：`LayerMask`、`QueryTriggerInteraction`
+- 2D：`ContactFilter2D`
+
+这通常更整洁。
+
+---
+
+### 误区 4：把 Trigger 当作“万能范围检测”
+
+Trigger 很好用，但不是所有场景都适合。
+
+例如：
+
+- 瞬时爆炸伤害
+- 主动按键时做一次检测
+- 技能释放瞬间做命中收集
+
+这类场景，用一次 `Overlap` 往往更直接。
+
+---
+
+### 误区 5：高频检测还在用 `All` 版本返回新数组
+
+开发阶段这么写没问题，方便。  
+但如果你已经进入项目实战，尤其是有大量单位、高频扫描时，最好逐步切到：
+
+- 2D：复用数组 + `ContactFilter2D`
+- 3D：`NonAlloc`
+
+---
+
+## 十二、实际项目里的选择建议
+
+给几个很实用的落地建议。
+
+### 场景 1：自动索敌
+
+- 2D：`OverlapCircle`
+- 3D：`OverlapSphere`
+- 后续再按距离、角度、血量排序
+
+### 场景 2：玩家前方是否有墙
+
+- 体积很小：`Raycast`
+- 角色有明显体积：`CircleCast` / `SphereCast`
+
+### 场景 3：爆炸伤害
+
+- 2D：`OverlapCircle`
+- 3D：`OverlapSphere`
+
+### 场景 4：近战攻击盒
+
+- 2D：`OverlapBox`
+- 3D：`OverlapBox`
+
+### 场景 5：长期警戒圈
+
+- Trigger 更合适
+- 进入时加入列表
+- 离开时移出列表
+- 攻击时再从候选列表里选目标
+
+这种“Trigger 维护候选集，主动逻辑再决策”的思路很实用。
+
+---
+
+## 十三、我会怎么推荐你记住这套东西
+
+不要死背 API 表。  
+记下面这组思路就够了：
+
+### 第一步：先问自己要查哪一种
+
+- 当前区域里有谁？
+- 朝前扫会撞到谁？
+- 谁进入/离开了我的区域？
+
+### 第二步：再决定形状
+
+- 点 / 线
+- 圆 / 球
+- 盒
+- 胶囊
+
+### 第三步：最后补过滤
+
+- LayerMask
+- Trigger
+- 2D 的 ContactFilter2D
+- 3D 的 QueryTriggerInteraction
+
+### 第四步：高频调用再考虑性能
+
+- 复用数组
+- NonAlloc
+- 降频
+- 分帧
+
+这样思考，范围检测就不会再是一堆零散 API，而是一张结构清楚的工具地图。
+
+---
+
+## 十四、结语
+
+Unity 里的范围检测，表面上看是很多 API，实际上可以压缩成一句话：
+
+> 你是在查“当前区域”，还是查“前方路径”，还是等“事件进入”？
+
+一旦这个问题想清楚，后面的 API 选择会自然很多。
+
+你可以把它们简单理解成：
+
+- **Overlap** 负责“看这片区域里现在有谁”
+- **Cast** 负责“看沿这条路径会撞到谁”
+- **Trigger** 负责“看谁进来了、谁出去了”
+
+然后在 2D 和 3D 中套上对应版本即可。
+
+---
+
+## 参考资料
+
+本文内容基于 Unity 2022 的 API 设计与使用方式整理，延伸阅读建议优先查看 Unity 官方文档：
+
+- [Unity Scripting API: Physics.Raycast](https://docs.unity3d.com/ScriptReference/Physics.Raycast.html)
+- [Unity Scripting API: Physics.OverlapSphere](https://docs.unity3d.com/ScriptReference/Physics.OverlapSphere.html)
+- [Unity Scripting API: Physics.OverlapSphereNonAlloc](https://docs.unity3d.com/ScriptReference/Physics.OverlapSphereNonAlloc.html)
+- [Unity Scripting API: Physics.SphereCast](https://docs.unity3d.com/ScriptReference/Physics.SphereCast.html)
+- [Unity Scripting API: Physics.OverlapBox](https://docs.unity3d.com/ScriptReference/Physics.OverlapBox.html)
+- [Unity Scripting API: Physics2D](https://docs.unity3d.com/ScriptReference/Physics2D.html)
+- [Unity Scripting API: Physics2D.OverlapCircle](https://docs.unity3d.com/ScriptReference/Physics2D.OverlapCircle.html)
+- [Unity Scripting API: Physics2D.CircleCast](https://docs.unity3d.com/ScriptReference/Physics2D.CircleCast.html)
+- [Unity Scripting API: Physics2D.OverlapBox](https://docs.unity3d.com/ScriptReference/Physics2D.OverlapBox.html)
+- [Unity Scripting API: Physics2D.OverlapCollider](https://docs.unity3d.com/ScriptReference/Physics2D.OverlapCollider.html)
+- [Unity Scripting API: ContactFilter2D](https://docs.unity3d.com/ScriptReference/ContactFilter2D.html)
+- [Unity Manual 2022.3: Layers and layerMasks](https://docs.unity3d.com/2022.3/Documentation/Manual/layers-and-layermasks.html)
+- [Unity Manual 2022.3: Optimize raycasts and other physics queries](https://docs.unity3d.com/2022.3/Documentation/Manual/physics-optimization-raycasts-queries.html)
