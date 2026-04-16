@@ -1,0 +1,108 @@
+---
+title: 4月15日项目进度 
+description: 实现核心功能：角色基础控制
+category: '学习记录'
+tags:
+  - 项目进度
+  - CharacterConroller
+  - Cinemachine
+pubDate: 2026-04-15
+---
+
+# 一、角色移动
+
+## 基于CharacterController与InputSystem的角色移动
+由于我之前已经封装好了一个InputSystemService类，玩家的输入只要从这个类对象中获取就好。简易的移动范例如下：
+```csharp
+    Vector2 input = InputService.Instance.Move;
+    Vector3 moveDirection = new Vector3(input.x, 0f, input.y).normalized;
+    _controller.Move(moveDirection * speed * Time.deltaTime);
+```
+**注意**  
+使用CharacterCotroller进行移动的对象不必挂载刚体与碰撞器。因此需要自行实现重力，物理碰撞等效果。  
+实现重力效果案例：
+```csharp
+_controller.Move(new Vector3(0, _verticalVelocity, 0)*Time.deltaTime);
+```
+实现碰撞效果案例：
+```csharp
+private void OnControllerColliderHit(ControllerColliderHit hit)
+{
+    Rigidbody rigidbody=hit.collider.attachedRigidbody;
+    if (rigidbody != null)
+    {
+        Vector3 pushDirection = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+        rigidbody.AddForce(pushDirection.normalized*pushForce, ForceMode.Impulse);
+    }
+}
+```
+
+# 二、角色朝向
+游戏基于俯视角，因此选择角色面向鼠标位置方向的方案。在3D项目中，不使用arctan算角度的方法，避免**搞反X/Z顺序、模型朝向不一致、难以插值做平滑转向**  
+具体流程为：
+```csharp
+//获取屏幕空间鼠标位置，以InputSystem为例
+Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+//从该位置生成射线
+Ray ray = mainCamera.ScreenPointToRay(mouseScreenPos);
+//找射线与地面的交点
+if (Physics.Raycast(ray, out RaycastHit hit, 1000f, groundMask, QueryTriggerInteraction.Ignore))
+{
+    //计算方向向量
+    Vector3 lookDirection = hit.point - transform.position;
+    lookDirection.y = 0f;
+    //转换成目标旋转
+    Quaternion targetRotation = Quaternion.LookRotation(lookDirection.normalized, Vector3.up);
+    //应用旋转
+    transform.rotation = Quaternion.RotateTowards(
+        transform.rotation,
+        targetRotation,
+        rotateSpeed * Time.deltaTime);
+}
+```
+在制作过程中遇到了问题，我的模型墙壁与地面不是分开的，此时有一个折衷方案：**不使用地面碰撞，直接打数学平面**  
+代码如下：
+```csharp
+// 让平面始终经过角色当前位置，保证转向基于角色所在高度
+Plane aimPlane = new Plane(Vector3.up, transform.position);
+if (aimPlane.Raycast(ray, out float enter))
+{
+    Vector3 hitPoint = ray.GetPoint(enter);
+    Vector3 dir = hitPoint - transform.position;
+    dir.y = 0f;
+    Quaternion targetRotation = Quaternion.LookRotation(dir.normalized, Vector3.up);
+    transform.rotation = Quaternion.RotateTowards(
+        transform.rotation,
+        targetRotation,
+        rotateSpeed * Time.deltaTime);
+}
+```
+new Plane(Vector3.up, transform.position)的意思是：  
+- 创建一个面向上方的水平平面，第一个参数是法向量
+- 这个平面经过角色当前所在位置  
+这么做有几个好处，一方面我们的射线不依赖地面的collider，其次如果角色处于不同高度，平面也会随着角色高度走
+# 三、Cinemachine
+Cinemachine是Unity 里做相机跟随最常见的方案。它很适合这种效果：
+- 相机跟着角色走
+- 但不是生硬锁死
+- 而是有一点“缓慢追上去”的平滑感
+## 核心组件
+1.Cinemachine Brain  
+挂在 Main Camera 上。  
+它的职责是：  
+- 监视场景里所有激活的 Cinemachine Cameras
+- 选出当前应该“活着”的那个
+- 在相机切换时做 Cut 或 Blend
+- 把最终位置、旋转、镜头参数应用到真实的 Unity Camera 上
+2.Cinemachine Camera  
+它通常加在一个空 GameObject 上，用来描述“一种镜头方案”。它有优先级、跟踪目标、看向目标、镜头参数，还能挂各种位置控制、旋转控制、噪声、扩展。
+
+### 基本使用流程
+1.Main Camera 上挂 Cinemachine Brain
+2.场景里新建一个 Cinemachine Camera
+3.给它指定 Tracking Target 和可选的 Look At Target
+4.给它选择 Position Control 和 Rotation Control
+5.运行时由 Brain 让真实相机跟着它工作
+
+# 四、角色动作
+在导入的模型中选择Rig，然后选择Humanoid，应用。Unity会生成人型骨骼
