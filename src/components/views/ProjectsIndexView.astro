@@ -1,0 +1,198 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PaginationNav from '../PaginationNav.astro';
+import { buildSortedTagCounts, getTagColorStyle } from '../../lib/tag-style';
+
+interface Props {
+	entries: CollectionEntry<'projects'>[];
+	currentPage: number;
+	totalPages: number;
+	totalItems: number;
+	basePath: string;
+}
+
+const { entries, currentPage, totalPages, totalItems, basePath } = Astro.props;
+
+const allTags = buildSortedTagCounts(entries);
+
+const getCoverImageAttrs = (coverImage: (typeof entries)[number]['data']['coverImage']) => {
+	if (!coverImage) return null;
+	if (typeof coverImage === 'string') return { src: coverImage };
+	return {
+		src: coverImage.src,
+		width: coverImage.width,
+		height: coverImage.height,
+	};
+};
+
+const projectCards = entries.map((entry) => ({
+	entry,
+	href: `/projects/${entry.id}/`,
+	coverImage: getCoverImageAttrs(entry.data.coverImage),
+	tagsAttr: JSON.stringify(entry.data.tags ?? []),
+}));
+---
+
+<main class="projects-page" data-project-index>
+	<section class="blog-hero projects-hero" aria-labelledby="projects-page-title">
+		<p class="blog-kicker">Project Showcase</p>
+		<h1 id="projects-page-title">项目展示</h1>
+		<p class="blog-intro">
+			共 {totalItems} 个项目，当前第 {currentPage} / {totalPages} 页。标签筛选只作用于当前页。
+		</p>
+	</section>
+
+	<div class="blog-shell projects-shell">
+		<section class="blog-list projects-list" aria-label="项目列表">
+			{
+				projectCards.map(({ entry, href, coverImage, tagsAttr }) => (
+					<article class="surface-card blog-card project-card" data-project-card data-tags={tagsAttr}>
+						<a class="blog-card__link project-card__link" href={href}>
+							{
+								coverImage ? (
+									<img
+										class="blog-card__image project-card__image"
+										src={coverImage.src}
+										width={coverImage.width}
+										height={coverImage.height}
+										alt=""
+										loading="lazy"
+										decoding="async"
+									/>
+								) : (
+									<div class="blog-card__image project-card__placeholder" aria-hidden="true">
+										<span>{entry.data.title.slice(0, 2)}</span>
+									</div>
+								)
+							}
+							<div class="blog-card__content project-card__content">
+								<div class="blog-card__meta">
+									<span class="blog-card__category">{entry.data.status}</span>
+									<p class="blog-card__date">{entry.data.year}</p>
+								</div>
+								<h2>{entry.data.title}</h2>
+								<p class="blog-card__description">{entry.data.summary}</p>
+								{
+									entry.data.stack.length > 0 && (
+										<p class="project-card__stack">{entry.data.stack.join(' / ')}</p>
+									)
+								}
+								{
+									entry.data.tags.length > 0 && (
+										<div class="blog-card__tags project-card__tags" aria-label="项目标签">
+											{
+												entry.data.tags.map((tag) => (
+													<span class="blog-card__tag" style={getTagColorStyle(tag)}>
+														{tag}
+													</span>
+												))
+											}
+										</div>
+									)
+								}
+							</div>
+						</a>
+					</article>
+				))
+			}
+		</section>
+
+		{
+			allTags.length > 0 && (
+				<aside class="blog-sidebar project-sidebar" aria-label="项目标签筛选">
+					<section class="blog-tag-filter" data-project-tag-filter>
+						<div class="blog-tag-filter__toolbar">
+							<div class="blog-tag-filter__heading">
+								<strong>标签筛选</strong>
+								<span class="blog-tag-filter__summary" data-project-tag-summary>全部标签</span>
+							</div>
+							<button type="button" class="blog-tag-filter__clear" data-project-tag-clear hidden>
+								清空
+							</button>
+						</div>
+						<p class="blog-filter-status" data-project-filter-status>当前显示本页全部项目。</p>
+						<div class="blog-tag-filter__selected" data-project-selected-tags hidden></div>
+						<div class="blog-tag-picker" data-project-tag-picker>
+							<div class="blog-tag-picker__list" data-project-tag-options>
+								{
+									allTags.map(({ tag, count }) => (
+										<label
+											class="blog-tag-option"
+											data-project-tag-option
+											data-tag-option={tag}
+											style={getTagColorStyle(tag)}
+										>
+											<input type="checkbox" value={tag} data-project-tag-checkbox />
+											<span class="blog-tag-option__swatch" aria-hidden="true"></span>
+											<span class="blog-tag-option__name">{tag}</span>
+											<span class="blog-tag-option__count">{count}</span>
+										</label>
+									))
+								}
+							</div>
+						</div>
+					</section>
+				</aside>
+			)
+		}
+	</div>
+
+	<PaginationNav
+		basePath={basePath}
+		currentPage={currentPage}
+		totalPages={totalPages}
+		totalItems={totalItems}
+		itemLabel="个项目"
+	/>
+
+	<p class="blog-empty project-empty" data-project-empty hidden>当前筛选条件下，本页还没有项目。</p>
+</main>
+
+<script>
+	import '../../scripts/project-index-page';
+</script>
+
+<style>
+	.projects-page {
+		display: grid;
+		gap: clamp(2rem, 4vw, 3.2rem);
+	}
+
+	.projects-hero {
+		max-width: 48rem;
+		padding: clamp(0.6rem, 2vw, 1.4rem) 0 0.2rem;
+	}
+
+	.project-card__placeholder {
+		display: grid;
+		place-items: center;
+		background:
+			radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.28), transparent 18%),
+			linear-gradient(135deg, rgba(204, 255, 255, 0.72), rgba(255, 214, 232, 0.42));
+	}
+
+	.project-card__placeholder span {
+		color: rgba(24, 72, 93, 0.78);
+		font-size: clamp(1.3rem, 3vw, 2.2rem);
+		font-weight: 700;
+		letter-spacing: 0.1em;
+	}
+
+	.project-card__stack {
+		margin: -0.2rem 0 0;
+		color: var(--color-subtext);
+		font-size: 0.88rem;
+		line-height: 1.5;
+	}
+
+	.project-card[hidden],
+	.project-empty[hidden] {
+		display: none !important;
+	}
+
+	@media (max-width: 860px) {
+		.project-card__placeholder {
+			border-radius: 28px 28px 0 0;
+		}
+	}
+</style>

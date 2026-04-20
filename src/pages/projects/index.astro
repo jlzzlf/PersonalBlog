@@ -1,0 +1,32 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import ProjectsIndexView from '../../components/views/ProjectsIndexView.astro';
+import { SITE_TITLE } from '../../consts';
+import { PROJECT_PAGE_SIZE, paginateItems } from '../../lib/pagination';
+import { sortProjectEntries } from '../../lib/projects';
+
+const pageTitle = `项目展示 | ${SITE_TITLE}`;
+const allEntries = sortProjectEntries(await getCollection('projects'));
+const pagination = paginateItems(allEntries, PROJECT_PAGE_SIZE, 1);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description="浏览独立项目与技术实践。" />
+	</head>
+	<body>
+		<Header />
+		<ProjectsIndexView
+			entries={pagination.items}
+			currentPage={pagination.currentPage}
+			totalPages={pagination.totalPages}
+			totalItems={pagination.totalItems}
+			basePath="/projects"
+		/>
+		<Footer />
+	</body>
+</html>

@@ -1,0 +1,158 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import PlaceholderCover from '../../assets/blog-placeholder-about.jpg';
+import PaginationNav from '../PaginationNav.astro';
+import FormattedDate from '../FormattedDate.astro';
+import { buildSortedTagCounts, getTagColorStyle } from '../../lib/tag-style';
+
+interface Props {
+	posts: CollectionEntry<'blog'>[];
+	currentPage: number;
+	totalPages: number;
+	totalItems: number;
+	basePath: string;
+}
+
+const { posts, currentPage, totalPages, totalItems, basePath } = Astro.props;
+
+const allTags = buildSortedTagCounts(posts);
+
+const getCoverImageAttrs = (coverImage: (typeof posts)[number]['data']['coverImage']) => {
+	if (!coverImage) {
+		return {
+			src: PlaceholderCover.src,
+			width: PlaceholderCover.width,
+			height: PlaceholderCover.height,
+		};
+	}
+
+	if (typeof coverImage === 'string') {
+		return { src: coverImage };
+	}
+
+	return {
+		src: coverImage.src,
+		width: coverImage.width,
+		height: coverImage.height,
+	};
+};
+
+const postCards = posts.map((post) => ({
+	post,
+	coverImage: getCoverImageAttrs(post.data.coverImage),
+	tagsAttr: JSON.stringify(post.data.tags ?? []),
+}));
+---
+
+<main class="blog-page" data-blog-index>
+	<section class="blog-hero" aria-labelledby="blog-page-title">
+		<p class="blog-kicker">Tech Blog</p>
+		<h1 id="blog-page-title">技术博客</h1>
+		<p class="blog-intro">
+			共 {totalItems} 篇文章，当前第 {currentPage} / {totalPages} 页。标签筛选只作用于当前页。
+		</p>
+	</section>
+
+	<div class="blog-shell">
+		<section class="blog-list" data-blog-grid>
+			{
+				postCards.map(({ post, coverImage, tagsAttr }) => (
+					<article
+						class="surface-card blog-card"
+						data-blog-card
+						data-category={post.data.category}
+						data-tags={tagsAttr}
+					>
+						<a class="blog-card__link" href={`/blog/${post.id}/`}>
+							<img
+								class="blog-card__image"
+								src={coverImage.src}
+								width={coverImage.width}
+								height={coverImage.height}
+								alt=""
+								loading="lazy"
+								decoding="async"
+							/>
+							<div class="blog-card__content">
+								<div class="blog-card__meta">
+									<span class="blog-card__category">{post.data.category}</span>
+									<p class="blog-card__date">
+										<FormattedDate date={post.data.pubDate} />
+									</p>
+								</div>
+								<h2>{post.data.title}</h2>
+								<p class="blog-card__description">{post.data.description}</p>
+								{
+									post.data.tags.length > 0 && (
+										<div class="blog-card__tags" aria-label="文章标签">
+											{
+												post.data.tags.map((tag) => (
+													<span class="blog-card__tag" style={getTagColorStyle(tag)}>
+														{tag}
+													</span>
+												))
+											}
+										</div>
+									)
+								}
+							</div>
+						</a>
+					</article>
+				))
+			}
+		</section>
+
+		{
+			allTags.length > 0 && (
+				<aside class="blog-sidebar" aria-label="博客标签筛选">
+					<section class="blog-tag-filter" data-blog-tag-filter>
+						<div class="blog-tag-filter__toolbar">
+							<div class="blog-tag-filter__heading">
+								<strong>标签筛选</strong>
+								<span class="blog-tag-filter__summary" data-blog-tag-summary>全部标签</span>
+							</div>
+							<button type="button" class="blog-tag-filter__clear" data-blog-tag-clear hidden>
+								清空
+							</button>
+						</div>
+						<p class="blog-filter-status" data-blog-filter-status>当前显示本页全部文章。</p>
+						<div class="blog-tag-filter__selected" data-blog-selected-tags hidden></div>
+						<div class="blog-tag-picker" id="blog-tag-picker" data-blog-tag-picker>
+							<div class="blog-tag-picker__list" data-blog-tag-options>
+								{
+									allTags.map(({ tag, count }) => (
+										<label
+											class="blog-tag-option"
+											data-blog-tag-option
+											data-tag-option={tag}
+											style={getTagColorStyle(tag)}
+										>
+											<input type="checkbox" value={tag} data-blog-tag-checkbox />
+											<span class="blog-tag-option__swatch" aria-hidden="true"></span>
+											<span class="blog-tag-option__name">{tag}</span>
+											<span class="blog-tag-option__count">{count}</span>
+										</label>
+									))
+								}
+							</div>
+						</div>
+					</section>
+				</aside>
+			)
+		}
+	</div>
+
+	<PaginationNav
+		basePath={basePath}
+		currentPage={currentPage}
+		totalPages={totalPages}
+		totalItems={totalItems}
+		itemLabel="篇文章"
+	/>
+
+	<p class="blog-empty" data-blog-empty hidden>当前筛选条件下，本页还没有文章。</p>
+</main>
+
+<script>
+	import '../../scripts/blog-index-page';
+</script>

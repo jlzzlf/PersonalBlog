@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../../components/BaseHead.astro';
+import Footer from '../../../components/Footer.astro';
+import Header from '../../../components/Header.astro';
+import ProjectsIndexView from '../../../components/views/ProjectsIndexView.astro';
+import { SITE_TITLE } from '../../../consts';
+import { PROJECT_PAGE_SIZE, paginateItems } from '../../../lib/pagination';
+import { sortProjectEntries } from '../../../lib/projects';
+
+export async function getStaticPaths() {
+	const allEntries = sortProjectEntries(await getCollection('projects'));
+	const firstPage = paginateItems(allEntries, PROJECT_PAGE_SIZE, 1);
+
+	if (firstPage.totalPages <= 1) {
+		return [];
+	}
+
+	return Array.from({ length: firstPage.totalPages - 1 }, (_, index) => {
+		const currentPage = index + 2;
+		const pagination = paginateItems(allEntries, PROJECT_PAGE_SIZE, currentPage);
+
+		return {
+			params: { page: String(currentPage) },
+			props: { pagination },
+		};
+	});
+}
+
+const { pagination } = Astro.props;
+const pageTitle = `项目展示 第 ${pagination.currentPage} 页 | ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead
+			title={pageTitle}
+			description={`项目展示分页列表，第 ${pagination.currentPage} 页，共 ${pagination.totalPages} 页。`}
+		/>
+	</head>
+	<body>
+		<Header />
+		<ProjectsIndexView
+			entries={pagination.items}
+			currentPage={pagination.currentPage}
+			totalPages={pagination.totalPages}
+			totalItems={pagination.totalItems}
+			basePath="/projects"
+		/>
+		<Footer />
+	</body>
+</html>

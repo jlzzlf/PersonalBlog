@@ -1,0 +1,32 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import Header from '../../components/Header.astro';
+import InterviewNotesView from '../../components/views/InterviewNotesView.astro';
+import { SITE_TITLE } from '../../consts';
+import { getInterviewNotes } from '../../lib/interview-notes';
+import { INTERVIEW_PAGE_SIZE, paginateItems } from '../../lib/pagination';
+
+const pageTitle = `面经整理 | ${SITE_TITLE}`;
+const allNotes = getInterviewNotes();
+const pagination = paginateItems(allNotes, INTERVIEW_PAGE_SIZE, 1);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description="把面试题和自己的回答整理成可搜索的清单，后续只需要维护一个 JSON 文件。" />
+	</head>
+	<body>
+		<Header />
+		<InterviewNotesView
+			notes={pagination.items}
+			currentPage={pagination.currentPage}
+			totalPages={pagination.totalPages}
+			totalItems={pagination.totalItems}
+			basePath="/interview-notes"
+			startIndex={(pagination.currentPage - 1) * INTERVIEW_PAGE_SIZE}
+		/>
+		<Footer />
+	</body>
+</html>
