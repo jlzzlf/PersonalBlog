@@ -1,0 +1,510 @@
+---
+title: "奇异递归模板模式（CRTP）是什么？"
+description: "从 Unity / C# 视角理解 CRTP 的概念、用途、优缺点与常见场景。"
+pubDate: "2026-04-24"
+tags:
+    - CRTP
+    - 设计模式
+---
+
+# 奇异递归模板模式（CRTP）是什么？
+## 从 Unity / C# 视角理解它能解决什么问题
+
+在看一些框架、底层库或者“写得有点绕”的泛型代码时，你可能会遇到这种写法：
+
+```csharp
+public abstract class Base<TSelf> where TSelf : Base<TSelf>
+{
+}
+```
+
+第一次看到，脑子通常会响起一声小警报：
+
+> “这不是递归了吗？为什么子类要把自己传给父类？”
+
+这就是 **CRTP**，全称：
+
+> **Curiously Recurring Template Pattern**  
+> 中文一般翻译为 **奇异递归模板模式**
+
+不过先提前说清楚一件事：
+
+**在 C# 里，我们更常见到的是“CRTP 风格写法”或“自引用泛型约束”**。  
+因为这个概念最初来自 **C++ 模板**，而 C# 没有 C++ 那种模板机制。
+
+所以这篇文章你可以理解成：
+
+> **“C# 里如何理解和使用 CRTP 这类写法”**
+
+---
+
+# 一、先看最经典的结构
+
+## C++ 里的经典形式
+
+```cpp
+template<typename Derived>
+class Base
+{
+};
+
+class Derived : public Base<Derived>
+{
+};
+```
+
+## C# 里的对应写法
+
+```csharp
+public abstract class Base<TSelf> where TSelf : Base<TSelf>
+{
+}
+
+public class Derived : Base<Derived>
+{
+}
+```
+
+这里最“奇异”的地方在于：
+
+- `Base` 需要一个泛型参数 `TSelf`
+- 这个 `TSelf` 又要求必须继承自 `Base<TSelf>`
+- 子类 `Derived` 在继承时，把自己作为参数传给父类
+
+所以它看起来像：
+
+> **子类把“我自己”告诉父类**
+
+这就是它名字里“奇异”的来源。
+
+---
+
+# 二、它到底在解决什么问题？
+
+CRTP 不是为了炫技，它主要解决的是一个很实际的问题：
+
+# **父类想知道“当前真正的子类类型”**
+
+普通继承里，父类只知道自己是 `Base`，不知道你到底是：
+
+- `FireballBuilder`
+- `IceBuilder`
+- `AudioService`
+- `EnemyController`
+
+但有时候，父类又确实需要知道“最终子类是谁”。
+
+最常见的场景就是：
+
+## 1. 链式调用想返回子类类型
+## 2. 基类想复用逻辑，但保留子类具体类型
+## 3. 想写“自引用”的通用基类
+
+---
+
+# 三、一个最容易理解的例子：链式调用
+
+假设我们想写一个技能构建器基类。
+
+## 不用 CRTP 的写法
+
+```csharp
+public abstract class SkillBuilder
+{
+    protected float _cooldown;
+    protected float _range;
+
+    public SkillBuilder SetCooldown(float cooldown)
+    {
+        _cooldown = cooldown;
+        return this;
+    }
+
+    public SkillBuilder SetRange(float range)
+    {
+        _range = range;
+        return this;
+    }
+}
+
+public class FireballBuilder : SkillBuilder
+{
+    private float _burnSeconds;
+
+    public FireballBuilder SetBurn(float burnSeconds)
+    {
+        _burnSeconds = burnSeconds;
+        return this;
+    }
+}
+```
+
+然后你想这么写：
+
+```csharp
+var builder = new FireballBuilder()
+    .SetCooldown(1.5f)
+    .SetRange(8f)
+    .SetBurn(3f);
+```
+
+问题来了。
+
+因为 `SetCooldown()` 返回的是 `SkillBuilder`，  
+所以 `.SetRange()` 之后，类型已经“变窄”成了父类，后面就**接不上 `SetBurn()`** 了。
+
+## 用 CRTP 改写
+
+```csharp
+public abstract class SkillBuilder<TSelf> where TSelf : SkillBuilder<TSelf>
+{
+    protected float _cooldown;
+    protected float _range;
+
+    protected TSelf Self => (TSelf)this;
+
+    public TSelf SetCooldown(float cooldown)
+    {
+        _cooldown = cooldown;
+        return Self;
+    }
+
+    public TSelf SetRange(float range)
+    {
+        _range = range;
+        return Self;
+    }
+}
+
+public class FireballBuilder : SkillBuilder<FireballBuilder>
+{
+    private float _burnSeconds;
+
+    public FireballBuilder SetBurn(float burnSeconds)
+    {
+        _burnSeconds = burnSeconds;
+        return this;
+    }
+}
+```
+
+这时候就可以正常链式调用：
+
+```csharp
+var builder = new FireballBuilder()
+    .SetCooldown(1.5f)
+    .SetRange(8f)
+    .SetBurn(3f);
+```
+
+因为：
+
+- `SetCooldown()` 返回 `FireballBuilder`
+- `SetRange()` 也返回 `FireballBuilder`
+
+这就是 CRTP 最常见、最直观的用途：
+
+# **让父类通用方法返回“真正的子类类型”**
+
+---
+
+# 四、Unity / C# 里最常见的 CRTP 风格：泛型单例基类
+
+你在 Unity 项目里很可能见过这种写法：
+
+```csharp
+using UnityEngine;
+
+public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
+{
+    public static T Instance { get; private set; }
+
+    protected virtual void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = (T)this;
+    }
+}
+
+public class AudioService : MonoSingleton<AudioService>
+{
+}
+```
+
+这里也是典型的 CRTP 风格：
+
+- 基类 `MonoSingleton<T>`
+- 子类 `AudioService : MonoSingleton<AudioService>`
+
+它的好处是：
+
+- `Instance` 的类型不是 `MonoSingleton<T>`
+- 而是具体的 `AudioService`
+
+所以你可以直接这样写：
+
+```csharp
+AudioService.Instance.PlayBgm();
+```
+
+而不需要手动强转。
+
+---
+
+# 五、为什么说它在 C# 里是“CRTP 风格”，不是原汁原味 CRTP
+
+## 在 C++ 里
+CRTP 常常带有 **编译期多态** 的意味。  
+因为模板展开后，很多东西在编译期就确定了。
+
+## 在 C# 里
+我们更多是在利用：
+
+- 泛型
+- 自引用约束
+- 子类类型回传
+
+所以在 C# 里，它更像是在解决：
+
+# **Self Type（自类型）问题**
+
+也就是：
+
+> “父类的方法如何返回真正的子类类型，而不是父类类型？”
+
+所以你在 Unity / C# 里，不要把它想成一个“性能黑魔法模式”，  
+更应该把它理解成：
+
+> **一种泛型约束技巧，用来让基类更懂子类类型。**
+
+---
+
+# 六、它和普通继承的区别是什么？
+
+## 普通继承
+父类不知道你到底是谁。
+
+```csharp
+public abstract class Base
+{
+    public Base DoSomething()
+    {
+        return this;
+    }
+}
+```
+
+返回的永远只是 `Base`。
+
+## CRTP
+父类知道你是哪个子类。
+
+```csharp
+public abstract class Base<TSelf> where TSelf : Base<TSelf>
+{
+    protected TSelf Self => (TSelf)this;
+
+    public TSelf DoSomething()
+    {
+        return Self;
+    }
+}
+```
+
+返回的是具体子类。
+
+---
+
+# 七、它和接口有什么区别？
+
+很多人会问：
+
+> “这不就是接口能干的事吗？”
+
+不完全一样。
+
+## 接口更适合描述“能力”
+比如：
+- `IDamageable`
+- `IInteractable`
+- `ISaveable`
+
+它回答的是：
+
+> **这个对象会什么**
+
+## CRTP 更适合解决“自类型”
+它回答的是：
+
+> **父类怎样拿到最终子类类型**
+
+所以：
+
+- 接口是“能力约束”
+- CRTP 是“类型回传/自引用约束”
+
+它们不冲突，甚至经常一起出现。
+
+---
+
+# 八、它适合用在哪些场景？
+
+## 1. 链式 API / Builder
+这个是最推荐的。
+
+比如：
+- 配置构建器
+- 规则构建器
+- 编辑器工具链式配置
+- UI Fluent API
+
+## 2. 泛型基类想返回具体子类
+比如：
+- 通用设置器
+- 通用状态节点
+- 某些工具基类
+
+## 3. Unity 里的泛型单例 / 自引用基类
+比如：
+- `MonoSingleton<T>`
+- 某些 `ManagerBase<T>`
+- 服务基类
+
+不过要注意，这类写法虽然常见，但也容易被滥用。
+
+---
+
+# 九、它不适合用在哪些场景？
+
+## 1. 只是为了“显得高级”
+如果没有“返回子类类型”的需求，就不要硬上。
+
+## 2. 只有一个实现类
+如果整个项目里只有一个类会用这个基类，  
+那很多时候普通继承就够了。
+
+## 3. 会让团队读代码成本暴涨
+CRTP 对初学者很不友好。  
+如果只是为了解决一个很小的问题，却把代码搞得像镜子迷宫，那不值。
+
+---
+
+# 十、在 C# 里用 CRTP，有什么坑？
+
+这部分很重要。
+
+## 坑 1：`(TSelf)this` 本质上是强转
+比如这个：
+
+```csharp
+protected TSelf Self => (TSelf)this;
+```
+
+如果你写错了继承关系，就可能在运行时报错。
+
+虽然正常写法下没问题，但这说明：
+
+> **C# 里的 CRTP 不是绝对“神圣安全”的魔法**
+
+## 坑 2：不是所有问题都该靠它解决
+很多时候你真正要的是：
+
+- 接口
+- 组合
+- 普通继承
+- 事件
+- 委托
+
+而不是 CRTP。
+
+## 坑 3：容易过度工程化
+比如为了一个链式调用，搞了三层泛型基类，  
+最后项目像被套娃套进了衣柜。
+
+---
+
+# 十一、一个更贴近工程实践的判断标准
+
+以后你看到这个模式，先问自己三件事：
+
+## 1. 我是不是需要“父类方法返回子类类型”？
+如果不需要，先别用。
+
+## 2. 这个问题用普通继承或接口能不能更简单解决？
+能的话，优先简单方案。
+
+## 3. 这个模式会不会让团队更难读懂代码？
+如果会，慎用。
+
+---
+
+# 十二、在 Unity 项目里，我建议你怎么理解它
+
+按你现在的阶段，我建议你这么记：
+
+# **CRTP = 一种让泛型基类“知道自己子类类型”的写法**
+
+你不用急着把它用到项目里每个角落。  
+先把它识别出来就够了。
+
+当你以后看到这些代码时，就不会再发懵：
+
+```csharp
+public abstract class Base<TSelf> where TSelf : Base<TSelf>
+```
+
+它通常在表达的是：
+
+- 这是个自引用泛型基类
+- 它想在基类里复用逻辑
+- 同时保留子类类型信息
+
+---
+
+# 十三、你可以先记住的最小版模板
+
+```csharp
+public abstract class Base<TSelf> where TSelf : Base<TSelf>
+{
+    protected TSelf Self => (TSelf)this;
+}
+```
+
+子类：
+
+```csharp
+public class Derived : Base<Derived>
+{
+}
+```
+
+如果你看到这种结构，先别慌，先想到一句：
+
+> **“这是子类把自己当参数传给父类，好让父类返回或处理真正的子类类型。”**
+
+---
+
+# 十四、总结
+
+## CRTP 是什么
+一种“子类把自己作为泛型参数传给父类”的模式。
+
+## 它解决什么问题
+主要解决：
+
+- 基类想返回子类类型
+- 基类想复用逻辑，但保留具体子类信息
+
+## 在 C# / Unity 里常见吗
+有，但通常是“CRTP 风格”写法，最常见于：
+
+- Builder
+- 泛型单例基类
+- 自引用泛型基类
+
+
