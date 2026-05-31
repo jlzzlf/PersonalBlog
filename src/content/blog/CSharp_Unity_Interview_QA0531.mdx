@@ -1,0 +1,700 @@
+---
+title: '面试归档2'
+description: '此博客用于记录 Unity / C# 面试题复盘'
+category: '学习记录'
+tags:
+  - Unity
+  - CSharp
+  - 学习记录
+  - 面试
+pubDate: '2026-05-31'
+---
+# C# / Unity 面试题整理
+
+## 1. C# 中 == 和 Equals 的区别是什么？
+
+### 标准回答
+
+`==` 是相等运算符，`Equals` 是对象提供的相等性方法。
+
+默认情况下：
+
+- 值类型使用 `==` 通常比较具体的值；
+- 引用类型如果没有重载 `==`，比较的是两个引用是否指向同一个对象；
+- `==` 可以通过运算符重载改变比较规则；
+- `Equals` 可以通过重写改变比较规则。
+
+例如：
+
+```csharp
+class Person
+{
+    public string Name;
+}
+
+Person a = new Person();
+Person b = a;
+
+Console.WriteLine(a == b);      // true
+Console.WriteLine(a.Equals(b)); // true
+```
+
+需要注意：
+
+- `==` 不是条件运算符，条件运算符是 `?:`；
+- `string` 比较特殊，它重载了 `==` 并重写了 `Equals`，所以通常比较的是字符串内容；
+- 自定义类型如果重写 `Equals`，通常也要重写 `GetHashCode`；
+- 如果需要，也可以同时重载 `==` 和 `!=`，保证比较逻辑一致。
+
+---
+
+## 2. 浅拷贝和深拷贝的区别是什么？
+
+### 标准回答
+
+浅拷贝是只复制对象本身的一层数据。
+
+如果字段是值类型，会复制值；如果字段是引用类型，只复制引用地址，因此新旧对象中的引用字段会指向同一个对象。
+
+深拷贝是不仅复制对象本身，还会把对象内部引用的其他对象也复制一份。
+
+示例：
+
+```csharp
+class Player
+{
+    public string Name;
+    public Weapon Weapon;
+}
+
+class Weapon
+{
+    public int Damage;
+}
+```
+
+浅拷贝后：
+
+```text
+player1.Weapon
+      ↑
+      ↓
+player2.Weapon
+```
+
+两个对象共用同一个 `Weapon`。
+
+如果修改：
+
+```csharp
+player2.Weapon.Damage = 100;
+```
+
+`player1.Weapon.Damage` 也会受到影响。
+
+深拷贝后：
+
+```text
+player1.Weapon
+
+player2.Weapon
+```
+
+两个 `Weapon` 是独立对象，互不影响。
+
+在 Unity 中，角色数据、背包物品、关卡配置等带嵌套引用的数据，如果需要独立修改，就要考虑深拷贝。
+
+---
+
+## 3. List 和数组哪种效率更高？为什么？
+
+### 标准回答
+
+在题目场景中，数组通常效率更高。
+
+数组：
+
+```csharp
+int[] array = new int[10000];
+```
+
+创建时已经一次性分配固定长度，后续只需要按下标写入，不需要扩容。
+
+`List<T>` 底层本质也是数组：
+
+```csharp
+List<int> list = new List<int>();
+```
+
+但如果没有提前设置容量，`Add` 时容量不足就会触发扩容。
+
+扩容流程：
+
+1. 创建一个更大的内部数组；
+2. 将旧数组中的元素复制到新数组；
+3. 让 `List` 指向新数组；
+4. 旧数组等待 GC 回收。
+
+例如容量变化：
+
+```text
+4 -> 8 -> 16 -> 32 -> 64
+```
+
+因此，频繁扩容会带来：
+
+- 额外内存申请；
+- 数据复制成本；
+- GC 压力。
+
+优化方式：
+
+```csharp
+List<int> list = new List<int>(10000);
+```
+
+提前指定容量可以减少扩容次数。
+
+需要注意：
+
+题目中一个是 `List<int>`，另一个是 `float[]`，类型并不完全一致。严格比较时应该使用相同类型，例如 `List<int>` 和 `int[]`。
+
+---
+
+## 4. try 中 return，finally 是否会执行？返回值是多少？
+
+### 标准回答
+
+代码：
+
+```csharp
+static int GetInt()
+{
+    int i = 10;
+    try
+    {
+        return i;
+    }
+    finally
+    {
+        i = 11;
+        Console.WriteLine($"第B处 i = {i}");
+    }
+}
+```
+
+输出结果：
+
+```text
+第B处 i = 11
+第A处 i = 10
+```
+
+原因：
+
+执行到：
+
+```csharp
+return i;
+```
+
+时，程序会先计算返回值，并把返回值临时保存下来。
+
+此时保存的是：
+
+```text
+10
+```
+
+然后执行 `finally`。
+
+`finally` 中：
+
+```csharp
+i = 11;
+```
+
+修改的是局部变量 `i`，不会影响已经缓存好的返回值。
+
+所以：
+
+- B 处先打印，值为 11；
+- A 处后打印，值为 10。
+
+---
+
+## 5. return 引用类型对象后，finally 修改对象字段会怎样？
+
+### 标准回答
+
+代码：
+
+```csharp
+class Test
+{
+    public int i = 10;
+}
+
+static Test GetObj()
+{
+    Test t = new Test();
+    try
+    {
+        return t;
+    }
+    finally
+    {
+        t.i = 11;
+        Console.WriteLine($"第B处 i = {t.i}");
+    }
+}
+```
+
+输出结果：
+
+```text
+第B处 i = 11
+第A处 i = 11
+```
+
+原因：
+
+执行到：
+
+```csharp
+return t;
+```
+
+时，程序临时保存的是对象引用。
+
+然后执行 `finally`。
+
+`finally` 中：
+
+```csharp
+t.i = 11;
+```
+
+修改的是该引用指向的对象内部字段。
+
+因为返回值保存的引用和 `finally` 中的 `t` 指向的是同一个对象，所以最终返回出去的对象字段也变成了 `11`。
+
+总结：
+
+```text
+值类型 return：缓存的是值本身。
+引用类型 return：缓存的是引用，修改对象内容会影响返回结果。
+```
+
+---
+
+# Unity 面试题
+
+## 1. Unity 中细小高速物体撞击较大物体时，会出现什么情况？如何避免？
+
+### 标准回答
+
+这种情况容易出现碰撞穿透问题，也叫：
+
+```text
+Tunneling（隧穿效应）
+```
+
+原因是 Unity 物理检测默认是离散的。
+
+如果高速物体在两次物理更新之间移动距离过大，就可能出现：
+
+```text
+上一帧在物体前面
+下一帧已经到物体后面
+中间没有检测到碰撞
+```
+
+常见解决方式：
+
+### 方式一：射线检测
+
+适合子弹、激光、飞行道具等高速小物体。
+
+```csharp
+Physics.Raycast(lastPos, direction, out hit, distance);
+```
+
+也可以使用：
+
+```csharp
+Physics.SphereCast();
+```
+
+从上一帧位置检测到当前帧位置，更稳定。
+
+---
+
+### 方式二：开启连续碰撞检测
+
+在 Rigidbody 上设置：
+
+```text
+Collision Detection = Continuous
+Collision Detection = Continuous Dynamic
+Collision Detection = Continuous Speculative
+```
+
+可以减少高速物体穿透问题。
+
+---
+
+### 方式三：减小 Fixed Timestep
+
+可以提高物理检测频率。
+
+但需要注意：
+
+- 会增加 CPU 开销；
+- 不建议作为首选方案；
+- 需要结合项目性能情况谨慎使用。
+
+---
+
+## 2. Prefab 的本质是什么？
+
+### 标准回答
+
+Prefab 的本质是 Unity 中一种：
+
+```text
+序列化资源模板
+```
+
+它不是场景中的真实对象，而是保存了一份可复用的对象结构数据。
+
+Prefab 中通常包含：
+
+- GameObject；
+- Transform；
+- 层级结构；
+- Component；
+- 组件上的序列化字段；
+- 对其他资源的引用，例如材质、贴图、动画、脚本等。
+
+运行时可以通过：
+
+```csharp
+Instantiate(prefab);
+```
+
+根据这份模板创建新的 GameObject 实例。
+
+需要注意：
+
+- Prefab 是资源文件；
+- Prefab Instance 是场景中的实例；
+- 实例可以保留对 Prefab 的关联；
+- 实例也可以产生 Override 覆盖修改。
+
+总结：
+
+```text
+Prefab 是可复用的 GameObject 序列化模板，保存对象结构、组件数据和资源引用。
+```
+
+---
+
+## 3. Unity 是否支持写多线程程序？如果支持需要注意什么？
+
+### 标准回答
+
+Unity 支持多线程。
+
+因为 Unity 使用 C#，可以使用：
+
+```csharp
+Thread
+Task
+ThreadPool
+```
+
+也可以使用 Unity 提供的：
+
+```text
+Job System
+```
+
+但需要注意：
+
+Unity 大多数 API 不是线程安全的，通常只能在主线程调用。
+
+不能在子线程中直接操作：
+
+```text
+GameObject
+Transform
+MonoBehaviour
+UI
+Instantiate
+Destroy
+UnityEngine.Object
+```
+
+适合放到子线程中的内容：
+
+```text
+配置解析
+网络数据处理
+文件 IO
+压缩解压
+寻路计算
+纯 C# 数值计算
+```
+
+如果子线程计算出了结果，应该把结果缓存起来，再回到主线程处理 Unity 对象。
+
+常见做法：
+
+```text
+子线程计算
+↓
+结果放入线程安全队列
+↓
+主线程 Update 中取出结果
+↓
+操作 Unity 对象
+```
+
+还需要注意：
+
+- 不要频繁创建和销毁 Thread；
+- `Task` 通常基于线程池，但仍然需要处理异常、取消和生命周期；
+- 多线程访问共享数据时要注意加锁或使用线程安全容器；
+- 避免竞态条件和死锁。
+
+---
+
+## 4. 什么是对象池？游戏开发中什么时候会用到？
+
+### 标准回答
+
+对象池是一种对象复用机制。
+
+它不会在对象使用完后立即销毁，而是把对象回收到池中，等待下次复用。
+
+基本流程：
+
+```text
+预创建
+↓
+取出对象
+↓
+使用对象
+↓
+回收对象
+↓
+再次复用
+```
+
+在 Unity 中，频繁调用：
+
+```csharp
+Instantiate();
+Destroy();
+```
+
+会带来较高的 CPU 开销和 GC 压力。
+
+对象池可以减少这些开销。
+
+常见使用场景：
+
+```text
+子弹
+特效
+飘字
+伤害数字
+怪物刷兵
+UI Item
+音效对象
+```
+
+回收对象时通常会：
+
+```csharp
+gameObject.SetActive(false);
+```
+
+取出对象时再：
+
+```csharp
+gameObject.SetActive(true);
+```
+
+需要注意：
+
+回收时必须重置状态，例如：
+
+- 位置；
+- 旋转；
+- 缩放；
+- 速度；
+- 血量；
+- 动画状态；
+- 粒子播放状态；
+- 协程；
+- 事件监听。
+
+否则复用时可能出现脏数据问题。
+
+---
+
+## 5. 什么是 DrawCall？为什么会影响效率？如何减少 DrawCall？
+
+### 标准回答
+
+DrawCall 可以理解为：
+
+```text
+CPU 向 GPU 提交一次绘制命令
+```
+
+每一次 DrawCall，CPU 都需要准备渲染状态，例如：
+
+- Mesh；
+- 材质；
+- Shader；
+- 纹理；
+- 矩阵参数；
+- 渲染状态。
+
+DrawCall 过多会影响性能，主要原因是 CPU 需要频繁提交渲染命令和切换渲染状态。
+
+常见开销包括：
+
+```text
+命令提交
+材质切换
+Shader 切换
+纹理切换
+渲染状态切换
+```
+
+在移动端或者大量小物体场景中，DrawCall 过多很容易造成 CPU 渲染瓶颈。
+
+减少 DrawCall 的常见方式：
+
+### 方式一：静态合批
+
+```text
+Static Batching
+```
+
+适合不移动的静态物体。
+
+---
+
+### 方式二：动态合批
+
+```text
+Dynamic Batching
+```
+
+适合部分小模型，但有顶点数量等限制。
+
+---
+
+### 方式三：图集
+
+```text
+Atlas
+```
+
+把多张小图合成一张大图，减少材质和纹理切换。
+
+UI 中尤其常见。
+
+---
+
+### 方式四：GPU Instancing
+
+适合大量相同 Mesh、相同材质的对象。
+
+例如：
+
+```text
+草
+树
+石头
+小怪
+```
+
+---
+
+### 方式五：剔除
+
+包括：
+
+```text
+Frustum Culling
+Occlusion Culling
+```
+
+避免绘制看不见的物体。
+
+---
+
+### 方式六：LOD
+
+```text
+Level of Detail
+```
+
+远处使用低模，减少面数和渲染压力。
+
+需要注意：
+
+LOD 主要降低模型渲染成本，不一定直接减少 DrawCall，除非配合剔除、合批等方案。
+
+总结：
+
+```text
+DrawCall 本质是 CPU 提交给 GPU 的绘制命令。
+优化方向是减少提交次数、减少状态切换、避免绘制不可见物体。
+```
+
+---
+
+# 本轮面试复盘总结
+
+| 题号 | 题目 | 结果 |
+|---|---|---|
+| 1 | == 和 Equals 的区别 | 通过 |
+| 2 | 浅拷贝和深拷贝 | 通过 |
+| 3 | List 和数组效率比较 | 通过 |
+| 4 | try return finally 返回值 | 通过 |
+| 5 | 引用类型 return 与 finally | 通过 |
+| 6 | 高速物体碰撞穿透 | 通过 |
+| 7 | Prefab 本质 | 勉强通过 |
+| 8 | Unity 多线程 | 通过 |
+| 9 | 对象池 | 通过 |
+| 10 | DrawCall | 通过 |
+
+综合评价：
+
+```text
+9 / 10 通过
+```
+
+当前表现：
+
+- C# 基础理解较扎实；
+- Unity 常见性能优化问题回答较稳定；
+- 对对象池、DrawCall、多线程等高频题有基本面试表达能力；
+- Prefab 这类概念题需要进一步提升表达准确性。
+
+后续建议重点加强：
+
+1. Unity 资源管理；
+2. AssetBundle / Addressables；
+3. Lua 热更新；
+4. ILRuntime / HybridCLR；
+5. UI 框架设计；
+6. 渲染管线基础；
+7. 项目经验表达。

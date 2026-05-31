@@ -1,0 +1,559 @@
+---
+title: '面试归档1'
+description: '此博客用于记录面试题'
+category: '学习记录'
+tags:
+  - Unity
+  - 学习记录
+  - 面试
+pubDate: '2026-05-28'
+---
+# C# / Unity 面试题整理
+
+## 1. 装箱和拆箱是什么？
+
+### 标准回答
+
+装箱（Boxing）是将值类型转换成引用类型的过程。CLR 会在托管堆上创建一个对象，并把值类型的数据复制进去。
+
+拆箱（Unboxing）是从装箱后的对象中取出原始值类型的过程。
+
+例如：
+
+```csharp
+int x = 10;
+object obj = x; // 装箱
+
+int y = (int)obj; // 拆箱
+```
+
+需要注意：
+
+- 装箱会产生堆内存分配；
+- 拆箱需要类型检查；
+- 频繁装箱拆箱会带来 GC 压力和性能损耗；
+- 可以通过泛型避免大量装箱。
+
+例如：
+
+```csharp
+List<int> list = new List<int>();
+```
+
+相比：
+
+```csharp
+ArrayList list = new ArrayList();
+```
+
+不会发生装箱。
+
+---
+
+## 2. 值类型和引用类型赋值时的区别是什么？
+
+### 标准回答
+
+值类型赋值时，复制的是数据本身。
+
+引用类型赋值时，复制的是引用地址，多个变量会指向同一个对象。
+
+值类型示例：
+
+```csharp
+int a = 10;
+int b = a;
+
+b = 20;
+```
+
+修改 `b` 不会影响 `a`。
+
+引用类型示例：
+
+```csharp
+Person p1 = new Person();
+Person p2 = p1;
+```
+
+此时 `p1` 和 `p2` 指向同一个对象。
+
+需要注意：
+
+- 值类型不一定总在栈上；
+- 引用类型对象通常在堆上；
+- 引用类型变量本身保存的是引用。
+
+---
+
+## 3. 委托和事件在使用上的区别是什么？
+
+### 标准回答
+
+委托（delegate）是一种可以保存方法引用的类型。
+
+事件（event）本质上是对委托的一层封装，它限制了外部访问权限，因此更安全。
+
+委托：
+
+```csharp
+public Action MyDelegate;
+```
+
+外部可以：
+
+```csharp
+obj.MyDelegate = null;
+obj.MyDelegate();
+```
+
+事件：
+
+```csharp
+public event Action MyEvent;
+```
+
+外部只能：
+
+```csharp
+obj.MyEvent += Func;
+obj.MyEvent -= Func;
+```
+
+不能：
+
+```csharp
+obj.MyEvent = null;
+obj.MyEvent();
+```
+
+总结：
+
+- 委托使用更自由；
+- 事件只能订阅和取消订阅；
+- 事件不能被外部直接触发，因此更安全。
+
+---
+
+## 4. 两个接口有同名方法时如何处理？
+
+### 标准回答
+
+如果两个接口中有同名方法：
+
+```csharp
+interface IA
+{
+    void Test();
+}
+
+interface IB
+{
+    void Test();
+}
+```
+
+类可以：
+
+### 方式一：一个方法同时实现
+
+```csharp
+class MyClass : IA, IB
+{
+    public void Test()
+    {
+    }
+}
+```
+
+### 方式二：显式接口实现
+
+```csharp
+class MyClass : IA, IB
+{
+    void IA.Test()
+    {
+    }
+
+    void IB.Test()
+    {
+    }
+}
+```
+
+调用：
+
+```csharp
+IA a = new MyClass();
+a.Test();
+
+IB b = new MyClass();
+b.Test();
+```
+
+注意：
+
+显式实现的方法不能通过类对象直接调用。
+
+---
+
+## 5. List 是如何扩容的？
+
+### 标准回答
+
+`List<T>` 底层是动态数组。
+
+它有两个核心属性：
+
+- Count：当前元素数量
+- Capacity：数组容量
+
+当：
+
+```text
+Count == Capacity
+```
+
+时，再添加元素就会触发扩容。
+
+扩容流程：
+
+1. 创建一个更大的数组；
+2. 通常扩容为原来的 2 倍；
+3. 将旧数组元素复制到新数组；
+4. 让 List 指向新数组；
+5. 旧数组等待 GC 回收。
+
+例如容量变化：
+
+```text
+4 -> 8 -> 16 -> 32
+```
+
+复杂度：
+
+- 普通 Add：O(1)
+- 扩容时：O(n)
+- 摊还复杂度：O(1)
+
+如果提前知道数据量，可以：
+
+```csharp
+new List<int>(1000);
+```
+
+减少扩容次数。
+
+---
+
+# Unity 面试题
+
+## 1. 点乘和叉乘的作用是什么？
+
+### 点乘 Dot
+
+```csharp
+Vector3.Dot(a, b)
+```
+
+作用：
+
+- 判断夹角；
+- 判断前后方向；
+- 视野检测。
+
+规律：
+
+```text
+dot > 0 同方向
+dot = 0 垂直
+dot < 0 反方向
+```
+
+常用于：
+
+```csharp
+Vector3.Dot(transform.forward, dir)
+```
+
+判断目标是否在前方。
+
+---
+
+### 叉乘 Cross
+
+```csharp
+Vector3.Cross(a, b)
+```
+
+作用：
+
+- 求法向量；
+- 判断左右方向；
+- 判断旋转方向。
+
+叉乘结果垂直于两个向量组成的平面。
+
+需要注意：
+
+```text
+Cross(a,b) != Cross(b,a)
+```
+
+顺序不同方向相反。
+
+---
+
+## 2. Unity 中多线程哪些代码会报错？
+
+### 题目
+
+A. Application.persistentDataPath  
+B. File.Exists()  
+C. transform.Translate  
+D. Object.Destroy()
+
+### 标准答案
+
+ACD。
+
+原因：
+
+Unity 大多数 API 不是线程安全的，只能在主线程调用。
+
+### 说明
+
+#### A
+
+```csharp
+Application.persistentDataPath
+```
+
+属于 Unity API。
+
+---
+
+#### B
+
+```csharp
+File.Exists()
+```
+
+属于 .NET IO API，可以在子线程执行。
+
+---
+
+#### C
+
+```csharp
+transform.Translate()
+```
+
+操作 Unity 场景对象，只能主线程调用。
+
+---
+
+#### D
+
+```csharp
+Object.Destroy()
+```
+
+销毁 Unity 对象，只能主线程调用。
+
+---
+
+## 3. streamingAssetsPath 和 persistentDataPath 的区别？
+
+### streamingAssetsPath
+
+作用：
+
+- 存放随安装包发布的原始文件；
+- 文件保持原样；
+- 通常只读。
+
+适合：
+
+- JSON
+- CSV
+- 视频
+- Lua
+- 初始配置
+- 首包 AB
+
+读取方式：
+
+```csharp
+string path = Path.Combine(Application.streamingAssetsPath, "config.json");
+```
+
+---
+
+### persistentDataPath
+
+作用：
+
+- 存放运行时产生的数据；
+- 可读写；
+- 应用更新后通常保留。
+
+适合：
+
+- 存档
+- 玩家设置
+- 缓存
+- 热更新资源
+- 下载内容
+
+例如：
+
+```csharp
+string path = Path.Combine(Application.persistentDataPath, "save.json");
+```
+
+---
+
+### 两者核心区别
+
+```text
+StreamingAssets：
+游戏自带、原始文件、通常只读。
+
+persistentDataPath：
+运行时数据、玩家数据、可读写。
+```
+
+---
+
+## 4. Unity 协程原理
+
+### 标准回答
+
+Unity 协程基于：
+
+```csharp
+IEnumerator
+```
+
+和：
+
+```csharp
+yield return
+```
+
+实现。
+
+C# 编译器会把协程方法转换成状态机。
+
+Unity 每帧调用：
+
+```csharp
+MoveNext()
+```
+
+推进协程执行。
+
+遇到：
+
+```csharp
+yield return
+```
+
+时暂停，并根据返回值决定什么时候恢复。
+
+例如：
+
+```csharp
+IEnumerator Test()
+{
+    yield return null;
+
+    yield return new WaitForSeconds(1f);
+}
+```
+
+常见 yield：
+
+```text
+yield return null
+下一帧继续
+
+yield return new WaitForSeconds()
+等待时间
+
+yield return AsyncOperation
+等待异步完成
+```
+
+注意：
+
+协程不是多线程，它仍然运行在 Unity 主线程上。
+
+---
+
+## 5. Unity 底层如何处理 C# 代码？
+
+### 标准回答
+
+Unity 中：
+
+```text
+C#
+↓
+IL 中间语言
+↓
+Mono 或 IL2CPP
+↓
+机器码
+```
+
+---
+
+### Mono
+
+流程：
+
+```text
+C#
+↓
+IL
+↓
+Mono Runtime
+↓
+JIT
+↓
+机器码
+```
+
+特点：
+
+- 开发调试方便；
+- 运行时即时编译。
+
+---
+
+### IL2CPP
+
+流程：
+
+```text
+C#
+↓
+IL
+↓
+C++
+↓
+平台 C++ 编译器
+↓
+机器码
+```
+
+特点：
+
+- AOT 提前编译；
+- 发布包常用；
+- 平台兼容性更好；
+- 更难反编译。
+
+最终无论 Mono 还是 IL2CPP，都会变成目标平台的机器码执行。
