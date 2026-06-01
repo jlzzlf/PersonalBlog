@@ -1,0 +1,529 @@
+---
+title: '面试归档3'
+description: '此博客用于记录 Unity / C# 面试题复盘'
+category: '学习记录'
+tags:
+  - Unity
+  - CSharp
+  - 学习记录
+  - 面试
+pubDate: '2026-06-01'
+---
+# Unity 面试陪练 10 题复习整理
+
+> 精简版：只保留题目、解释说明和参考回答，适合复习与面试前背诵。
+
+---
+
+## 第 1 题：泛型的约束有哪几种？
+
+### 解释说明
+
+C# 泛型约束用于限制泛型参数必须满足某些条件。加了约束之后，编译器就能保证泛型类型具备某些能力，比如必须是引用类型、值类型、实现某个接口、继承某个基类，或者必须有公共无参构造函数。
+
+常见约束包括：
+
+```csharp
+where T : class        // T 必须是引用类型
+where T : struct       // T 必须是值类型
+where T : new()        // T 必须有公共无参构造函数
+where T : BaseClass    // T 必须继承某个基类
+where T : IInterface   // T 必须实现某个接口
+where T : U            // T 必须继承或实现另一个泛型参数 U
+```
+
+在 Unity 中，基类约束很常见，例如：
+
+```csharp
+public T GetOrAddComponent<T>() where T : Component
+{
+    T comp = GetComponent<T>();
+    if (comp == null)
+    {
+        comp = gameObject.AddComponent<T>();
+    }
+    return comp;
+}
+```
+
+这里 `where T : Component` 表示 T 必须是 `Component` 或它的子类。
+
+需要注意的是，`new()` 约束一般写在约束列表最后。
+
+### 参考回答
+
+C# 泛型约束常见有几类。首先是类型约束，`where T : class` 表示 T 必须是引用类型，`where T : struct` 表示 T 必须是值类型。其次是构造函数约束，`where T : new()` 表示 T 必须有公共无参构造函数，这样在泛型方法里才能 `new T()`。还有基类约束，比如 `where T : Component`，表示 T 必须继承自 Component，这在 Unity 中很常见。也可以有接口约束，比如 `where T : IDisposable`，表示 T 必须实现某个接口。另外还支持泛型参数约束，比如 `where T : U`。需要注意的是，如果同时写多个约束，`new()` 必须放在最后，`class` 和 `struct` 这类约束也不能随便混用。
+
+---
+
+## 第 2 题：什么是闭包？
+
+### 解释说明
+
+闭包是指一个函数、Lambda 或匿名方法捕获了外部作用域中的变量，使得这个变量即使在外部作用域结束后，仍然可以被内部函数访问。
+
+在 C# 和 Unity 中，闭包常见于委托、事件回调、Lambda 表达式中。最常见的问题是在循环中添加事件监听时直接使用循环变量。
+
+错误示例：
+
+```csharp
+for (int i = 0; i < buttons.Length; i++)
+{
+    buttons[i].onClick.AddListener(() =>
+    {
+        Debug.Log(i);
+    });
+}
+```
+
+如果有 5 个按钮，点击时可能都会输出 `5`，因为闭包捕获的是同一个变量 `i`，而不是每次循环时的值。
+
+正确做法是在循环内部定义临时变量：
+
+```csharp
+for (int i = 0; i < buttons.Length; i++)
+{
+    int index = i;
+    buttons[i].onClick.AddListener(() =>
+    {
+        Debug.Log(index);
+    });
+}
+```
+
+这样每次循环都会创建新的局部变量 `index`，每个回调捕获的变量不同。
+
+### 参考回答
+
+闭包是指函数捕获外部作用域变量的能力。在 C# 中，Lambda、匿名函数、委托和事件回调都可能形成闭包。它的特点是内部函数可以访问外部变量，而且这个变量的生命周期会被延长。Unity 中常见问题是循环添加按钮事件时，如果直接捕获循环变量 `i`，点击按钮时输出的可能都是循环结束后的值。因为闭包捕获的是变量本身，不是当时的值。解决方法是在循环体内部定义一个临时变量，比如 `int index = i;`，让每次循环都捕获不同的变量。使用闭包时还要注意对象生命周期和事件注销，否则可能造成额外 GC 或内存泄漏风险。
+
+---
+
+## 第 3 题：内存泄漏指什么？常见的内存泄漏有哪些？
+
+### 解释说明
+
+内存泄漏是指对象或资源已经不再被业务使用，但由于仍然被引用，或者没有正确释放，导致它占用的内存无法被回收。
+
+在 C# 中，GC 会回收不可达对象。如果一个对象仍然被静态变量、单例、事件、委托、闭包、集合缓存等引用着，GC 就会认为它仍然可达，因此不会回收。
+
+Unity 中还要区分两类内存：
+
+```text
+C# 托管对象：由 GC 管理
+Unity 原生资源：如 Texture、Mesh、AudioClip、AssetBundle，需要主动释放或卸载
+```
+
+常见内存泄漏场景包括：
+
+```text
+事件监听没有注销
+静态变量或单例长期持有对象
+集合缓存没有清理
+协程没有停止
+Timer、委托、回调没有取消
+闭包持有外部对象引用
+AssetBundle 加载后没有正确 Unload
+Resources 加载资源后长期持有引用
+GameObject 实例化后没有 Destroy 或没有回收到对象池
+```
+
+典型例子是 UI 面板注册全局事件后，关闭时没有移除监听，事件管理器继续持有面板对象的方法引用，导致该对象无法被 GC 回收。
+
+### 参考回答
+
+内存泄漏是指某个对象或资源已经不再被业务使用，但由于仍然被引用或者没有正确释放，导致它占用的内存无法被回收。在 C# 里，GC 只能回收不可达对象，如果对象还被静态变量、单例、事件、委托、闭包、Timer 或集合缓存引用着，就不会被回收。Unity 中常见的内存泄漏包括：事件监听没有注销，静态列表或单例缓存对象没有清理，协程或回调没有停止，闭包持有外部对象引用，AssetBundle 加载后没有正确 Unload，Resources 加载的资源长期被引用，以及 GameObject 实例化后没有 Destroy。比如一个 UI 面板注册了全局事件，但关闭面板时没有移除监听，那么事件系统会继续持有这个面板对象的方法引用，导致这个面板无法被 GC 回收。解决方式是在 `OnDisable` 或 `OnDestroy` 中解除监听，并及时清理缓存和卸载不用的资源。实际排查时可以使用 Unity Profiler 和 Memory Profiler 查看对象数量和引用链。
+
+---
+
+## 第 4 题：序列化是什么？常见的序列化方式有哪些？什么时候会用到序列化？
+
+### 解释说明
+
+序列化是指把对象的状态或数据结构转换成一种可以存储或传输的格式。反序列化则是把这些数据重新还原成对象。
+
+序列化的不是代码逻辑，而是对象中的数据。例如一个玩家数据对象：
+
+```csharp
+[Serializable]
+public class PlayerData
+{
+    public string name;
+    public int level;
+    public int gold;
+}
+```
+
+序列化成 JSON 后可能是：
+
+```json
+{
+    "name": "Tom",
+    "level": 10,
+    "gold": 500
+}
+```
+
+常见序列化方式包括：
+
+```text
+JSON：可读性好，配置、存档、接口数据常用
+XML：可读性强，但比较冗余
+二进制：体积小、读写快，但可读性差
+Protobuf / MessagePack：常用于网络通信或高性能数据传输
+Unity 自带序列化：Scene、Prefab、ScriptableObject、Inspector 字段等
+```
+
+Unity 中常见工具有：
+
+```csharp
+JsonUtility.ToJson(data);
+JsonUtility.FromJson<PlayerData>(json);
+```
+
+C# 项目中也常用：
+
+```csharp
+JsonConvert.SerializeObject(data);
+JsonConvert.DeserializeObject<PlayerData>(json);
+```
+
+序列化常用于玩家存档、配置表读取、网络消息传输、编辑器工具数据保存、资源清单和热更新版本文件等场景。
+
+### 参考回答
+
+序列化是指把对象的状态或数据结构转换成一种可以存储或传输的格式，比如 JSON 字符串、XML、二进制数据等。反序列化则是把这些数据重新还原成对象。在 Unity 里常见的序列化方式包括 Unity 自带的序列化系统，比如 `[SerializeField]`、Prefab、Scene、`ScriptableObject`，也包括运行时的数据序列化，比如 `JsonUtility`、`Newtonsoft.Json`、二进制序列化、Protobuf、MessagePack 等。使用场景很多，比如保存玩家存档、读取配置表、保存编辑器工具数据、网络消息传输、资源版本文件、热更新清单等。需要注意的是，Unity 的 `JsonUtility` 性能较好、使用简单，但限制比较多，比如对字典、属性、复杂多态支持不好；`Newtonsoft.Json` 功能更强，支持复杂对象、字典等，但性能、包体和 AOT 兼容性需要注意。
+
+---
+
+## 第 5 题：A、B、C 三处打印结果分别是多少？为什么？
+
+### 解释说明
+
+题目代码：
+
+```csharp
+static unsafe void Main(string[] args)
+{
+    int test1Value = 10;
+    Test1(test1Value);
+    Console.WriteLine($"A:{test1Value}");
+
+    int test2Value = 10;
+    Test2(&test2Value);
+    Console.WriteLine($"B:{test2Value}");
+
+    int test3Value = 10;
+    Test3(ref test3Value);
+    Console.WriteLine($"C:{ test3Value}");
+    Console.ReadKey();
+}
+
+private static void Test1(int value)
+{
+    value += 90;
+}
+
+private unsafe static void Test2(int* value)
+{
+    *value += 90;
+}
+
+private static void Test3(ref int value)
+{
+    value += 90;
+}
+```
+
+正确输出是：
+
+```text
+A:10
+B:100
+C:100
+```
+
+A 输出 10，因为 `Test1(test1Value)` 是普通值传递。`int` 是值类型，传入方法时会复制一份值，方法内部修改的是形参副本，不会影响外部变量。
+
+B 输出 100，因为 `Test2(&test2Value)` 传入的是变量地址。方法内部通过指针解引用 `*value` 修改的是原变量本身。
+
+C 输出 100，因为 `Test3(ref test3Value)` 是 `ref` 引用传递。形参和实参代表同一个变量，方法内部修改 `value` 会影响外部的 `test3Value`。
+
+需要注意的是，B 不是普通的 C# 引用传递，而是 unsafe 指针传递。
+
+### 参考回答
+
+A 输出 10，因为 `int` 是值类型，普通参数传递时传入的是变量值的副本。`Test1` 中修改的是形参 `value`，不会影响外部的 `test1Value`。B 输出 100，因为 `Test2` 传入的是 `test2Value` 的地址，方法内部通过指针解引用 `*value` 修改的是原变量本身。C 输出 100，因为 `ref` 是引用传递，形参和实参代表同一个变量，所以在 `Test3` 里修改 `value` 会影响外部的 `test3Value`。所以最终结果是 `A:10，B:100，C:100`。补充一点，C# 默认参数传递都是按值传递；对于值类型，复制的是值本身；对于引用类型，复制的是对象引用的副本，而 `ref`、`out`、指针这些方式可以让方法直接影响外部变量本身。
+
+---
+
+## 第 6 题：`transform.forward` 和 `Vector3.forward` 的区别
+
+### 解释说明
+
+`Vector3.forward` 是 Unity 世界坐标系中的固定前方，等价于：
+
+```csharp
+new Vector3(0, 0, 1)
+```
+
+它表示世界 Z 轴正方向，不会随着任何物体旋转而改变。
+
+`transform.forward` 表示当前物体自身坐标系中的前方方向，会受到该物体 Transform 旋转影响。
+
+可以理解为：
+
+```csharp
+transform.forward == transform.rotation * Vector3.forward
+```
+
+例如，一个物体没有旋转时，`transform.forward` 和 `Vector3.forward` 一样；如果物体绕 Y 轴旋转 90 度，`transform.forward` 就会变成旋转后的本地 Z 轴正方向，可能接近世界 X 轴方向。
+
+常见使用方式：
+
+```csharp
+// 沿自身朝向移动
+transform.position += transform.forward * speed * Time.deltaTime;
+
+// 沿世界 Z 轴移动
+transform.position += Vector3.forward * speed * Time.deltaTime;
+```
+
+### 参考回答
+
+`Vector3.forward` 是 Unity 世界坐标系中的固定前方，也就是 `(0, 0, 1)`，不会随着任何物体旋转而改变。`transform.forward` 是当前物体自身坐标系的前方方向，会受到该物体 `Transform` 旋转的影响。比如一个物体没有旋转时，`transform.forward` 和 `Vector3.forward` 一样；如果物体旋转了，`transform.forward` 就表示旋转后的本地 Z 轴正方向。所以移动物体自身前方一般用 `transform.forward`，而沿世界 Z 轴方向移动则用 `Vector3.forward`。
+
+---
+
+## 第 7 题：Unity 中如何解决过多创建和删除对象带来的卡顿问题？
+
+### 解释说明
+
+Unity 中频繁 `Instantiate` 和 `Destroy` 容易造成卡顿，原因包括：
+
+```text
+对象构建开销
+组件初始化开销
+Transform 层级变更开销
+内存分配开销
+可能触发资源加载
+Destroy 后带来的 GC 和资源回收压力
+```
+
+常见解决方案有：
+
+1. 使用对象池
+
+对于子弹、特效、伤害数字、怪物、掉落物、UI Item 等反复出现的对象，不要频繁创建和销毁，而是用完后隐藏并放回池中，下次再复用。
+
+```csharp
+GameObject obj = pool.Get();
+obj.SetActive(true);
+
+// 使用完毕后
+obj.SetActive(false);
+pool.Release(obj);
+```
+
+2. 分帧创建
+
+如果确实需要一次性创建大量对象，可以使用协程分摊到多帧，降低单帧峰值。
+
+```csharp
+IEnumerator CreateObjects()
+{
+    for (int i = 0; i < count; i++)
+    {
+        CreateOne();
+
+        if (i % 10 == 0)
+        {
+            yield return null;
+        }
+    }
+}
+```
+
+3. 预加载或预创建
+
+在场景加载、战斗开始前提前创建常用对象，运行过程中直接从池中取用。
+
+4. 统一释放
+
+关卡结束时统一清理对象池和资源，避免运行中频繁销毁。但要注意不要无限累积对象，否则会造成内存占用过高。
+
+对象池回收时还要重置状态，比如位置、旋转、缩放、动画、粒子、碰撞、血量、事件监听等，避免复用时出现脏数据。
+
+### 参考回答
+
+Unity 中过多创建和删除对象卡顿，主要是因为 `Instantiate` 和 `Destroy` 会带来对象构建、组件初始化、内存分配和 GC 压力。如果在运行时频繁调用，就容易造成帧率波动。常见解决方案是使用对象池。对于子弹、特效、怪物、伤害数字、UI Item 这类反复出现的对象，不直接销毁，而是在不用时隐藏并回收到池里，下次需要时重新取出使用。另外，如果需要一次性创建大量对象，可以用协程或异步方式分帧创建，避免单帧压力过大。也可以在场景加载或战斗开始前预加载和预创建常用对象，运行过程中直接复用。最后，在回收对象时要重置状态，比如 Transform、动画、粒子、碰撞、血量、事件监听等，关卡结束时再统一释放对象池，避免内存长期占用。对象池不是单纯 `SetActive(false)`，关键是完整的生命周期管理，包括初始化、取出、回收、状态重置和最终释放。
+
+---
+
+## 第 8 题：游戏中的成就系统一般会使用哪种设计模式？为什么？
+
+### 解释说明
+
+成就系统通常适合使用观察者模式，也就是基于事件系统来实现。
+
+原因是成就系统需要关注玩家的很多行为，例如：
+
+```text
+击杀怪物
+完成关卡
+获得道具
+角色升级
+完成任务
+累计登录
+消耗货币
+```
+
+如果让战斗系统、背包系统、任务系统直接调用成就系统，会导致模块之间耦合过高。
+
+更好的方式是：业务系统只负责派发事件，成就系统作为观察者监听事件。
+
+例如战斗系统派发事件：
+
+```csharp
+EventManager.Dispatch(GameEvent.KillMonster, monsterId);
+```
+
+成就系统监听事件：
+
+```csharp
+private void OnKillMonster(object data)
+{
+    // 根据事件数据和成就配置更新进度
+}
+```
+
+这样战斗系统不需要知道成就系统是否存在。后续如果任务系统、活动系统、数据埋点系统也需要监听击杀事件，也可以复用同一个事件。
+
+实际项目中，成就系统通常还会配表，例如成就类型、目标参数、目标数量、奖励内容等。事件触发后，根据事件类型和参数匹配配置并更新成就进度。
+
+### 参考回答
+
+游戏中的成就系统一般适合使用观察者模式，或者基于事件中心的事件驱动方式实现。原因是成就系统本身不应该强耦合到战斗、任务、背包、关卡等具体业务系统里。比如玩家击杀怪物时，战斗系统只需要派发一个“击杀怪物”的事件；玩家获得道具时，背包系统只需要派发一个“获得道具”的事件。成就系统监听这些事件，然后根据成就配置更新进度，判断是否完成并发放奖励。这样做的好处是模块之间耦合低，扩展性好。后续如果增加任务系统、活动系统、数据埋点系统，也可以监听同样的事件，不需要修改原有战斗或背包逻辑。需要注意的是，事件监听要在合适的生命周期内注册和注销，避免重复监听或对象无法释放。
+
+---
+
+## 第 9 题：请简述热更新的流程
+
+### 解释说明
+
+热更新是指在不重新安装 App 的情况下，更新游戏资源、配置或部分逻辑代码。Unity 中热更新一般分为资源热更新和代码热更新。
+
+资源热更新常见内容包括：
+
+```text
+AssetBundle
+Addressables 资源
+配置表
+图片、音频、Prefab 等资源
+资源清单 Manifest
+版本文件
+```
+
+代码热更新常见方案包括：
+
+```text
+Lua
+ILRuntime
+HybridCLR
+```
+
+热更新一般不是直接替换安装包本体，而是把更新文件下载到本地可写目录，例如：
+
+```csharp
+Application.persistentDataPath
+```
+
+运行时加载资源时，优先从热更新目录读取；如果没有，再读取包内资源。
+
+常见流程：
+
+```text
+1. 启动游戏
+2. 读取本地版本号和资源清单
+3. 请求服务器版本文件
+4. 对比本地和远程版本号、资源 hash、MD5、文件大小
+5. 判断是否需要更新
+6. 计算需要下载的差异文件
+7. 下载 AssetBundle、配置表、脚本或热更 DLL
+8. 校验文件完整性
+9. 解压或保存到本地可写目录
+10. 更新本地版本文件和 Manifest
+11. 重新加载资源或重启游戏逻辑
+12. 进入游戏
+```
+
+### 参考回答
+
+热更新的基本流程是：游戏启动后，先读取本地版本文件和资源清单，然后向服务器请求最新的版本信息。客户端会对比本地和远程的版本号、资源列表、MD5 或 hash 值，判断哪些资源需要更新。如果需要更新，就从资源服务器或 CDN 下载差异资源，比如 AssetBundle、配置表、Lua 脚本，或者 HybridCLR 这类方案中的热更 DLL。下载完成后，需要进行完整性校验，确认文件大小和 MD5 正确，然后把资源保存到 `Application.persistentDataPath` 等本地可写目录，并更新本地 Manifest 和版本号。后续加载资源时，客户端优先从热更新目录加载最新资源，如果没有再回退到包内资源。这样可以实现不重新安装 App 的情况下更新资源和部分逻辑。热更新一般分为资源热更新和代码热更新，资源热更新常用 AssetBundle 或 Addressables，代码热更新可以使用 Lua、ILRuntime、HybridCLR 等方案，但实际项目中要结合平台规则和公司方案设计。
+
+---
+
+## 第 10 题：我们应该如何优化 UI（基于 UGUI）？
+
+### 解释说明
+
+UGUI 优化通常从以下几个方向考虑：
+
+```text
+Canvas Rebuild
+Draw Call
+Overdraw
+Raycast 检测
+布局计算
+ScrollView 长列表
+资源加载与复用
+```
+
+1. 拆分 Canvas
+
+Canvas 下的 UI 元素发生变化时，可能触发 Canvas Rebuild。如果所有 UI 都放在一个大 Canvas 下，一个小元素变化也可能导致较大范围重建。
+
+常见拆分方式：
+
+```text
+StaticCanvas      静态背景、固定装饰
+DynamicCanvas     血条、倒计时、数字等频繁变化元素
+PopupCanvas       弹窗
+TopCanvas         飘字、提示、引导层
+```
+
+2. 使用图集
+
+把同一界面或同一模块的 UI 图片打进 SpriteAtlas，减少贴图切换和 Draw Call。
+
+3. 减少 LayoutGroup 和 ContentSizeFitter
+
+`HorizontalLayoutGroup`、`VerticalLayoutGroup`、`GridLayoutGroup`、`ContentSizeFitter` 会带来布局计算和重建开销。固定布局可以手动摆放；如果只在初始化时需要自动排版，可以排完后禁用布局组件。
+
+4. 关闭不需要交互对象的 RaycastTarget
+
+很多 Image 和 Text 只是显示用，不需要响应点击，应关闭：
+
+```csharp
+image.raycastTarget = false;
+text.raycastTarget = false;
+```
+
+这样可以减少 `GraphicRaycaster` 的遍历开销。
+
+5. 降低 Overdraw
+
+减少透明图片叠加、无意义的空 Image、全屏半透明图片、复杂 Mask 和过深 UI 层级。
+
+6. ScrollView 长列表优化
+
+长列表不要一次性创建大量 Item，应使用对象池或虚拟列表，只创建当前可见范围内的 UI 节点。
+
+7. 使用工具定位问题
+
+实际排查时可以结合 Unity Profiler、Frame Debugger 和 UI Profiler，看 Canvas Rebuild、Batch 数量、Overdraw 和 Draw Call 是否异常。
+
+### 参考回答
+
+UGUI 优化一般可以从几个方面入手。第一是拆分 Canvas，因为 Canvas 下 UI 发生变化时可能触发重建，所以要把静态 UI 和动态 UI 分开，比如背景、固定装饰放一个 Canvas，血条、倒计时、飘字等频繁变化的元素放到单独 Canvas，减少 Rebuild 范围。第二是减少 Draw Call，比如使用 SpriteAtlas 图集，把同一界面的 UI 资源合并，减少贴图切换。第三是减少布局开销，少用 `LayoutGroup`、`ContentSizeFitter`，固定布局可以手动摆放，动态列表可以初始化后禁用布局组件。第四是优化点击检测，不需要交互的 Image、Text 要关闭 `RaycastTarget`，减少 `GraphicRaycaster` 遍历。第五是降低 Overdraw，减少透明图片叠加、空 Image、复杂 Mask 和过深 UI 层级。如果是 ScrollView 长列表，还应该使用对象池或虚拟列表，避免一次性创建大量 UI Item。总结来说，UGUI 优化重点就是减少 Canvas Rebuild、减少 Draw Call、降低 Overdraw、减少布局和事件检测开销。实际排查 UI 性能时，可以结合 Unity Profiler、Frame Debugger 和 UI Profiler 定位问题。
+

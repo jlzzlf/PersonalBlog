@@ -1,0 +1,540 @@
+---
+title: '面试归档4'
+description: '此博客用于记录 Unity / C# 面试题复盘'
+category: '学习记录'
+tags:
+  - Unity
+  - CSharp
+  - 学习记录
+  - 面试
+pubDate: '2026-05-31'
+---
+
+# Unity / C# 面试题复盘归档 1
+
+本篇记录本轮 Unity / C# 面试陪练中的 10 道题，包含用户原回答、评价等级、关键问题点和可背诵的标准参考答案。
+
+---
+
+## 1. `null`、`""`、`string.Empty` 的区别
+
+### 题目
+
+请说明字符串中：
+
+```csharp
+string str = null;
+string str = "";
+string str = string.Empty;
+```
+
+三者的区别。
+
+### 用户原回答
+
+不知道有什么区别。
+
+### 评价等级
+
+不通过。
+
+### 关键点
+
+`string str = null` 表示变量没有引用任何字符串对象，是空引用，直接访问 `Length` 或调用方法会抛出 `NullReferenceException`。
+
+`string str = ""` 表示变量引用了一个长度为 0 的字符串对象。它不是 `null`，可以正常访问 `Length`，结果是 0。
+
+`string str = string.Empty` 和 `""` 基本等价，都表示空字符串，长度为 0。区别主要是写法风格，`string.Empty` 语义更明确，`""` 更简洁。
+
+### 标准参考答案
+
+`null` 表示字符串变量没有指向任何对象，所以调用它的属性或方法会空引用报错。
+
+`""` 表示空字符串，它不是 `null`，只是长度为 0，可以正常访问 `Length`。
+
+`string.Empty` 和 `""` 基本一样，也表示空字符串，区别主要是表达风格。
+
+实际开发中判断字符串是否为空，通常使用 `string.IsNullOrEmpty(str)`；如果还要把空格字符串也视为无效，可以使用 `string.IsNullOrWhiteSpace(str)`。
+
+---
+
+## 2. C# 重载 `==`、`!=` 和重写 `Equals` 的意义
+
+### 题目
+
+C# 重载运算符 `==`、`!=`，以及重写 `Object` 基类中的虚方法：
+
+```csharp
+public virtual bool Equals(object obj)
+```
+
+对于我们的意义是什么？
+
+### 用户原回答
+
+意义是可以自定义比较内容。
+
+### 评价等级
+
+勉强通过。
+
+### 关键点
+
+你的方向是对的，重载 `==`、`!=` 和重写 `Equals` 的核心意义就是自定义对象的相等判断规则。
+
+默认情况下，普通引用类型通常比较的是两个变量是否指向同一个对象。但业务中可能希望按内容比较，例如玩家 `Id` 相同就认为是同一个玩家。
+
+如果重写了 `Equals`，通常还要重写 `GetHashCode`，否则在 `Dictionary`、`HashSet` 等集合中可能出现逻辑不一致。
+
+### 标准参考答案
+
+重载 `==`、`!=` 和重写 `Equals` 的意义，是让我们可以自定义对象之间的相等判断规则。
+
+默认情况下，普通引用类型的 `==` 通常比较的是引用是否相同，也就是两个变量是否指向同一个对象。但在业务中，我们可能更关心对象内容是否相同，比如两个玩家对象只要 `Id` 相同，就认为是同一个玩家。
+
+所以可以重载 `==` 和 `!=`，让代码在使用 `a == b` 时走自定义比较逻辑。同时重写 `Equals`，可以让集合查找、去重等场景也使用同一套相等规则。
+
+如果重写了 `Equals`，通常还要重写 `GetHashCode`，保证相等对象有相同哈希值。总结来说，`==`、`!=`、`Equals` 和 `GetHashCode` 最好保持一致。
+
+### 示例
+
+```csharp
+public class Player
+{
+    public int Id;
+    public string Name;
+
+    public override bool Equals(object obj)
+    {
+        return obj is Player other && Id == other.Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+
+    public static bool operator ==(Player left, Player right)
+    {
+        if (ReferenceEquals(left, right)) return true;
+        if (left is null || right is null) return false;
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Player left, Player right)
+    {
+        return !(left == right);
+    }
+}
+```
+
+---
+
+## 3. `string` 和 `StringBuilder` 如何选择
+
+### 题目
+
+在开发时，对 `string` 和 `StringBuilder` 我们应该如何选择？
+
+### 用户原回答
+
+如果是频繁拼接的字符串，例如文件路径，可以使用 `StringBuilder`。而确定的字符串内容，直接使用 `string` 就好了。
+
+### 评价等级
+
+勉强通过。
+
+### 关键点
+
+`string` 是不可变对象，每次拼接或修改通常都会产生新的字符串对象。如果在循环里大量使用 `string +=`，可能产生大量临时对象，增加 GC 压力。
+
+`StringBuilder` 适合循环中大量拼接字符串，例如日志、文本生成、CSV、协议字符串等。
+
+但文件路径拼接通常不推荐手动用 `+` 或 `StringBuilder`，更推荐使用 `Path.Combine`，这样跨平台更安全。
+
+### 标准参考答案
+
+`string` 和 `StringBuilder` 的选择主要看字符串是否会频繁修改。
+
+`string` 在 C# 中是不可变类型，如果只是固定内容，或者少量字符串拼接，直接使用 `string`、`+` 或字符串插值就可以，代码更简单，可读性也更好。
+
+但如果是在循环中大量拼接字符串，比如生成日志、拼接大量文本、构建 CSV、生成协议内容等，频繁使用 `string +=` 会产生很多临时对象，增加 GC 压力。这个时候更适合使用 `StringBuilder`，通过 `Append` 追加内容，最后再调用 `ToString()` 得到结果。
+
+在 Unity 中尤其要注意，不要在 `Update` 中频繁拼接字符串，否则可能造成 GC Alloc，影响性能。
+
+如果是文件路径拼接，通常使用 `Path.Combine`，而不是手动拼接字符串。
+
+---
+
+## 4. .NET 跨语言原理
+
+### 题目
+
+请简要说明 .NET 跨语言原理。
+
+### 用户原回答
+
+.NET 通过公共语言 IL 实现跨语言。
+
+### 评价等级
+
+勉强通过。
+
+### 关键点
+
+不同的 .NET 语言，例如 C#、F#、VB.NET，编译后都会生成统一的 IL / CIL 中间语言和元数据。
+
+运行时由 CLR 加载程序集并执行 IL。不同语言之间能互操作，还依赖 CTS 通用类型系统和 CLS 公共语言规范。
+
+### 标准参考答案
+
+.NET 的跨语言原理主要是：不同的 .NET 语言，比如 C#、VB.NET、F#，在编译后并不是直接变成最终机器码，而是先编译成统一的中间语言 IL，也叫 CIL。
+
+这些 IL 会和类型、方法、字段等元数据一起打包成程序集。运行时由 CLR，也就是公共语言运行时，负责加载程序集，并通过 JIT 编译把 IL 转换成本机机器码执行。
+
+同时，.NET 还提供了 CTS 通用类型系统和 CLS 公共语言规范，保证不同语言之间对类型、方法、访问规则等有统一约定。
+
+所以只要语言遵守这些规范，最终都能编译成 IL，就可以在 .NET 平台上运行，并且可以互相调用。这就是 .NET 跨语言的核心原理。
+
+---
+
+## 5. .NET 跨平台原理
+
+### 题目
+
+请简要说明 .NET 跨平台原理。
+
+### 用户原回答
+
+.NET 的跨平台我不太了解。我知道 Unity 的跨平台分为 Mono 和 IL2CPP 方案。都是转换成 IL 中间语言，Mono 走 JIT 运行时编译，然后转成相应语言，最后转译成机器码。而 IL2CPP 走的是 AOT 编译，编译成 C++ 然后成机器码运行。Unity 编辑器中的预览用的是 Mono 方案。大部分平台都会选 C++ 方案，性能高，可以防代码注入。
+
+### 评价等级
+
+勉强通过。
+
+### 关键点
+
+你对 Unity 的 Mono / IL2CPP 有一定理解，但这题问的是 .NET 跨平台原理，不能完全用 Unity 脚本后端替代回答。
+
+.NET 跨平台的核心是：C# 先编译成统一的 IL 和元数据，不同平台上有对应实现的 .NET Runtime，再由运行时通过 JIT 或 AOT 生成当前平台的机器码。
+
+Mono 不是把 IL 转成“相应语言”，而是在运行时通过 JIT 把 IL 编译成当前平台 CPU 可执行的机器码。
+
+### 标准参考答案
+
+.NET 跨平台的核心是：C# 代码不会一开始就直接编译成某个平台的机器码，而是先编译成统一的 IL 中间语言，并带有元数据生成程序集。
+
+在不同平台上，比如 Windows、Linux、macOS，会有对应平台的 .NET Runtime。运行时负责加载程序集，并通过 JIT 或 AOT 的方式，把 IL 转换成当前操作系统和 CPU 架构能执行的机器码。
+
+同时 .NET 提供了统一的基础类库，比如文件、网络、集合、线程等 API，屏蔽一部分平台差异。所以同一份 .NET 代码，只要没有调用平台特有 API，就可以在不同系统上运行。
+
+如果结合 Unity 来说，Unity 的 C# 脚本通常也是先编译成 IL。Mono 后端是运行时 JIT 编译，IL2CPP 后端是提前把 IL 转成 C++，再由平台编译器编译成本机代码。IL2CPP 更适合正式发布和不支持 JIT 的平台，比如 iOS。
+
+---
+
+## 6. Unity 中 `Destroy` 和 `DestroyImmediate` 的区别
+
+### 题目
+
+Unity 中的 `Destroy` 和 `DestroyImmediate` 的区别是什么？
+
+### 用户原回答
+
+`Destroy` 虽然会销毁游戏中的对象，但是它的 C# 对象可能会等待 GC 统一销毁。而 `DestroyImmediate` 是立即销毁对象，它会连同 C# 对象一起销毁。
+
+### 评价等级
+
+勉强通过。
+
+### 关键点
+
+你答中了“延迟销毁 vs 立即销毁”的方向，但 `DestroyImmediate` 并不等于“连同 C# 对象一起立即 GC 掉”。
+
+Unity 对象可以理解为两层：C# 托管包装对象和 Native 引擎对象。`Destroy` / `DestroyImmediate` 主要销毁的是 Unity 引擎层对象。C# 包装对象什么时候真正释放，仍然取决于 GC。
+
+### 标准参考答案
+
+`Destroy` 和 `DestroyImmediate` 都是用来销毁 Unity 对象的，但区别主要在销毁时机和使用场景。
+
+`Destroy` 是延迟销毁，不会在调用这一行代码时立刻把对象完全清掉，而是在 Unity 当前生命周期的合适阶段统一处理，所以它更适合运行时游戏逻辑。
+
+`DestroyImmediate` 是立即销毁，调用后对象马上被销毁，通常用于编辑器脚本或者 Edit Mode 下。运行时一般不推荐使用，因为它会立即改变对象状态，可能破坏当前帧逻辑、遍历流程或 Unity 生命周期。
+
+另外要注意，Unity 对象有 C# 包装层和 Native 引擎对象两层。`Destroy` 或 `DestroyImmediate` 主要销毁的是 Unity 引擎对象，C# 引用对象什么时候真正释放，仍然要看 GC，而不是 `DestroyImmediate` 直接负责。
+
+---
+
+## 7. Unity 销毁对象后的 null 判断结果
+
+### 题目
+
+```csharp
+string s = string.Empty;
+GameObject go = new GameObject();
+DestroyImmediate(go);
+
+if (!go)
+    s += "A";
+if (go is null)
+    s += "B";
+if (go == null)
+    s += "C";
+if ((System.Object)go == null)
+    s += "D";
+Debug.Log(s);
+```
+
+请问最终打印的 `s` 的结果为？
+
+### 用户原回答
+
+结果为 `ABCD`。
+
+### 评价等级
+
+不通过。
+
+### 正确结果
+
+```csharp
+AC
+```
+
+### 关键点
+
+`DestroyImmediate(go)` 会立即销毁 GameObject 对应的 Unity Native 对象，但 C# 托管引用 `go` 本身并不会立刻变成真正的 `null`。
+
+`!go` 会走 UnityEngine.Object 的 bool 判断逻辑。对象已经被销毁，所以判断成立，拼接 `A`。
+
+`go is null` 是 C# 模式匹配的空判断，不走 Unity 的 `==` 重载。它判断 C# 引用本身是否为真正的 `null`，这里不成立。
+
+`go == null` 会走 UnityEngine.Object 重载的 `==`，销毁后的 Unity 对象会表现为 `null`，所以成立，拼接 `C`。
+
+`(System.Object)go == null` 会绕过 UnityEngine.Object 的重载，变成普通 C# 引用判断。托管引用仍然存在，所以不成立。
+
+### 标准参考答案
+
+最终输出是 `AC`。
+
+因为 Unity 对象有 Native 对象和 C# 包装对象两层。`DestroyImmediate` 销毁的是 Native 层，但 C# 引用还在。
+
+`!go` 和 `go == null` 会走 Unity 的重载逻辑，所以销毁后的对象会被当成 null，分别拼上 `A` 和 `C`。
+
+但 `go is null` 和 `(System.Object)go == null` 判断的是 C# 引用本身，不走 Unity 的假 null 逻辑，所以不会拼 `B` 和 `D`。
+
+---
+
+## 8. 第一次执行 `GameObject.Instantiate` 卡顿如何解决
+
+### 题目
+
+第一次执行 `GameObject.Instantiate` 时可能出现明显的卡顿，如何解决该问题？
+
+### 用户原回答
+
+可以预先加载。
+
+### 评价等级
+
+勉强通过。
+
+### 关键点
+
+“预先加载”方向对，但不够完整。
+
+第一次 `Instantiate` 卡顿可能来自资源首次加载、Prefab 反序列化、层级克隆、组件初始化、`Awake` / `OnEnable` 执行、Shader 变体首次加载或预热不足、GC Alloc 等。
+
+解决方案通常是：预加载资源、预实例化对象、对象池复用、分帧初始化、Shader 预热。
+
+### 标准参考答案
+
+第一次 `Instantiate` 卡顿，通常不是单纯因为 Instantiate 这一行，而是它可能触发资源加载、Prefab 反序列化、层级克隆、组件初始化、`Awake` / `OnEnable` 执行，以及材质、Shader、动画等首次使用成本。
+
+解决方式一般是把这些成本提前或分摊掉。首先可以在加载界面提前加载 Prefab 和它的依赖资源，比如通过 Addressables 或 AssetBundle 预加载。
+
+其次，对于运行时会频繁创建的对象，比如子弹、怪物、特效、伤害数字，应该在进入场景或战斗前预实例化一批，放进对象池，使用时激活，不用时回收，而不是频繁 Instantiate 和 Destroy。
+
+如果对象数量很多，也不要一帧全部创建，可以用协程或异步流程分帧初始化。对于 Shader 首次使用造成的卡顿，还可以做 Shader Variant 预热。
+
+总结来说，就是预加载资源、预实例化对象、对象池复用，并把初始化成本放到加载阶段或分帧处理。
+
+---
+
+## 9. Lua 如何实现面向对象三大特性
+
+### 题目
+
+Lua 如何实现面向对象的三大特性？
+
+### 用户原回答
+
+我不太了解 Lua，但是我觉得任何一门语言都能够实现封装、继承、多态。只要我们掌握了对内存地址的操作。
+
+### 评价等级
+
+不通过。
+
+### 关键点
+
+Lua 实现面向对象通常不是靠操作内存地址，而是靠 `table`、`metatable`、`__index`、函数和闭包。
+
+封装：用 table 保存字段和方法，用 local 变量或闭包隐藏私有数据。
+
+继承：通过 metatable 和 `__index`，让子对象找不到字段或方法时去父表中查找。
+
+多态：子类重写父类同名方法，运行时调用实际对象的方法。Lua 也偏鸭子类型，只要对象有同名方法即可调用。
+
+### 标准参考答案
+
+Lua 本身没有 C# 那种原生 class 语法，但可以通过 table、metatable 和 `__index` 来模拟面向对象。
+
+封装方面，可以用 table 保存对象的字段和方法，也可以通过 local 变量和闭包实现私有数据。
+
+继承方面，通常会给对象设置 metatable，并把 `__index` 指向父类或类表。当子对象访问一个自己没有的字段或方法时，就会沿着 `__index` 去父类中查找。
+
+多态方面，可以让子类重写父类的同名方法，运行时调用时会优先调用子类自己的实现。Lua 本身也是动态语言，更偏鸭子类型，只要对象拥有同名方法，就可以表现出多态效果。
+
+所以 Lua 实现面向对象的核心不是操作内存地址，而是利用 table、metatable、`__index` 和函数闭包。
+
+### 示例
+
+```lua
+Player = {}
+
+function Player:new(name, hp)
+    local obj = {}
+    obj.name = name
+    obj.hp = hp
+
+    setmetatable(obj, self)
+    self.__index = self
+
+    return obj
+end
+
+function Player:Attack()
+    print(self.name .. " attack")
+end
+
+Monster = Player:new()
+
+function Monster:Attack()
+    print(self.name .. " monster attack")
+end
+
+local m = Monster:new("Goblin", 100)
+m:Attack()
+```
+
+---
+
+## 10. Unity 使用 IL2CPP 打包时应该注意什么
+
+### 题目
+
+Unity 使用 IL2CPP 打包时，我们应该注意什么？如何避免？可以举例说明。
+
+### 用户原回答
+
+不知道。
+
+### 评价等级
+
+不通过。
+
+### 关键点
+
+IL2CPP 是 AOT 编译模式，Unity 会把 C# 编译出的 IL 转成 C++，再由平台编译器编译成本机代码。
+
+使用 IL2CPP 打包时，要重点注意：
+
+- 代码裁剪 Managed Code Stripping；
+- 反射访问的类型或成员被裁掉；
+- AOT 泛型实例没有生成；
+- `System.Reflection.Emit` 和运行时动态代码生成不可用；
+- Lua / 热更新 / JSON / 协议反序列化相关类型需要保留；
+- 第三方库是否支持 IL2CPP；
+- 不能只在 Editor 或 Mono 下测试，要定期打 IL2CPP 真机包验证。
+
+### 标准参考答案
+
+Unity 使用 IL2CPP 打包时，核心要注意 AOT 限制、代码裁剪、反射、泛型和第三方库兼容问题。
+
+IL2CPP 会把 C# 编译出的 IL 转成 C++，再由平台编译器编译成本机代码。它是提前编译模式，所以不像 Mono JIT 那样可以运行时再生成代码。像 `System.Reflection.Emit`、运行时动态生成 IL、某些动态代理库，在 IL2CPP 下就可能不能用。
+
+另外，IL2CPP 打包时会做 Managed Code Stripping。Unity Linker 会删除它认为没有被使用的代码，所以通过反射、字符串、JSON 反序列化、Lua 调用到的类型，如果没有显式引用，可能会在打包时被裁掉。解决方式是使用 `[Preserve]` 或 `link.xml` 保留这些类型、构造函数、字段和方法。
+
+泛型也要注意。因为 IL2CPP 是 AOT，如果某些泛型实例只在运行时通过反射创建，编译期没有被识别到，就可能没有生成对应代码。解决方式是写 AOTHelper，显式引用需要生成的泛型类型和泛型方法。
+
+所以实际项目中，我会避免依赖运行时动态代码生成；对反射、序列化、Lua 调用、热更新相关类型配置 `link.xml` 或 `[Preserve]`；对泛型做 AOT 补充；并且不能只在 Editor 下测，要定期打 Android / iOS 的 IL2CPP 真机包测试。
+
+### 示例：用 `[Preserve]` 保留反射类型
+
+```csharp
+using UnityEngine.Scripting;
+
+[Preserve]
+public class PlayerData
+{
+    public int id;
+    public string name;
+
+    [Preserve]
+    public PlayerData()
+    {
+    }
+}
+```
+
+### 示例：用 `link.xml` 保留类型
+
+```xml
+<linker>
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="PlayerData" preserve="all"/>
+  </assembly>
+</linker>
+```
+
+### 示例：AOT 泛型补充
+
+```csharp
+public static class AOTHelper
+{
+    public static void UsedOnlyForAOTCodeGeneration()
+    {
+        var list1 = new List<int>();
+        var list2 = new List<PlayerData>();
+
+        Handle<int>(0);
+        Handle<PlayerData>(null);
+    }
+
+    public static void Handle<T>(T value)
+    {
+    }
+}
+```
+
+---
+
+# 本轮总结
+
+本轮共完成 10 道题，覆盖内容包括：
+
+- C# 字符串基础；
+- 运算符重载、`Equals` 与 `GetHashCode`；
+- `string` 与 `StringBuilder`；
+- .NET 跨语言与跨平台；
+- Unity 对象销毁与假 null；
+- `Instantiate` 卡顿优化；
+- Lua 面向对象；
+- IL2CPP 打包注意事项。
+
+整体来看，你对部分 Unity 运行机制有直觉，例如 Mono / IL2CPP、Destroy 延迟销毁、预加载等，但不少回答还停留在关键词层面。后续复习时建议重点补强：
+
+1. C# 基础概念的准确表述；
+2. Unity Native 对象与 C# 托管对象的区别；
+3. IL2CPP 下 AOT、泛型、反射和代码裁剪问题；
+4. Lua 的 table、metatable、`__index` 机制；
+5. 面试回答时从“是什么、为什么、怎么用、有什么坑”四个层次展开。
