@@ -1,0 +1,325 @@
+---
+title: '面试归档6'
+description: '此博客用于记录 Unity / C# 面试题复盘'
+category: '学习记录'
+tags:
+  - Unity
+  - CSharp
+  - 学习记录
+  - 面试
+pubDate: '2026-06-03'
+---
+
+# 面试归档6
+
+## 1. C# 中如何让自定义容器类能够使用 for 循环遍历？通过 类对象[索引] 的形式遍历。
+
+标准回答：
+
+如果想让自定义容器支持 `for` 循环，并且能通过 `对象[index]` 的方式访问元素，需要在类中定义索引器，同时提供元素数量，比如 `Count` 或 `Length` 属性。
+
+例如内部用数组或 `List<T>` 存储数据，可以这样写：
+
+```csharp
+public int Count => items.Count;
+
+public T this[int index]
+{
+    get { return items[index]; }
+}
+```
+
+外部就可以这样遍历：
+
+```csharp
+for (int i = 0; i < container.Count; i++)
+{
+    var item = container[i];
+}
+```
+
+如果是想支持 `foreach`，那才需要实现 `IEnumerable<T>`，并返回枚举器。
+
+---
+
+## 2. C# 中如何让自定义容器类能够使用 foreach 循环遍历？
+
+标准回答：
+
+让自定义容器支持 `foreach`，通常需要实现 `IEnumerable<T>` 接口，并实现 `GetEnumerator()` 方法，返回对应的 `IEnumerator<T>`。
+
+`foreach` 内部会通过枚举器不断调用 `MoveNext()`，再通过 `Current` 取出当前元素。如果内部本身是 `List<T>`，可以直接返回 `items.GetEnumerator()`。
+
+```csharp
+public class MyContainer<T> : IEnumerable<T>
+{
+    private List<T> items = new List<T>();
+
+    public void Add(T item)
+    {
+        items.Add(item);
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        return items.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}
+```
+
+严格来说，C# 的 `foreach` 不一定强制要求实现 `IEnumerable<T>`，只要类型提供了符合规则的 `GetEnumerator()` 方法，也可以被遍历。但工程上一般推荐实现 `IEnumerable<T>`，语义更清楚，也更方便配合 LINQ 等功能使用。
+
+---
+
+## 3. C# 中接口的作用是什么？说说你的理解。
+
+标准回答：
+
+接口主要用于定义一组行为规范或者能力。一个类实现某个接口，就表示它具备这个接口描述的能力。
+
+接口最大的作用是解耦和多态。调用方可以面向接口编程，而不是依赖具体类。比如攻击系统不需要知道目标是玩家、敌人还是可破坏物，只要它实现了 `IDamageable` 接口，就可以调用 `TakeDamage()`。
+
+```csharp
+public interface IDamageable
+{
+    void TakeDamage(int damage);
+}
+
+public void Attack(IDamageable target)
+{
+    target.TakeDamage(10);
+}
+```
+
+这样做的好处是扩展性更好。后续新增怪物、箱子、建筑等类型时，只要它们实现 `IDamageable`，攻击系统本身就不需要修改。
+
+在 Unity 项目里，常见接口有 `IDamageable`、`IInteractable`、`IPoolable`、`IState` 等。接口更适合表达“具备某种能力”，而不是表达“是什么”。C# 中类只能单继承，但可以实现多个接口，所以接口也常用于组合多个能力。
+
+---
+
+## 4. Unity 引擎中哪些功能使用了 C# 的反射功能？至少说出一点。
+
+标准回答：
+
+Unity 中很多编辑器功能都和 C# 的反射或元数据扫描有关。
+
+比如 Inspector 能显示脚本中的 `public` 字段，以及带 `[SerializeField]` 的私有字段，这背后和 Unity 的序列化系统、字段信息和 Attribute 识别有关。
+
+```csharp
+public class Player : MonoBehaviour
+{
+    public int hp;
+
+    [SerializeField]
+    private float moveSpeed;
+}
+```
+
+另外，像 `[MenuItem]`、`[ContextMenu]`、`[CustomEditor]`、`[RuntimeInitializeOnLoadMethod]` 这些 Attribute，Unity 都需要扫描程序集中的类型或方法，找到带有对应 Attribute 的成员，然后注册菜单、Inspector 右键命令、自定义编辑器或启动回调。
+
+UnityEvent 也可以作为例子，比如 Button 的 `onClick` 在 Inspector 中能列出目标对象上可调用的方法，这也可以理解为反射相关的应用。
+
+不过不建议简单说“MonoBehaviour 挂载就是靠反射关联”，因为脚本组件、场景和 Prefab 的保存恢复主要依赖 Unity 自己的序列化和资源引用系统。
+
+---
+
+## 5. 请问这三行代码，运行后，在堆上会分配几个“房间”？
+
+```csharp
+static void Main(string[] args)
+{
+    string str = "123";
+    string str2 = "123";
+    string str3 = "1234";
+}
+```
+
+标准回答：
+
+如果这里的“房间”指的是堆上的字符串对象，那么通常是 2 个。
+
+因为 `"123"` 和 `"123"` 是相同的字符串字面量，会被字符串驻留机制复用，`str` 和 `str2` 实际上指向同一个字符串对象。
+
+`"1234"` 是另一个不同的字符串字面量，所以会有另一个字符串对象。
+
+也就是说：
+
+```text
+str  ───┐
+        ├──> "123"
+str2 ───┘
+
+str3 ─────> "1234"
+```
+
+局部变量 `str`、`str2`、`str3` 本身只是引用，不等于堆上的对象。
+
+可以用下面的代码验证：
+
+```csharp
+string str = "123";
+string str2 = "123";
+string str3 = "1234";
+
+Console.WriteLine(object.ReferenceEquals(str, str2)); // True
+Console.WriteLine(object.ReferenceEquals(str, str3)); // False
+```
+
+---
+
+## 6. Unity 中 Awake 和 Start 两个生命周期函数，分别在什么时候被调用？
+
+标准回答：
+
+`Awake` 和 `Start` 都是 Unity 的生命周期函数，并且每个脚本实例通常都只调用一次。
+
+`Awake` 会在脚本实例被加载或初始化时调用，通常用于做自身初始化，比如获取组件、初始化字段等。它一定早于 `Start`。如果 GameObject 一开始是 inactive，那么 `Awake` 会延迟到它第一次被激活时调用。
+
+`Start` 会在 `Awake` 之后，并且在第一次 `Update` 之前调用。它只会调用一次，不会因为对象反复 `SetActive` 而重复执行。
+
+对象反复激活时，重复调用的是：
+
+```csharp
+OnEnable()
+OnDisable()
+```
+
+不是：
+
+```csharp
+Awake()
+Start()
+```
+
+常见使用习惯是：`Awake` 做自身初始化，`Start` 做依赖其他对象初始化完成后的逻辑。
+
+---
+
+## 7. Unity 场景上有多个对象，都分别挂载了 n 个脚本。我们如何控制不同脚本间生命周期函数 Awake 的执行先后顺序？
+
+标准回答：
+
+可以通过 Unity 的 `Project Settings > Script Execution Order` 来控制不同脚本类型的生命周期执行顺序。数值越小，越早执行。
+
+例如：
+
+```text
+GameManager     -100
+PlayerManager      0
+UIManager        100
+```
+
+大致执行顺序就是：
+
+```text
+GameManager.Awake()
+PlayerManager.Awake()
+UIManager.Awake()
+```
+
+也可以通过代码里的 `[DefaultExecutionOrder]` Attribute 来指定脚本执行顺序：
+
+```csharp
+[DefaultExecutionOrder(-100)]
+public class GameManager : MonoBehaviour
+{
+    private void Awake()
+    {
+    }
+}
+```
+
+但要注意，这个控制的是脚本类型之间的顺序，不适合用来精确控制同一个脚本多个实例之间的顺序。
+
+工程上也不建议大量依赖 `Awake` 的执行先后。通常会让 `Awake` 只做自身初始化，复杂模块初始化可以用统一的 `GameEntry`、`Bootstrap` 或显式 `Init()` 流程来控制。
+
+---
+
+## 8. 想要在 Unity 中使用指针，我们需要进行哪些操作？
+
+标准回答：
+
+在 Unity 中使用指针，首先代码需要放在 `unsafe` 上下文里，比如给方法、类或者代码块加 `unsafe` 关键字。
+
+```csharp
+unsafe void Test()
+{
+    int value = 10;
+    int* p = &value;
+}
+```
+
+其次 Unity 项目需要开启 unsafe 编译，可以在：
+
+```text
+Project Settings > Player > Other Settings > Allow unsafe Code
+```
+
+中勾选 `Allow unsafe Code`。
+
+如果使用了 `.asmdef`，还要在对应 Assembly Definition 上勾选 `Allow 'unsafe' Code`。
+
+实际取托管对象地址时还要注意 GC 移动对象的问题，必要时用 `fixed` 固定对象。
+
+```csharp
+unsafe void Test()
+{
+    int[] arr = { 1, 2, 3 };
+
+    fixed (int* p = arr)
+    {
+        Debug.Log(*p);
+    }
+}
+```
+
+指针一般用于性能优化、Native 插件交互或底层数据处理，普通业务逻辑中不建议滥用。
+
+---
+
+## 9. Unity 中的协同程序中 yield return 不同的内容，代表的含义不同。请说明下面这些 yield return 的含义。
+
+标准回答：
+
+`yield return null` 表示暂停当前协程，下一帧继续执行。
+
+`yield return new WaitForSeconds(t)` 表示等待 `t` 秒游戏时间后继续，它受 `Time.timeScale` 影响；如果要等待真实时间，可以用 `WaitForSecondsRealtime`。
+
+`yield return new WaitForFixedUpdate()` 表示等到下一次 `FixedUpdate` 阶段再继续，通常用于和物理更新同步。
+
+`yield return new WaitForEndOfFrame()` 表示等到当前帧渲染结束后、画面显示前继续，常用于截屏或者读取屏幕像素。
+
+`yield break` 表示直接结束这个协程。
+
+至于 `yield return 数字`，它不是等待数字帧的意思，不建议这样写。如果要等待 N 帧，应该循环 N 次 `yield return null`。
+
+```csharp
+IEnumerator WaitFrames(int frameCount)
+{
+    for (int i = 0; i < frameCount; i++)
+    {
+        yield return null;
+    }
+
+    Debug.Log("N 帧后继续");
+}
+```
+
+---
+
+## 10. 使用 Unity 协同程序进行异步加载时，底层是否会使用多线程？
+
+标准回答：
+
+使用协程进行异步加载时，协程本身不会开启新线程。Unity 协程本质上还是在主线程里按帧推进，通过 `yield return` 暂停和恢复。
+
+但是如果协程里等待的是 `LoadSceneAsync`、`Resources.LoadAsync`、`AssetBundle.LoadAssetAsync` 这类 Unity 异步加载接口，那么底层加载过程可能会使用 Unity 的后台加载线程，比如进行数据读取和反序列化。
+
+不过对象集成、场景激活、GameObject 和 Component 的创建，以及很多 Unity API 调用仍然发生在主线程。
+
+所以异步加载不等于完全多线程，也不代表一定不卡。协程只是等待异步操作完成的一种写法。
