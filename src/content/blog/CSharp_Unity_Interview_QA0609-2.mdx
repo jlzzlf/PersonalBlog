@@ -1,0 +1,275 @@
+---
+title: '面试归档8'
+description: '此博客用于记录 Unity / C# 面试题复盘'
+category: '学习记录'
+tags:
+  - Unity
+  - CSharp
+  - 学习记录
+  - 面试
+pubDate: '2026-06-09'
+---
+# Unity / C# 面试题复盘
+
+## 1. 如果我们想为 Unity 中的 Transform 类添加一个自定义的方法，应该如何处理？
+
+标准答案：
+
+如果想给 Unity 的 Transform 添加自定义方法，一般会使用 C# 的扩展方法。因为 Transform 是 Unity 内置类，我们不能也不应该直接修改它的源码。
+
+扩展方法需要写在静态类中，方法本身也必须是静态方法，并且第一个参数使用 this Transform 表示要扩展的类型。这样就可以像调用普通成员方法一样调用它。
+
+示例：
+```csharp
+public static class TransformExtensions
+{
+    public static void ResetLocal(this Transform transform)
+    {
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Vector3.one;
+    }
+}
+```
+调用时可以写成：
+```csharp
+transform.ResetLocal();
+```
+需要注意的是，扩展方法并没有真正修改 Transform 类本身，它本质上仍然是一个静态工具方法，只是调用形式更像成员方法。
+
+
+## 2. 请说出 using 关键字的两个作用。
+
+标准答案：
+
+using 在 C# 中常见有两个作用。
+
+第一个作用是引入命名空间，比如 using UnityEngine;。这样代码中就可以直接使用 GameObject、Transform、Debug 等类型，而不需要每次都写完整命名空间。
+
+第二个作用是用于资源释放，也就是 using 语句块。它要求对象实现 IDisposable 接口，当代码执行离开 using 作用域时，会自动调用对象的 Dispose() 方法，常用于文件流、数据库连接、网络连接等资源的释放。
+
+需要注意的是，using 不是直接销毁对象，而是帮助我们自动释放资源。对象内存本身仍然由 GC 管理。
+
+
+## 3. C# 中 Dictionary 不支持相同键存储，如果想要一个键对应多个值如何处理？
+
+标准答案：
+
+Dictionary 的 key 必须是唯一的。如果想让一个 key 对应多个 value，通常会把 value 设计成一个集合，比如 Dictionary<TKey, List<TValue>>。
+
+添加数据时，先判断这个 key 是否存在。如果不存在，就先创建一个 List<TValue>，然后再把值添加进去。
+
+示例：
+```csharp
+Dictionary<int, List<string>> playerItems = new Dictionary<int, List<string>>();
+
+if (!playerItems.ContainsKey(playerId))
+{
+    playerItems[playerId] = new List<string>();
+}
+
+playerItems[playerId].Add(itemName);
+```
+如果希望同一个 key 下的 value 不重复，可以使用 Dictionary<TKey, HashSet<TValue>>。
+
+另外，如果问题是多个字段共同组成一个 key，那可以使用元组、结构体或类作为组合 key。但这和“一个 key 对多个 value”不是同一个问题。如果使用自定义类或结构体作为 key，需要正确实现 Equals() 和 GetHashCode()。
+
+
+## 4. 请问下面代码的最终打印结果是什么？为什么？
+```csharp
+static void Main(string[] args)
+{
+    Action action = null;
+    for (int i = 0; i < 10; i++)
+    {
+        action += () =>
+        {
+            Console.WriteLine(i);
+        };
+    }
+    action();
+}
+```
+标准答案：
+
+这段代码最终会打印 10 个 10。
+
+原因是 Lambda 表达式形成了闭包，捕获的是 for 循环中的变量 i 本身，而不是每次循环时 i 的临时值。
+
+循环过程中，action 累加了 10 个委托，但这些委托捕获的是同一个变量 i。等 for 循环结束后，i 的值已经变成了 10。此时再调用 action()，会依次执行之前添加的 10 个委托，所以每次打印的都是 10。
+
+最终输出：
+
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+
+
+## 5. 上题中的代码，如果我们希望打印出 0~9，应该如何修改代码？
+
+标准答案：
+
+如果希望打印 0 到 9，需要在循环体内部声明一个临时变量，比如 int temp = i;，然后在 Lambda 中打印 temp。
+
+示例：
+```csharp
+static void Main(string[] args)
+{
+    Action action = null;
+
+    for (int i = 0; i < 10; i++)
+    {
+        int temp = i;
+
+        action += () =>
+        {
+            Console.WriteLine(temp);
+        };
+    }
+
+    action();
+}
+```
+这样做的原因是，原代码中所有 Lambda 捕获的是同一个循环变量 i，循环结束后它的值已经是 10。
+
+而把 i 赋值给循环体内部的局部变量后，每次循环都会创建一个新的局部变量 temp。每个 Lambda 捕获的是自己那一轮对应的 temp，所以最终会按顺序打印 0 到 9。
+
+
+## 6. Unity 中如何将本地坐标转为世界坐标？
+
+标准答案：
+
+Unity 中可以使用 transform.TransformPoint() 将本地坐标转换成世界坐标。
+
+示例：
+
+Vector3 worldPos = transform.TransformPoint(localPos);
+
+这里的 localPos 是相对于当前物体 Transform 的本地坐标，转换后得到的是世界坐标。
+
+如果要反过来，把世界坐标转换成本地坐标，可以使用：
+
+Vector3 localPos = transform.InverseTransformPoint(worldPos);
+
+另外需要注意，TransformPoint 用于转换位置点，会受到物体的位置、旋转和缩放影响。
+
+如果只是转换方向，一般使用 TransformDirection。
+
+如果是转换向量，可以使用 TransformVector。TransformVector 不受位置影响，但会受到旋转和缩放影响。
+
+
+## 7. Unity 中如何计算出两个向量之间的夹角？请说出两种方式。
+
+标准答案：
+
+Unity 中计算两个向量夹角，第一种方式可以直接使用 Vector3.Angle(a, b)。它会返回两个向量之间的夹角，单位是度，范围一般是 0 到 180 度。
+
+示例：
+
+float angle = Vector3.Angle(a, b);
+
+第二种方式是使用点乘公式。因为：
+
+a · b = |a| * |b| * cosθ
+
+所以可以先把两个向量归一化，然后用 Vector3.Dot 得到 cosθ，再通过 Mathf.Acos 求出弧度，最后乘以 Mathf.Rad2Deg 转成角度。
+
+示例：
+
+float dot = Vector3.Dot(a.normalized, b.normalized);
+dot = Mathf.Clamp(dot, -1f, 1f);
+float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+
+需要注意，这里用的是 Acos，不是 Atan。加 Clamp 是为了避免浮点误差导致 Acos 参数超出 -1 到 1 的范围。
+
+如果需要带方向的角度，可以使用 Vector3.SignedAngle(a, b, axis)。
+
+
+## 8. 请写出 UGUI 中两种处理异形按钮的具体方法。
+
+标准答案：
+
+UGUI 中处理异形按钮常见有两种方式。
+
+第一种是使用图片的 Alpha 点击检测。可以设置 Image.alphaHitTestMinimumThreshold，让透明区域不响应点击。
+
+示例：
+
+Image image = GetComponent<Image>();
+image.alphaHitTestMinimumThreshold = 0.1f;
+
+这种方式适合图片本身带透明区域的不规则按钮，比如圆形按钮、不规则图标按钮等。需要注意，使用这种方式时，图片纹理通常需要开启 Read/Write Enabled，否则 Unity 无法读取像素透明度。
+
+第二种是自定义射线检测逻辑。可以实现 ICanvasRaycastFilter，在 IsRaycastLocationValid 方法中判断点击点是否在有效区域内。
+
+示例：
+```csharp
+public class CircleRaycastFilter : MonoBehaviour, ICanvasRaycastFilter
+{
+    public float radius = 100f;
+
+    public bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera)
+    {
+        RectTransform rectTransform = transform as RectTransform;
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rectTransform,
+            screenPoint,
+            eventCamera,
+            out Vector2 localPoint
+        );
+
+        return localPoint.magnitude <= radius;
+    }
+}
+```
+这种方式适合更复杂的异形按钮，比如圆形、扇形、多边形或者地图区域点击。
+
+RectMask2D 主要用于矩形裁剪显示区域，不是处理异形按钮点击区域的标准答案。
+
+
+## 9. 请说出 Unity 中如何进行数据持久化，至少说出 5 种方式。
+
+标准答案：
+
+Unity 中数据持久化常见方式有很多。
+
+第一种是 PlayerPrefs，适合保存音量、画质、简单开关、新手引导状态等少量简单数据。
+
+第二种是 JSON 文件。可以把玩家存档对象序列化成 JSON 字符串，再通过 File.WriteAllText 写入本地文件。JSON 适合保存结构化存档，可读性强，调试方便。
+
+第三种是 XML 文件。XML 也可以保存结构化数据，不过相对 JSON 更冗长，现在项目中使用得少一些。
+
+第四种是二进制文件。可以通过 FileStream、BinaryWriter 或序列化框架保存数据。二进制文件体积较小，读取效率较高，也不容易被普通玩家直接修改，但可读性差，版本兼容需要额外处理。
+
+第五种是 SQLite 或其他本地数据库。适合数据量较大、需要增删改查的数据，比如背包、任务、关卡进度、大量配置缓存等。
+
+另外，联网游戏还可以把数据保存到服务器或云端，用于账号数据、排行榜、充值数据、多端同步存档等场景。
+
+ScriptableObject 也可以作为配置类数据资产进行持久化，比如技能配置、道具配置、角色属性配置等。但它更适合保存配置，不太适合作为运行时玩家存档的主要方案。
+
+
+## 10. 在 Unity 中如何控制渲染优先级？谁先渲染谁后渲染，分情况回答。
+
+标准答案：
+
+Unity 中控制渲染优先级要分情况看。
+
+对于普通 3D 物体，默认主要由材质的 Render Queue、深度测试和相机决定。Unity 会先渲染不透明物体，再渲染透明物体。不透明物体一般依靠深度缓冲决定遮挡关系，而透明物体通常需要从远到近渲染。
+
+如果想手动控制材质渲染顺序，可以修改 Shader 中的 Queue 标签，或者修改 Material.renderQueue。常见队列有 Background、Geometry、AlphaTest、Transparent 和 Overlay。队列值越小越早渲染，越大越晚渲染。
+
+对于 2D Sprite，可以使用 Sorting Layer 和 Order in Layer 控制渲染顺序。Order in Layer 越大，通常越后渲染，也越显示在前面。多个 Sprite 组成一个整体时，可以使用 SortingGroup 统一管理排序。
+
+对于 UGUI，可以通过 Canvas 的 Sorting Layer、Order in Layer、Sort Order 控制不同 Canvas 的显示顺序。同一个 Canvas 内，一般 Hierarchy 中越靠后的 UI 元素越后绘制，通常越显示在上面。
+
+如果是多个 Camera，可以通过 Camera 的 Depth 控制渲染顺序。Depth 值小的 Camera 先渲染，Depth 值大的 Camera 后渲染。在 URP 中，还可以使用 Camera Stack，让 Base Camera 和 Overlay Camera 组合渲染。
+
+需要注意，“后渲染”不一定绝对等于“显示在前面”，因为最终显示结果还会受到深度测试、ZWrite、ZTest、透明排序等因素影响。
