@@ -1,22 +1,22 @@
 const TAG_COLOR_VARIANTS = [
 	{
-		bg: 'rgba(230, 250, 255, 0.9)',
-		border: 'rgba(153, 230, 255, 0.56)',
+		bg: 'rgba(226, 244, 248, 0.9)',
+		border: 'rgba(198, 215, 219, 0.56)',
 		color: 'var(--color-link-hover)',
 	},
 	{
-		bg: 'rgba(255, 214, 232, 0.62)',
-		border: 'rgba(255, 214, 232, 0.92)',
-		color: '#7a4961',
+		bg: 'rgba(198, 215, 219, 0.62)',
+		border: 'rgba(198, 215, 219, 0.92)',
+		color: '#a4e1ff',
 	},
 	{
-		bg: 'rgba(255, 244, 204, 0.72)',
-		border: 'rgba(255, 244, 204, 0.94)',
-		color: '#7a6212',
+		bg: 'rgba(198, 215, 219, 0.72)',
+		border: 'rgba(198, 215, 219, 0.94)',
+		color: '#c6d7db',
 	},
 	{
-		bg: 'rgba(204, 255, 255, 0.82)',
-		border: 'rgba(153, 230, 255, 0.72)',
+		bg: 'rgba(198, 215, 219, 0.82)',
+		border: 'rgba(198, 215, 219, 0.72)',
 		color: 'var(--color-link-hover)',
 	},
 ];

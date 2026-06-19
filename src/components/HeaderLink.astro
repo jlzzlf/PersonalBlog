@@ -23,7 +23,7 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 		background: rgba(255, 255, 255, 0.74);
 		color: var(--color-text);
 		text-decoration: none;
-		box-shadow: 0 10px 24px rgba(112, 159, 176, 0.08);
+		box-shadow: 0 10px 24px rgba(198, 215, 219, 0.08);
 		transition:
 			transform 180ms ease,
 			background-color 180ms ease,
@@ -34,14 +34,14 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 
 	a:hover {
 		transform: translateY(-1px);
-		background: rgba(230, 250, 255, 0.9);
-		border-color: rgba(153, 230, 255, 0.78);
+		background: rgba(226, 244, 248, 0.9);
+		border-color: rgba(198, 215, 219, 0.78);
 		color: var(--color-link-hover);
 	}
 
 	a.active {
 		background: var(--color-primary-soft);
-		border-color: rgba(153, 230, 255, 0.84);
+		border-color: rgba(198, 215, 219, 0.84);
 		color: var(--color-link-hover);
 		font-weight: 700;
 	}
