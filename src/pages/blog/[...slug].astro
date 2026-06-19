@@ -1,17 +1,35 @@
 ---
 import { type CollectionEntry, getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
+import { legacyBlogRedirects } from '../../lib/content-migrations';
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
+	return [
+		...posts.map((post) => ({
+			params: { slug: post.id },
+			props: { post },
+		})),
+		...Object.entries(legacyBlogRedirects).map(([slug, redirectTo]) => ({
+			params: { slug },
+			props: { redirectTo },
+		})),
+	];
 }
-type Props = CollectionEntry<'blog'>;
 
-const post = Astro.props;
+const { post, redirectTo } = Astro.props as {
+	post?: CollectionEntry<'blog'>;
+	redirectTo?: string;
+};
+
+if (redirectTo) {
+	return Astro.redirect(encodeURI(redirectTo), 301);
+}
+
+if (!post) {
+	throw new Error('Missing blog post data.');
+}
+
 const { Content, headings } = await render(post);
 ---
 

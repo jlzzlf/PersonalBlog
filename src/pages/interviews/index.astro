@@ -5,30 +5,30 @@ import ContentArchiveListView from '../../components/views/ContentArchiveListVie
 import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 import { SITE_TITLE } from '../../consts';
-import { sortProjectLogEntries } from '../../lib/project-logs';
+import { sortInterviewEntries } from '../../lib/interviews';
 
-const projectLogs = sortProjectLogEntries(await getCollection('projectLogs'));
-const pageTitle = `项目日志 | ${SITE_TITLE}`;
-const items = projectLogs.map((entry) => ({
+const interviews = sortInterviewEntries(await getCollection('interviews'));
+const pageTitle = `面试归档 | ${SITE_TITLE}`;
+const items = interviews.map((entry) => ({
 	title: entry.data.title,
 	description: entry.data.description,
-	meta: entry.data.project,
+	meta: entry.data.subject,
 	pubDate: entry.data.pubDate,
-	href: `/projects/logs/${entry.id}/`,
+	href: `/interviews/${entry.id}/`,
 }));
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={pageTitle} description="记录项目开发中的阶段目标、技术取舍与进度复盘。" />
+		<BaseHead title={pageTitle} description="集中整理 Unity 与 C# 面试题、复盘和回答思路。" />
 	</head>
 	<body>
 		<Header />
 		<ContentArchiveListView
-			eyebrow="Development Log"
-			title="项目日志"
-			intro="按时间记录项目开发中的阶段目标、技术取舍、进度与下一步计划。"
+			eyebrow="Interview Archive"
+			title="面试归档"
+			intro="把面试题、复盘与回答思路集中在一起，作为可持续维护的资料库。"
 			items={items}
 		/>
 		<Footer />

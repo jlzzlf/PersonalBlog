@@ -6,22 +6,22 @@ import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import HomeBlogShowcase from '../components/home/HomeBlogShowcase.astro';
 import HomeProfileCard from '../components/home/HomeProfileCard.astro';
-import HomeProjectShowcaseCard from '../components/home/HomeProjectShowcaseCard.astro';
+import HomeProjectLogShowcaseCard from '../components/home/HomeProjectLogShowcaseCard.astro';
 import HomeQuickNavCard from '../components/home/HomeQuickNavCard.astro';
 import HomeRecentCommentsCard from '../components/home/HomeRecentCommentsCard.astro';
 import HomeSiteStatsCard from '../components/home/HomeSiteStatsCard.astro';
 import HomeThoughtsCard from '../components/home/HomeThoughtsCard.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { buildHomePageViewModel } from '../lib/homepage';
-import { buildHomeProjectShowcaseItems, sortProjectEntries } from '../lib/projects';
+import { buildHomeProjectLogItems } from '../lib/project-logs';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const projectEntries = sortProjectEntries(await getCollection('projects'));
+const projectLogs = await getCollection('projectLogs');
 
 const { recentPosts, siteStats } = buildHomePageViewModel(posts);
-const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
+const projectLogItems = buildHomeProjectLogItems(projectLogs);
 ---
 
 <!doctype html>
@@ -38,15 +38,15 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 				<HomeThoughtsCard />
 			</section>
 
-			<section id="projects" class="home-section projects-section" aria-labelledby="home-projects-title">
+			<section id="project-logs" class="home-section projects-section" aria-labelledby="home-projects-title">
 				<div class="section-heading section-heading--split home-reveal" data-reveal-card>
 					<div>
-						<p class="section-kicker">Project Showcase</p>
-						<h2 id="home-projects-title">项目展示</h2>
+						<p class="section-kicker">Project Logs</p>
+						<h2 id="home-projects-title">项目日志</h2>
 					</div>
-					<a class="text-link" href="/projects/">查看全部项目<span aria-hidden="true">→</span></a>
+					<a class="text-link" href="/projects/">查看全部日志<span aria-hidden="true">→</span></a>
 				</div>
-				<HomeProjectShowcaseCard items={projectShowcaseItems} />
+				<HomeProjectLogShowcaseCard items={projectLogItems} />
 			</section>
 
 			<section id="blog" class="home-section blog-section" aria-labelledby="home-blog-title">
@@ -622,6 +622,21 @@ const projectShowcaseItems = buildHomeProjectShowcaseItems(projectEntries);
 		margin-left: 0.25rem;
 		color: #66cccc;
 		font-size: 1rem;
+	}
+
+	.stat-card__link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		color: var(--color-link-hover);
+		font-size: 1.05rem;
+		font-weight: 800;
+		text-decoration: none;
+	}
+
+	.stat-card__link:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
 	}
 
 	.stat-card__icon,

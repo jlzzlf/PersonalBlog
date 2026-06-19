@@ -1,0 +1,14 @@
+---
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+	const projectLogs = await getCollection('projectLogs');
+	return projectLogs.map((projectLog) => ({
+		params: { slug: projectLog.id },
+		props: { redirectTo: `/projects/logs/${projectLog.id}/` },
+	}));
+}
+
+const { redirectTo } = Astro.props;
+return Astro.redirect(redirectTo, 301);
+---

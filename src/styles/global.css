@@ -1211,14 +1211,7 @@ hr {
 
 .blog-list--posts {
 	gap: 0;
-	overflow: hidden;
-	padding: 0.25rem 1.25rem;
-	border: 1px solid rgba(224, 242, 247, 0.96);
-	border-radius: 28px;
-	background:
-		radial-gradient(circle at top left, rgba(204, 255, 255, 0.2), transparent 38%),
-		linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(242, 253, 255, 0.76));
-	box-shadow: var(--shadow-soft);
+	padding: 0;
 }
 
 .blog-card--post {
@@ -1246,12 +1239,12 @@ hr {
 	align-items: center;
 	min-height: 5.7rem;
 	padding: 0.85rem 0.15rem;
-	border-radius: 18px;
+	border-radius: 0;
 	transition: background-color 180ms ease;
 }
 
 .blog-card__link--compact:hover {
-	background: rgba(204, 255, 255, 0.18);
+	background: rgba(153, 230, 255, 0.42);
 }
 
 .blog-card__link--compact:focus-visible {
@@ -1362,10 +1355,6 @@ hr {
 	.blog-card__image {
 		min-height: 10.5rem;
 		border-radius: 28px 28px 0 0;
-	}
-
-	.blog-list--posts {
-		padding: 0.25rem 0.9rem;
 	}
 
 	.blog-card__link--compact {

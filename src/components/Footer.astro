@@ -6,60 +6,51 @@ const today = new Date();
 
 <footer class="site-footer">
 	<div class="footer-shell">
-		<p class="footer-title">{SITE_TITLE}</p>
-		<p class="footer-copy">
-			一个正在持续生长的个人博客。现在先把首页与内容结构搭好，后面再逐步加入更多功能。
-		</p>
-		<div class="footer-meta">
-			<span>&copy; {today.getFullYear()}</span>
-			<span>Built with Astro</span>
-			<span>Local First</span>
-		</div>
+		<p class="footer-meta">© {today.getFullYear()} {SITE_TITLE}<span aria-hidden="true">·</span>Built with Astro</p>
 	</div>
 </footer>
 
 <style>
 	.site-footer {
-		padding: 1rem;
+		padding: 1.5rem 1rem 1.8rem;
+		border: 0 !important;
+		border-radius: 0 !important;
+		background: transparent !important;
+		box-shadow: none !important;
 	}
 
 	.footer-shell {
 		width: min(1360px, calc(100% - 2rem));
 		margin: 0 auto;
-		padding: 2rem;
-		border: 1px solid var(--color-border);
-		border-radius: 28px;
-		background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(230, 250, 255, 0.74));
-		color: var(--color-subtext);
-		text-align: center;
-		box-shadow: var(--shadow-soft);
-	}
-
-	.footer-title {
-		margin: 0;
-		color: var(--color-text);
-		font-size: 1.1rem;
-		font-weight: 700;
-	}
-
-	.footer-copy {
-		max-width: 40rem;
-		margin: 0.75rem auto 1.25rem;
+		padding-top: 1rem;
+		border-top: 1px solid rgba(102, 204, 204, 0.36);
+		border-right: 0 !important;
+		border-bottom: 0 !important;
+		border-left: 0 !important;
+		border-radius: 0 !important;
+		background: transparent !important;
+		box-shadow: none !important;
 	}
 
 	.footer-meta {
 		display: flex;
 		justify-content: center;
+		align-items: center;
 		flex-wrap: wrap;
-		gap: 0.85rem;
-		font-size: 0.92rem;
+		gap: 0.45rem;
+		margin: 0;
+		color: var(--color-subtext);
+		font-size: 0.78rem;
+		line-height: 1.6;
+		text-align: center;
 	}
 
 	.footer-meta span {
-		padding: 0.3rem 0.7rem;
-		border-radius: 999px;
-		border: 1px solid var(--color-border);
-		background: rgba(255, 255, 255, 0.72);
-		color: var(--color-text);
+		padding: 0 !important;
+		border: 0 !important;
+		border-radius: 0 !important;
+		background: transparent !important;
+		box-shadow: none !important;
+		color: rgba(74, 90, 106, 0.6);
 	}
 </style>

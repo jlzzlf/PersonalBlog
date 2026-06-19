@@ -1,0 +1,148 @@
+---
+import FormattedDate from '../FormattedDate.astro';
+
+export type ContentArchiveItem = {
+	title: string;
+	description: string;
+	meta: string;
+	pubDate: Date;
+	href: string;
+};
+
+interface Props {
+	eyebrow: string;
+	title: string;
+	intro: string;
+	items: ContentArchiveItem[];
+}
+
+const { eyebrow, title, intro, items } = Astro.props;
+---
+
+<main class="content-archive-page">
+	<section class="content-archive-hero" aria-labelledby="content-archive-title">
+		<p class="content-archive-kicker">{eyebrow}</p>
+		<h1 id="content-archive-title">{title}</h1>
+		<p>{intro}</p>
+	</section>
+
+	<section class="content-archive-list" aria-label={title}>
+		{
+			items.map((item) => (
+				<article class="content-archive-item">
+					<a href={item.href}>
+						<div class="content-archive-item__main">
+							<p class="content-archive-item__meta">{item.meta}</p>
+							<h2>{item.title}</h2>
+							<p>{item.description}</p>
+						</div>
+						<FormattedDate date={item.pubDate} />
+					</a>
+				</article>
+			))
+		}
+	</section>
+</main>
+
+<style>
+	.content-archive-page {
+		display: grid;
+		gap: clamp(1.8rem, 4vw, 3rem);
+		width: min(980px, calc(100% - 2rem));
+	}
+
+	.content-archive-hero {
+		display: grid;
+		gap: 0.55rem;
+		max-width: 46rem;
+	}
+
+	.content-archive-kicker,
+	.content-archive-hero p,
+	.content-archive-item__meta,
+	.content-archive-item time,
+	.content-archive-item p {
+		margin: 0;
+		color: var(--color-subtext);
+	}
+
+	.content-archive-kicker {
+		color: var(--color-link-hover);
+		font-size: 0.82rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.content-archive-hero h1 {
+		margin: 0;
+		font-size: clamp(2.2rem, 5vw, 3.4rem);
+	}
+
+	.content-archive-list {
+		display: grid;
+		border-top: 1px solid rgba(224, 242, 247, 0.96);
+	}
+
+	.content-archive-item {
+		border-bottom: 1px solid rgba(224, 242, 247, 0.96);
+	}
+
+	.content-archive-item a {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: 1rem;
+		align-items: center;
+		padding: 1.1rem 0.25rem;
+		color: inherit;
+		text-decoration: none;
+		transition: background-color 180ms ease;
+	}
+
+	.content-archive-item a:hover {
+		background: rgba(153, 230, 255, 0.42);
+	}
+
+	.content-archive-item a:focus-visible {
+		outline: 3px solid rgba(43, 114, 138, 0.35);
+		outline-offset: -2px;
+	}
+
+	.content-archive-item__main {
+		display: grid;
+		gap: 0.28rem;
+		min-width: 0;
+	}
+
+	.content-archive-item__meta {
+		color: var(--color-link-hover);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.content-archive-item h2 {
+		margin: 0;
+		font-size: clamp(1.1rem, 2vw, 1.38rem);
+	}
+
+	.content-archive-item__main > p:last-child {
+		overflow: hidden;
+		font-size: 0.92rem;
+		line-height: 1.55;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.content-archive-item time {
+		font-size: 0.82rem;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 620px) {
+		.content-archive-item a {
+			grid-template-columns: 1fr;
+			gap: 0.45rem;
+		}
+	}
+</style>

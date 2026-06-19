@@ -1,6 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
-export const BLOG_CATEGORIES = ['学习记录', '技术笔记', '面试整理', '随想随笔'] as const;
+export const BLOG_CATEGORIES = ['学习记录', '技术笔记', '随想随笔'] as const;
 
 export type BlogCategory = (typeof BLOG_CATEGORIES)[number];
 export type BlogCategoryCount = {

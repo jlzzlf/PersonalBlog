@@ -15,6 +15,7 @@ export interface HomeRecentPost {
 export interface HomeSiteStat {
 	label: string;
 	value: string;
+	href?: string;
 }
 
 export interface HomeArchiveEntryStat {
@@ -137,8 +138,9 @@ export const buildHomePageViewModel = (posts: BlogPost[]) => {
 			value: `${Math.max(1, Math.floor((Date.now() - siteLaunchDate.getTime()) / ONE_DAY_IN_MS))} 天`,
 		},
 		{
-			label: '最后更新',
-			value: formatRelativeTime(latestUpdatedDate),
+			label: '面试归档',
+			value: '查看入口',
+			href: '/interviews/',
 		},
 		{
 			label: '全站字数',

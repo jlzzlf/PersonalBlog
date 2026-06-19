@@ -10,7 +10,7 @@ const blog = defineCollection({
 		z.object({
 			title: z.string(),
 			description: z.string(),
-			category: z.enum(['学习记录', '技术笔记', '面试整理', '随想随笔']),
+			category: z.enum(['学习记录', '技术笔记', '随想随笔']),
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
@@ -45,6 +45,30 @@ const projects = defineCollection({
 		}),
 });
 
-export const collections = { blog, projects };
+const interviews = defineCollection({
+	loader: glob({ base: './src/content/interviews', pattern: '**/*.{md,mdx}' }),
+	schema: () =>
+		z.object({
+			title: z.string(),
+			description: z.string(),
+			subject: z.string().trim().min(1).default('Unity / C#'),
+			pubDate: z.coerce.date(),
+			updatedDate: z.coerce.date().optional(),
+		}),
+});
+
+const projectLogs = defineCollection({
+	loader: glob({ base: './src/content/project-logs', pattern: '**/*.{md,mdx}' }),
+	schema: () =>
+		z.object({
+			title: z.string(),
+			description: z.string(),
+			project: z.string().trim().min(1),
+			pubDate: z.coerce.date(),
+			updatedDate: z.coerce.date().optional(),
+		}),
+});
+
+export const collections = { blog, projects, interviews, projectLogs };
 
 

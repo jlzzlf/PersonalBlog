@@ -1,0 +1,15 @@
+export const legacyBlogRedirects: Record<string, string> = {
+	csharp_unity_interview_qa0528: '/interviews/csharp_unity_interview_qa0528/',
+	csharp_unity_interview_qa0531: '/interviews/csharp_unity_interview_qa0531/',
+	'csharp_unity_interview_qa0601-2': '/interviews/csharp_unity_interview_qa0601-2/',
+	csharp_unity_interview_qa0601: '/interviews/csharp_unity_interview_qa0601/',
+	csharp_unity_interview_qa0602: '/interviews/csharp_unity_interview_qa0602/',
+	csharp_unity_interview_qa0603: '/interviews/csharp_unity_interview_qa0603/',
+	csharp_unity_interview_qa0608: '/interviews/csharp_unity_interview_qa0608/',
+	csharp_unity_interview_qa0609: '/interviews/csharp_unity_interview_qa0609/',
+	'csharp_unity_interview_qa0609-2': '/interviews/csharp_unity_interview_qa0609-2/',
+	'Unity面试题目归档_2026-04-07': '/interviews/Unity面试题目归档_2026-04-07/',
+	'project-schedule-4-16': '/projects/logs/project-schedule-4-16/',
+	'dungeon_ops_progress_report_2026-04-18': '/projects/logs/dungeon_ops_progress_report_2026-04-18/',
+	'dungeon_ops_blog_non_inventory_2026-04-22': '/projects/logs/dungeon_ops_blog_non_inventory_2026-04-22/',
+};

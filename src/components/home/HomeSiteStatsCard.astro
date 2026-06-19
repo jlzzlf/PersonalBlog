@@ -42,13 +42,23 @@ const splitStatValue = (value: string) => {
 						<span>{stat.label}</span>
 					</dt>
 					<dd>
-						<span
-							data-stat-count={value.target}
-							data-stat-precision={value.target.includes('.') ? '1' : '0'}
-						>
-							{value.initialValue}
-						</span>
-						{value.suffix && <small>{value.suffix}</small>}
+						{
+							stat.href ? (
+								<a class="stat-card__link" href={stat.href}>
+									{stat.value}<span aria-hidden="true">→</span>
+								</a>
+							) : (
+								<>
+									<span
+										data-stat-count={value.target}
+										data-stat-precision={value.target.includes('.') ? '1' : '0'}
+									>
+										{value.initialValue}
+									</span>
+									{value.suffix && <small>{value.suffix}</small>}
+								</>
+							)
+						}
 					</dd>
 				</div>
 			);

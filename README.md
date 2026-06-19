@@ -41,7 +41,7 @@
 在 Pages 项目的 Production 环境中配置以下变量：
 
 - `CMS_GITHUB_REPO=你的GitHub用户名/你的仓库名`
-- `CMS_GITHUB_BRANCH=main`
+- `CMS_GITHUB_BRANCH=master`
 - `CMS_ALLOWED_GITHUB_LOGINS=你的GitHub用户名`
 - `CMS_GITHUB_AUTH_SCOPE=repo`
 - `CMS_ADMIN_USERNAME=你自定义的后台用户名`
