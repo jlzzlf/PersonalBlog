@@ -1,0 +1,12 @@
+---
+title: '文章标题'
+description: '一句话描述文章的核心内容。'
+category: '学习记录'
+pubDate: '2026-06-19'
+updatedDate: '2026-06-19'
+coverImage: '/uploads/cover.jpg'
+---
+
+从这里开始写正文。
+
+可选类型：`学习记录`、`技术笔记`、`面试整理`、`随想随笔`。

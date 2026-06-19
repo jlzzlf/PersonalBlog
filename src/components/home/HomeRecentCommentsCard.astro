@@ -51,7 +51,7 @@
 				const normalized = String(title || '').trim();
 				if (!normalized) return '';
 
-				const match = normalized.match(/\/(blog|reviews|projects|links|profile|about|archive|study-log)(?:\/[\w\u4e00-\u9fa5-]+)?\/?/i);
+				const match = normalized.match(/\/(blog|projects|links|profile|archive|study-log)(?:\/[\w\u4e00-\u9fa5-]+)?\/?/i);
 				return match ? match[0].replace(/\/$/, '') : '';
 			};
 

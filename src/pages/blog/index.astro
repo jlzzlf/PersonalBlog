@@ -4,12 +4,13 @@ import Footer from '../../components/Footer.astro';
 import Header from '../../components/Header.astro';
 import BlogIndexView from '../../components/views/BlogIndexView.astro';
 import { SITE_TITLE } from '../../consts';
-import { getSortedBlogEntries } from '../../lib/blog';
+import { getBlogCategoryCounts, getSortedBlogEntries } from '../../lib/blog';
 import { BLOG_PAGE_SIZE, paginateItems } from '../../lib/pagination';
 
 const pageTitle = `技术博客 | ${SITE_TITLE}`;
 const allPosts = await getSortedBlogEntries();
 const pagination = paginateItems(allPosts, BLOG_PAGE_SIZE, 1);
+const categoryCounts = getBlogCategoryCounts(allPosts);
 ---
 
 <!doctype html>
@@ -21,6 +22,7 @@ const pagination = paginateItems(allPosts, BLOG_PAGE_SIZE, 1);
 		<Header />
 		<BlogIndexView
 			posts={pagination.items}
+			categoryCounts={categoryCounts}
 			currentPage={pagination.currentPage}
 			totalPages={pagination.totalPages}
 			totalItems={pagination.totalItems}

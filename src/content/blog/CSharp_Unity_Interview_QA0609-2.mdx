@@ -1,275 +1,179 @@
 ---
-title: '面试归档8'
+title: '面试归档9'
 description: '此博客用于记录 Unity / C# 面试题复盘'
 category: '学习记录'
-tags:
-  - Unity
-  - CSharp
-  - 学习记录
-  - 面试
 pubDate: '2026-06-09'
 ---
-# Unity / C# 面试题复盘
 
-## 1. 如果我们想为 Unity 中的 Transform 类添加一个自定义的方法，应该如何处理？
+# 面试归档1
 
-标准答案：
+## 1. 请说出 Lua 中常用的数据类型，至少说出 6 种
 
-如果想给 Unity 的 Transform 添加自定义方法，一般会使用 C# 的扩展方法。因为 Transform 是 Unity 内置类，我们不能也不应该直接修改它的源码。
+### 标准答案
 
-扩展方法需要写在静态类中，方法本身也必须是静态方法，并且第一个参数使用 this Transform 表示要扩展的类型。这样就可以像调用普通成员方法一样调用它。
+Lua 中常用的数据类型有 `nil`、`boolean`、`number`、`string`、`table`、`function`、`userdata` 和 `thread`。
 
-示例：
-```csharp
-public static class TransformExtensions
-{
-    public static void ResetLocal(this Transform transform)
-    {
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
-        transform.localScale = Vector3.one;
-    }
-}
-```
-调用时可以写成：
-```csharp
-transform.ResetLocal();
-```
-需要注意的是，扩展方法并没有真正修改 Transform 类本身，它本质上仍然是一个静态工具方法，只是调用形式更像成员方法。
+其中，`nil` 表示空值；`boolean` 表示布尔值；`number` 表示数字；`string` 表示字符串；`table` 是 Lua 中最重要的数据结构，可以用来表示数组、字典和对象；`function` 表示函数，Lua 中函数是一等值；`userdata` 通常用于 Lua 和 C/C++ 或 C# 交互；`thread` 表示协程类型。
 
+面试中可以这样说：
 
-## 2. 请说出 using 关键字的两个作用。
+Lua 常用的数据类型有 `nil`、`boolean`、`number`、`string`、`table`、`function`、`userdata` 和 `thread`。其中 `table` 是 Lua 最核心的数据结构，数组、字典、对象都可以用它实现；函数在 Lua 中也是一等值，可以赋值、传参和返回。
 
-标准答案：
+---
 
-using 在 C# 中常见有两个作用。
+## 2. Lua 中 pairs 和 ipairs 的区别
 
-第一个作用是引入命名空间，比如 using UnityEngine;。这样代码中就可以直接使用 GameObject、Transform、Debug 等类型，而不需要每次都写完整命名空间。
+### 标准答案
 
-第二个作用是用于资源释放，也就是 using 语句块。它要求对象实现 IDisposable 接口，当代码执行离开 using 作用域时，会自动调用对象的 Dispose() 方法，常用于文件流、数据库连接、网络连接等资源的释放。
+`pairs` 和 `ipairs` 都可以遍历 table，但它们的遍历规则不同。
 
-需要注意的是，using 不是直接销毁对象，而是帮助我们自动释放资源。对象内存本身仍然由 GC 管理。
+`ipairs` 主要用于遍历数组部分，它会从下标 `1` 开始，按照连续整数 key 依次遍历，遇到第一个 `nil` 就会停止。
 
+`pairs` 用于遍历 table 中的所有键值对，包括数字 key、字符串 key 等，但遍历顺序是不确定的。
 
-## 3. C# 中 Dictionary 不支持相同键存储，如果想要一个键对应多个值如何处理？
+面试中可以这样说：
 
-标准答案：
+`ipairs` 适合遍历连续数组，从下标 `1` 开始，遇到 `nil` 就停止；`pairs` 适合遍历 table 中所有键值对，包括字符串 key 和不连续的数字 key，但是遍历顺序不保证。
 
-Dictionary 的 key 必须是唯一的。如果想让一个 key 对应多个 value，通常会把 value 设计成一个集合，比如 Dictionary<TKey, List<TValue>>。
+---
 
-添加数据时，先判断这个 key 是否存在。如果不存在，就先创建一个 List<TValue>，然后再把值添加进去。
+## 3. Lua 中常用的元方法有哪些？至少说出 3 个元方法
 
-示例：
-```csharp
-Dictionary<int, List<string>> playerItems = new Dictionary<int, List<string>>();
+### 标准答案
 
-if (!playerItems.ContainsKey(playerId))
-{
-    playerItems[playerId] = new List<string>();
-}
+Lua 中常用的元方法有：
 
-playerItems[playerId].Add(itemName);
-```
-如果希望同一个 key 下的 value 不重复，可以使用 Dictionary<TKey, HashSet<TValue>>。
+- `__index`：访问 table 中不存在的字段时触发，常用于实现继承、默认值和方法查找。
+- `__newindex`：给 table 中不存在的字段赋值时触发，常用于赋值拦截、只读表或数据绑定。
+- `__call`：让 table 可以像函数一样被调用。
+- `__tostring`：控制 table 或对象转成字符串时的表现。
+- `__add`：重载加法运算符。
+- `__sub`：重载减法运算符。
+- `__eq`：重载相等比较。
+- `__gc`：垃圾回收时触发，常用于 userdata 的资源清理。
 
-另外，如果问题是多个字段共同组成一个 key，那可以使用元组、结构体或类作为组合 key。但这和“一个 key 对多个 value”不是同一个问题。如果使用自定义类或结构体作为 key，需要正确实现 Equals() 和 GetHashCode()。
+面试中可以这样说：
 
+Lua 常用的元方法有 `__index`、`__newindex`、`__call`、`__tostring`、`__add`、`__eq` 等。比如 `__index` 常用于实现继承和方法查找，`__newindex` 可以拦截赋值，`__call` 可以让 table 像函数一样调用。
 
-## 4. 请问下面代码的最终打印结果是什么？为什么？
-```csharp
-static void Main(string[] args)
-{
-    Action action = null;
-    for (int i = 0; i < 10; i++)
-    {
-        action += () =>
-        {
-            Console.WriteLine(i);
-        };
-    }
-    action();
-}
-```
-标准答案：
+---
 
-这段代码最终会打印 10 个 10。
+## 4. Lua 中元表的作用
 
-原因是 Lambda 表达式形成了闭包，捕获的是 for 循环中的变量 i 本身，而不是每次循环时 i 的临时值。
+### 标准答案
 
-循环过程中，action 累加了 10 个委托，但这些委托捕获的是同一个变量 i。等 for 循环结束后，i 的值已经变成了 10。此时再调用 action()，会依次执行之前添加的 10 个委托，所以每次打印的都是 10。
+元表可以理解为给 table 附加的一套特殊行为规则。Lua 中的 table 本身比较简单，但通过元表和元方法，可以实现很多类似面向对象和运算符重载的能力。
 
-最终输出：
+元表常见作用包括：实现继承、实现默认值、拦截字段访问、拦截字段赋值、实现运算符重载、让 table 像函数一样调用、自定义字符串输出等。
 
-10
-10
-10
-10
-10
-10
-10
-10
-10
-10
+面试中可以这样说：
 
+元表的作用是给 table 定义额外的行为规则。通过元表中的元方法，可以实现字段访问拦截、赋值拦截、运算符重载、默认值、继承等效果。在 Lua 的面向对象写法中，元表非常常见，尤其是通过 `__index` 实现对象方法查找和继承。
 
-## 5. 上题中的代码，如果我们希望打印出 0~9，应该如何修改代码？
+---
 
-标准答案：
+## 5. Lua 中 __index 和 __newindex 有什么作用
 
-如果希望打印 0 到 9，需要在循环体内部声明一个临时变量，比如 int temp = i;，然后在 Lambda 中打印 temp。
+### 标准答案
 
-示例：
-```csharp
-static void Main(string[] args)
-{
-    Action action = null;
+`__index` 和 `__newindex` 都是 Lua 元表中非常重要的元方法。
 
-    for (int i = 0; i < 10; i++)
-    {
-        int temp = i;
+`__index` 会在访问 table 中不存在的字段时触发。它可以是一个 table，也可以是一个 function。如果 `__index` 是 table，Lua 会去这个 table 中继续查找字段；如果是 function，就会调用这个函数并返回结果。它常用于实现继承、默认值和方法查找。
 
-        action += () =>
-        {
-            Console.WriteLine(temp);
-        };
-    }
+`__newindex` 会在给 table 中不存在的字段赋值时触发。它也可以是 table 或 function，常用于属性赋值拦截、只读表、数据绑定等场景。
 
-    action();
-}
-```
-这样做的原因是，原代码中所有 Lambda 捕获的是同一个循环变量 i，循环结束后它的值已经是 10。
+需要注意的是，只有字段不存在时才会触发 `__index` 或 `__newindex`。如果字段本身已经存在，普通访问和赋值不会触发这些元方法。
 
-而把 i 赋值给循环体内部的局部变量后，每次循环都会创建一个新的局部变量 temp。每个 Lambda 捕获的是自己那一轮对应的 temp，所以最终会按顺序打印 0 到 9。
+面试中可以这样说：
 
+`__index` 是访问 table 中不存在字段时触发，常用于继承、默认值和方法查找；`__newindex` 是给 table 中不存在字段赋值时触发，常用于赋值拦截、只读表和数据绑定。需要注意，只有字段不存在时才会触发它们。
 
-## 6. Unity 中如何将本地坐标转为世界坐标？
+---
 
-标准答案：
+## 6. Unity 中判断两个 2D 矩形是否相交，有几种方式？请至少说出两种方式
 
-Unity 中可以使用 transform.TransformPoint() 将本地坐标转换成世界坐标。
+### 标准答案
 
-示例：
+Unity 中判断两个 2D 矩形是否相交，常见有两类方式：一种是数学层面的矩形判断，另一种是使用 Unity 的物理或 API。
 
-Vector3 worldPos = transform.TransformPoint(localPos);
+第一种方式是使用 `Rect.Overlaps`。如果两个矩形可以用 Unity 的 `Rect` 表示，比如 UI 区域或逻辑矩形，可以直接使用 `rectA.Overlaps(rectB)` 判断两个矩形是否重叠。
 
-这里的 localPos 是相对于当前物体 Transform 的本地坐标，转换后得到的是世界坐标。
+第二种方式是使用 AABB 判断。对于没有旋转的矩形，可以比较两个矩形的 `xMin`、`xMax`、`yMin`、`yMax`。只要一个矩形没有完全在另一个矩形的左边、右边、上边或下边，就说明它们相交。
 
-如果要反过来，把世界坐标转换成本地坐标，可以使用：
+第三种方式是使用 Unity 的 2D 物理系统。如果是场景中的 GameObject，并且挂了 `BoxCollider2D`，可以通过 `OnTriggerEnter2D`、`OnCollisionEnter2D` 或 `Physics2D.OverlapBox` 判断是否发生重叠。
 
-Vector3 localPos = transform.InverseTransformPoint(worldPos);
+面试中可以这样说：
 
-另外需要注意，TransformPoint 用于转换位置点，会受到物体的位置、旋转和缩放影响。
+Unity 中判断两个 2D 矩形是否相交，要看矩形来源。如果是 UI 或普通逻辑矩形，可以使用 `Rect.Overlaps`，也可以自己用 AABB 方式比较四条边。如果是场景中的 2D 物体，可以使用 `BoxCollider2D` 配合 `OnTriggerEnter2D`、`OnCollisionEnter2D`，或者使用 `Physics2D.OverlapBox` 来判断。
 
-如果只是转换方向，一般使用 TransformDirection。
+---
 
-如果是转换向量，可以使用 TransformVector。TransformVector 不受位置影响，但会受到旋转和缩放影响。
+## 7. Unity 中想要制作角色的连招功能，在制作状态机时一般如何处理？
 
+### 标准答案
 
-## 7. Unity 中如何计算出两个向量之间的夹角？请说出两种方式。
+Unity 中制作角色连招时，一般会把每一段攻击设计成独立状态，比如 `Attack1`、`Attack2`、`Attack3`。
 
-标准答案：
+玩家按下攻击键后进入第一段攻击。在攻击动画播放到某个阶段时，开启连招输入窗口。如果玩家在窗口期内再次按下攻击键，就记录或缓存这次输入，然后在当前攻击动画播放到合适节点时切换到下一段攻击。
 
-Unity 中计算两个向量夹角，第一种方式可以直接使用 Vector3.Angle(a, b)。它会返回两个向量之间的夹角，单位是度，范围一般是 0 到 180 度。
+如果玩家没有在窗口期内输入，当前攻击播放结束后就回到 Idle 状态。
 
-示例：
+实际项目中，连招窗口、伤害判定、攻击位移、是否允许转向、是否允许被打断等，通常可以通过动画事件、`normalizedTime` 或配置表来控制。
 
-float angle = Vector3.Angle(a, b);
+面试中可以这样说：
 
-第二种方式是使用点乘公式。因为：
+Unity 中做角色连招时，一般会把每一段攻击设计成独立状态，比如 `Attack1`、`Attack2`、`Attack3`。玩家按攻击键后进入第一段攻击，在动画播放到某个阶段时开启连招输入窗口。如果玩家在窗口期内再次按攻击键，就先缓存输入，然后在当前动画播放到合适节点时切换到下一段攻击。如果没有继续输入，攻击结束后回到 Idle。实际项目里，一般会把战斗逻辑放在代码状态机或技能系统中，Animator 主要负责动画表现。
 
-a · b = |a| * |b| * cosθ
+---
 
-所以可以先把两个向量归一化，然后用 Vector3.Dot 得到 cosθ，再通过 Mathf.Acos 求出弧度，最后乘以 Mathf.Rad2Deg 转成角度。
+## 8. Unity 中如果想要在动作的某一时刻进行伤害检测，应该怎么做？请说出两种做法
 
-示例：
+### 标准答案
 
-float dot = Vector3.Dot(a.normalized, b.normalized);
-dot = Mathf.Clamp(dot, -1f, 1f);
-float angle = Mathf.Acos(dot) * Mathf.Rad2Deg;
+Unity 中如果想在动作的某一时刻进行伤害检测，常见有两种做法。
 
-需要注意，这里用的是 Acos，不是 Atan。加 Clamp 是为了避免浮点误差导致 Acos 参数超出 -1 到 1 的范围。
+第一种是使用 Animation Event。可以在攻击动画的关键帧上添加动画事件，当动画播放到挥刀命中的那一帧时，调用伤害检测方法。检测方式可以是 `Physics2D.OverlapBox`、`Physics2D.OverlapCircle`、射线检测，或者 3D 中的 `Physics.OverlapBox` 等。
 
-如果需要带方向的角度，可以使用 Vector3.SignedAngle(a, b, axis)。
+第二种是通过代码判断动画播放进度。比如使用 `AnimatorStateInfo.normalizedTime` 获取当前动画播放百分比，当动画播放到指定时间点或时间段时，执行伤害检测。这种方式更适合做配置化，可以把技能的伤害帧、判定范围、持续时间写进配置表。
 
+还可以补充一种做法：在攻击帧开启武器或攻击范围的 Trigger Collider，在攻击结束帧关闭，通过 `OnTriggerEnter2D` 或 `OnTriggerEnter` 判断是否命中敌人。
 
-## 8. 请写出 UGUI 中两种处理异形按钮的具体方法。
+面试中可以这样说：
 
-标准答案：
+Unity 中想在动作某一时刻进行伤害检测，第一种方式是使用 Animation Event，在攻击动画的命中帧调用伤害检测函数，比如使用 `OverlapBox` 或 `OverlapCircle` 检测敌人。第二种方式是通过代码判断动画播放进度，比如使用 `normalizedTime`，当动画播放到指定百分比时执行检测。实际项目中也可以在攻击帧开启攻击碰撞盒，在攻击结束时关闭。还要注意同一次攻击不要重复命中同一个目标，可以用命中列表做去重。
 
-UGUI 中处理异形按钮常见有两种方式。
+---
 
-第一种是使用图片的 Alpha 点击检测。可以设置 Image.alphaHitTestMinimumThreshold，让透明区域不响应点击。
+## 9. Unity 中想要制作自动寻路逻辑，应该怎么做？请至少说出两种做法
 
-示例：
+### 标准答案
 
-Image image = GetComponent<Image>();
-image.alphaHitTestMinimumThreshold = 0.1f;
+Unity 中制作自动寻路逻辑，常见有两种做法。
 
-这种方式适合图片本身带透明区域的不规则按钮，比如圆形按钮、不规则图标按钮等。需要注意，使用这种方式时，图片纹理通常需要开启 Read/Write Enabled，否则 Unity 无法读取像素透明度。
+第一种是使用 Unity 自带的 NavMesh。先在场景中烘焙导航网格，标记哪些区域可以行走，然后给角色添加 `NavMeshAgent`，通过 `SetDestination` 设置目标点，让 Unity 自动计算路径并驱动角色移动。这个方案适合普通 3D 场景中的 NPC、怪物追踪和 AI 移动。
 
-第二种是自定义射线检测逻辑。可以实现 ICanvasRaycastFilter，在 IsRaycastLocationValid 方法中判断点击点是否在有效区域内。
+第二种是自己实现寻路系统。可以把地图抽象成格子地图、路点网络或节点图，每个节点记录是否可通行，以及和相邻节点的连接关系。然后使用 A*、Dijkstra 或 BFS 等算法计算从起点到终点的路径。
 
-示例：
-```csharp
-public class CircleRaycastFilter : MonoBehaviour, ICanvasRaycastFilter
-{
-    public float radius = 100f;
+A* 算法中常见的代价计算是 `F = G + H`。其中 `G` 表示从起点到当前节点的实际代价，`H` 表示当前节点到目标点的预估代价，`F` 是综合代价，搜索时优先选择代价更低的节点。
 
-    public bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera)
-    {
-        RectTransform rectTransform = transform as RectTransform;
+面试中可以这样说：
 
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rectTransform,
-            screenPoint,
-            eventCamera,
-            out Vector2 localPoint
-        );
+Unity 中制作自动寻路，第一种方式是使用 Unity 自带的 NavMesh。通过烘焙导航网格和 `NavMeshAgent.SetDestination` 实现角色自动寻路，适合普通 3D 场景中的 NPC 或怪物移动。第二种方式是自己实现寻路系统，比如把地图抽象成格子、路点或节点图，然后使用 A* 算法计算路径。A* 通常通过 `F = G + H` 评估节点，适合 2D、战棋、塔防或需要自定义寻路规则的项目。
 
-        return localPoint.magnitude <= radius;
-    }
-}
-```
-这种方式适合更复杂的异形按钮，比如圆形、扇形、多边形或者地图区域点击。
+---
 
-RectMask2D 主要用于矩形裁剪显示区域，不是处理异形按钮点击区域的标准答案。
+## 10. 游戏编辑器，比如角色编辑器、关卡编辑器、地图编辑器等工具的本质是什么？
 
+### 标准答案
 
-## 9. 请说出 Unity 中如何进行数据持久化，至少说出 5 种方式。
+游戏编辑器的本质是内容生产和数据编辑工具。
 
-标准答案：
+它把游戏中的角色、关卡、地图、怪物、技能、触发器等内容，以可视化、配置化的方式提供给开发者、策划或美术编辑。编辑器本身通常不是最终的游戏逻辑，而是负责生成、校验、保存和导出数据。
 
-Unity 中数据持久化常见方式有很多。
+比如角色编辑器可以编辑角色属性、技能、模型、动画、特效和音效配置；关卡编辑器可以摆放怪物、出生点、机关、触发器和奖励点；地图编辑器可以编辑地形、格子、障碍物、寻路区域和资源点。
 
-第一种是 PlayerPrefs，适合保存音量、画质、简单开关、新手引导状态等少量简单数据。
+这些编辑结果最终通常会保存成 JSON、XML、CSV、二进制文件、ScriptableObject、Prefab、场景文件或自定义配置表。游戏运行时再读取这些数据，并根据数据生成真正的游戏内容。
 
-第二种是 JSON 文件。可以把玩家存档对象序列化成 JSON 字符串，再通过 File.WriteAllText 写入本地文件。JSON 适合保存结构化存档，可读性强，调试方便。
+面试中可以这样说：
 
-第三种是 XML 文件。XML 也可以保存结构化数据，不过相对 JSON 更冗长，现在项目中使用得少一些。
-
-第四种是二进制文件。可以通过 FileStream、BinaryWriter 或序列化框架保存数据。二进制文件体积较小，读取效率较高，也不容易被普通玩家直接修改，但可读性差，版本兼容需要额外处理。
-
-第五种是 SQLite 或其他本地数据库。适合数据量较大、需要增删改查的数据，比如背包、任务、关卡进度、大量配置缓存等。
-
-另外，联网游戏还可以把数据保存到服务器或云端，用于账号数据、排行榜、充值数据、多端同步存档等场景。
-
-ScriptableObject 也可以作为配置类数据资产进行持久化，比如技能配置、道具配置、角色属性配置等。但它更适合保存配置，不太适合作为运行时玩家存档的主要方案。
-
-
-## 10. 在 Unity 中如何控制渲染优先级？谁先渲染谁后渲染，分情况回答。
-
-标准答案：
-
-Unity 中控制渲染优先级要分情况看。
-
-对于普通 3D 物体，默认主要由材质的 Render Queue、深度测试和相机决定。Unity 会先渲染不透明物体，再渲染透明物体。不透明物体一般依靠深度缓冲决定遮挡关系，而透明物体通常需要从远到近渲染。
-
-如果想手动控制材质渲染顺序，可以修改 Shader 中的 Queue 标签，或者修改 Material.renderQueue。常见队列有 Background、Geometry、AlphaTest、Transparent 和 Overlay。队列值越小越早渲染，越大越晚渲染。
-
-对于 2D Sprite，可以使用 Sorting Layer 和 Order in Layer 控制渲染顺序。Order in Layer 越大，通常越后渲染，也越显示在前面。多个 Sprite 组成一个整体时，可以使用 SortingGroup 统一管理排序。
-
-对于 UGUI，可以通过 Canvas 的 Sorting Layer、Order in Layer、Sort Order 控制不同 Canvas 的显示顺序。同一个 Canvas 内，一般 Hierarchy 中越靠后的 UI 元素越后绘制，通常越显示在上面。
-
-如果是多个 Camera，可以通过 Camera 的 Depth 控制渲染顺序。Depth 值小的 Camera 先渲染，Depth 值大的 Camera 后渲染。在 URP 中，还可以使用 Camera Stack，让 Base Camera 和 Overlay Camera 组合渲染。
-
-需要注意，“后渲染”不一定绝对等于“显示在前面”，因为最终显示结果还会受到深度测试、ZWrite、ZTest、透明排序等因素影响。
+游戏编辑器的本质是内容生产和数据编辑工具。它把角色、关卡、地图、怪物、技能、触发器等游戏内容，以可视化和配置化的方式提供给开发者、策划或美术编辑。编辑器本身通常不直接等于游戏运行逻辑，而是负责生成、校验、保存和导出数据。游戏运行时再读取这些数据生成真正的内容。一个好的编辑器还应该考虑数据校验、预览、导入导出、撤销重做、版本兼容和团队协作。

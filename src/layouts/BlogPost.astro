@@ -13,7 +13,6 @@ type Props = CollectionEntry<'blog'>['data'] & {
 
 const { title, description, category, pubDate, updatedDate, coverImage } = Astro.props;
 const usesPublicCoverImage = typeof coverImage === 'string';
-const tags = Astro.props.tags ?? [];
 const tocHeadings = (Astro.props.headings ?? []).filter(
 	(heading) => heading.depth >= 2 && heading.depth <= 3,
 );
@@ -64,17 +63,6 @@ const resolvedHeroImage =
 						}
 					</div>
 
-					{
-						tags.length > 0 && (
-							<div class="post-tags" aria-label="文章标签">
-								{
-									tags.map((tag) => (
-										<span class="post-tag">{tag}</span>
-									))
-								}
-							</div>
-						)
-					}
 				</header>
 
 				{
@@ -253,26 +241,6 @@ const resolvedHeroImage =
 	.post-breadcrumb a:hover {
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
-	}
-
-	.post-tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.45rem;
-		margin-top: 0.15rem;
-	}
-
-	.post-tag {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.26rem 0.58rem;
-		border: 1px solid rgba(15, 23, 42, 0.1);
-		border-radius: 999px;
-		background: #fff;
-		color: var(--color-link-hover);
-		font-size: 0.78rem;
-		font-weight: 700;
-		line-height: 1.2;
 	}
 
 	.post-description {

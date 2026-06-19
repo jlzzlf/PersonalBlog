@@ -9,7 +9,6 @@ export interface HomeRecentPost {
 	pubDateLabel: string;
 	dateTime: string;
 	readTimeLabel: string;
-	tags: string[];
 	featured: boolean;
 }
 
@@ -118,7 +117,6 @@ export const buildHomePageViewModel = (posts: BlogPost[]) => {
 		pubDateLabel: formatArchiveDate(post.data.pubDate),
 		dateTime: post.data.pubDate.toISOString(),
 		readTimeLabel: formatReadTime(post.body),
-		tags: post.data.tags.length > 0 ? post.data.tags : [post.data.category],
 		featured: index === 0,
 	}));
 

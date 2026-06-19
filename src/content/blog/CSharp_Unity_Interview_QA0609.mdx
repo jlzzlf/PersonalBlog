@@ -2,11 +2,6 @@
 title: '面试归档8'
 description: '此博客用于记录 Unity / C# 面试题复盘'
 category: '学习记录'
-tags:
-  - Unity
-  - CSharp
-  - 学习记录
-  - 面试
 pubDate: '2026-06-09'
 ---
 # Unity / C# 面试题复盘
@@ -55,9 +50,9 @@ using 在 C# 中常见有两个作用。
 
 标准答案：
 
-Dictionary 的 key 必须是唯一的。如果想让一个 key 对应多个 value，通常会把 value 设计成一个集合，比如 Dictionary<TKey, List<TValue>>。
+Dictionary 的 key 必须是唯一的。如果想让一个 key 对应多个 value，通常会把 value 设计成一个集合，比如 `Dictionary<TKey, List<TValue>>`。
 
-添加数据时，先判断这个 key 是否存在。如果不存在，就先创建一个 List<TValue>，然后再把值添加进去。
+添加数据时，先判断这个 key 是否存在。如果不存在，就先创建一个 `List<TValue>`，然后再把值添加进去。
 
 示例：
 ```csharp
@@ -70,7 +65,7 @@ if (!playerItems.ContainsKey(playerId))
 
 playerItems[playerId].Add(itemName);
 ```
-如果希望同一个 key 下的 value 不重复，可以使用 Dictionary<TKey, HashSet<TValue>>。
+如果希望同一个 key 下的 value 不重复，可以使用 `Dictionary<TKey, HashSet<TValue>>`。
 
 另外，如果问题是多个字段共同组成一个 key，那可以使用元组、结构体或类作为组合 key。但这和“一个 key 对多个 value”不是同一个问题。如果使用自定义类或结构体作为 key，需要正确实现 Equals() 和 GetHashCode()。
 
@@ -202,8 +197,10 @@ UGUI 中处理异形按钮常见有两种方式。
 
 示例：
 
+```csharp
 Image image = GetComponent<Image>();
 image.alphaHitTestMinimumThreshold = 0.1f;
+```
 
 这种方式适合图片本身带透明区域的不规则按钮，比如圆形按钮、不规则图标按钮等。需要注意，使用这种方式时，图片纹理通常需要开启 Read/Write Enabled，否则 Unity 无法读取像素透明度。
 

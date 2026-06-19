@@ -30,6 +30,12 @@ function buildPostFields() {
 			widget: 'text',
 		},
 		{
+			label: '文章类型',
+			name: 'category',
+			widget: 'select',
+			options: ['学习记录', '技术笔记', '面试整理', '随想随笔'],
+		},
+		{
 			label: '发布日期',
 			name: 'pubDate',
 			widget: 'datetime',
@@ -48,7 +54,7 @@ function buildPostFields() {
 		},
 		{
 			label: '封面图',
-			name: 'heroImage',
+			name: 'coverImage',
 			widget: 'image',
 			required: false,
 			hint: '图片会上传到 public/uploads，并以 /uploads/... 路径写入 frontmatter。',

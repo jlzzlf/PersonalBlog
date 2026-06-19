@@ -1,4 +1,4 @@
-export const BLOG_PAGE_SIZE = 8;
+export const BLOG_PAGE_SIZE = 20;
 export const PROJECT_PAGE_SIZE = 6;
 export const INTERVIEW_PAGE_SIZE = 8;
 

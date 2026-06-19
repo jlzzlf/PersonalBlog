@@ -2,11 +2,6 @@
 title: '面试归档3'
 description: '此博客用于记录 Unity / C# 面试题复盘'
 category: '学习记录'
-tags:
-  - Unity
-  - CSharp
-  - 学习记录
-  - 面试
 pubDate: '2026-06-01'
 ---
 # Unity 面试题
@@ -523,4 +518,3 @@ text.raycastTarget = false;
 ### 参考回答
 
 UGUI 优化一般可以从几个方面入手。第一是拆分 Canvas，因为 Canvas 下 UI 发生变化时可能触发重建，所以要把静态 UI 和动态 UI 分开，比如背景、固定装饰放一个 Canvas，血条、倒计时、飘字等频繁变化的元素放到单独 Canvas，减少 Rebuild 范围。第二是减少 Draw Call，比如使用 SpriteAtlas 图集，把同一界面的 UI 资源合并，减少贴图切换。第三是减少布局开销，少用 `LayoutGroup`、`ContentSizeFitter`，固定布局可以手动摆放，动态列表可以初始化后禁用布局组件。第四是优化点击检测，不需要交互的 Image、Text 要关闭 `RaycastTarget`，减少 `GraphicRaycaster` 遍历。第五是降低 Overdraw，减少透明图片叠加、空 Image、复杂 Mask 和过深 UI 层级。如果是 ScrollView 长列表，还应该使用对象池或虚拟列表，避免一次性创建大量 UI Item。总结来说，UGUI 优化重点就是减少 Canvas Rebuild、减少 Draw Call、降低 Overdraw、减少布局和事件检测开销。实际排查 UI 性能时，可以结合 Unity Profiler、Frame Debugger 和 UI Profiler 定位问题。
-

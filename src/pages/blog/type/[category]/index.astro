@@ -1,0 +1,57 @@
+---
+import BaseHead from '../../../../components/BaseHead.astro';
+import Footer from '../../../../components/Footer.astro';
+import Header from '../../../../components/Header.astro';
+import BlogIndexView from '../../../../components/views/BlogIndexView.astro';
+import { SITE_TITLE } from '../../../../consts';
+import {
+	getBlogCategoryCounts,
+	getBlogCategoryPath,
+	getPostsByBlogCategory,
+	getSortedBlogEntries,
+} from '../../../../lib/blog';
+import { BLOG_PAGE_SIZE, paginateItems } from '../../../../lib/pagination';
+
+export async function getStaticPaths() {
+	const allPosts = await getSortedBlogEntries();
+	const categoryCounts = getBlogCategoryCounts(allPosts);
+
+	return categoryCounts
+		.filter(({ count }) => count > 0)
+		.map(({ category }) => {
+			const pagination = paginateItems(
+				getPostsByBlogCategory(allPosts, category),
+				BLOG_PAGE_SIZE,
+				1,
+			);
+
+			return {
+				params: { category },
+				props: { category, categoryCounts, pagination },
+			};
+		});
+}
+
+const { category, categoryCounts, pagination } = Astro.props;
+const pageTitle = `${category} | ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={pageTitle} description={`浏览全部${category}文章。`} />
+	</head>
+	<body>
+		<Header />
+		<BlogIndexView
+			posts={pagination.items}
+			categoryCounts={categoryCounts}
+			activeCategory={category}
+			currentPage={pagination.currentPage}
+			totalPages={pagination.totalPages}
+			totalItems={pagination.totalItems}
+			basePath={getBlogCategoryPath(category)}
+		/>
+		<Footer />
+	</body>
+</html>

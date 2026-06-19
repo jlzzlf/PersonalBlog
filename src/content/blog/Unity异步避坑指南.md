@@ -2,11 +2,6 @@
 title: 'Unity异步避坑指南'
 description: '以我迁移《合成守卫战》资源加载流程时踩到的问题为起点，整理一套 Unity 异步、Addressables、WebGL、UniTask 相关的学习笔记。'
 category: '学习记录'
-tags:
-  - Unity
-  - 学习记录
-  - async
-  - WebGL
 pubDate: '2026-05-18'
 ---
 
@@ -517,6 +512,5 @@ handle.WaitForCompletion();
 ```
 
 这些写法要么依赖线程池，要么同步阻塞主线程。
-
 
 

@@ -11,7 +11,6 @@ const blog = defineCollection({
 			title: z.string(),
 			description: z.string(),
 			category: z.enum(['学习记录', '技术笔记', '面试整理', '随想随笔']),
-			tags: z.array(z.string().trim().min(1)).optional().default([]),
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
@@ -46,25 +45,6 @@ const projects = defineCollection({
 		}),
 });
 
-const reviews = defineCollection({
-	loader: glob({ base: './src/content/reviews', pattern: '**/*.{md,mdx}' }),
-	schema: ({ image }) =>
-		z.object({
-			title: z.string(),
-			description: z.string(),
-			mediaType: z.enum(['动画', '游戏']),
-			score: z.number().min(0).max(10),
-			pubDate: z.coerce.date(),
-			tags: z.array(z.string().trim().min(1)).optional().default([]),
-			coverImage: z
-				.union([
-					z.string().trim().regex(/^\/.+/, 'Public cover images must start with "/"'),
-					image(),
-				])
-				.optional(),
-		}),
-});
-
-export const collections = { blog, projects, reviews };
+export const collections = { blog, projects };
 
 

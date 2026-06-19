@@ -4,7 +4,7 @@ import Footer from '../../../components/Footer.astro';
 import Header from '../../../components/Header.astro';
 import BlogIndexView from '../../../components/views/BlogIndexView.astro';
 import { SITE_TITLE } from '../../../consts';
-import { getSortedBlogEntries } from '../../../lib/blog';
+import { getBlogCategoryCounts, getSortedBlogEntries } from '../../../lib/blog';
 import { BLOG_PAGE_SIZE, paginateItems } from '../../../lib/pagination';
 
 export async function getStaticPaths() {
@@ -27,6 +27,7 @@ export async function getStaticPaths() {
 }
 
 const { pagination } = Astro.props;
+const categoryCounts = getBlogCategoryCounts(await getSortedBlogEntries());
 const pageTitle = `技术博客 第 ${pagination.currentPage} 页 | ${SITE_TITLE}`;
 ---
 
@@ -42,6 +43,7 @@ const pageTitle = `技术博客 第 ${pagination.currentPage} 页 | ${SITE_TITLE
 		<Header />
 		<BlogIndexView
 			posts={pagination.items}
+			categoryCounts={categoryCounts}
 			currentPage={pagination.currentPage}
 			totalPages={pagination.totalPages}
 			totalItems={pagination.totalItems}

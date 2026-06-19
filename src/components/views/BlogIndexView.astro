@@ -1,21 +1,26 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import PlaceholderCover from '../../assets/blog-placeholder-about.jpg';
+import {
+	getBlogCategoryPath,
+	type BlogCategory,
+	type BlogCategoryCount,
+} from '../../lib/blog';
 import PaginationNav from '../PaginationNav.astro';
 import FormattedDate from '../FormattedDate.astro';
-import { buildSortedTagCounts, getTagColorStyle } from '../../lib/tag-style';
 
 interface Props {
 	posts: CollectionEntry<'blog'>[];
+	categoryCounts: BlogCategoryCount[];
+	activeCategory?: BlogCategory;
 	currentPage: number;
 	totalPages: number;
 	totalItems: number;
 	basePath: string;
 }
 
-const { posts, currentPage, totalPages, totalItems, basePath } = Astro.props;
-
-const allTags = buildSortedTagCounts(posts);
+const { posts, categoryCounts, activeCategory, currentPage, totalPages, totalItems, basePath } = Astro.props;
+const allPostCount = categoryCounts.reduce((total, item) => total + item.count, 0);
 
 const getCoverImageAttrs = (coverImage: (typeof posts)[number]['data']['coverImage']) => {
 	if (!coverImage) {
@@ -40,32 +45,26 @@ const getCoverImageAttrs = (coverImage: (typeof posts)[number]['data']['coverIma
 const postCards = posts.map((post) => ({
 	post,
 	coverImage: getCoverImageAttrs(post.data.coverImage),
-	tagsAttr: JSON.stringify(post.data.tags ?? []),
 }));
 ---
 
-<main class="blog-page" data-blog-index>
+<main class="blog-page">
 	<section class="blog-hero" aria-labelledby="blog-page-title">
 		<p class="blog-kicker">Tech Blog</p>
-		<h1 id="blog-page-title">技术博客</h1>
+		<h1 id="blog-page-title">{activeCategory ?? '技术博客'}</h1>
 		<p class="blog-intro">
-			共 {totalItems} 篇文章，当前第 {currentPage} / {totalPages} 页。标签筛选只作用于当前页。
+			共 {totalItems} 篇文章，当前第 {currentPage} / {totalPages} 页。类型筛选会检索全部文章。
 		</p>
 	</section>
 
 	<div class="blog-shell">
-		<section class="blog-list" data-blog-grid>
+		<section class="blog-list blog-list--posts" aria-label={activeCategory ? `${activeCategory}文章列表` : '全部文章列表'}>
 			{
-				postCards.map(({ post, coverImage, tagsAttr }) => (
-					<article
-						class="surface-card blog-card"
-						data-blog-card
-						data-category={post.data.category}
-						data-tags={tagsAttr}
-					>
-						<a class="blog-card__link" href={`/blog/${post.id}/`}>
+				postCards.map(({ post, coverImage }) => (
+					<article class="surface-card blog-card blog-card--post">
+						<a class="blog-card__link blog-card__link--compact" href={`/blog/${post.id}/`}>
 							<img
-								class="blog-card__image"
+								class="blog-card__image blog-card__image--compact"
 								src={coverImage.src}
 								width={coverImage.width}
 								height={coverImage.height}
@@ -73,28 +72,19 @@ const postCards = posts.map((post) => ({
 								loading="lazy"
 								decoding="async"
 							/>
-							<div class="blog-card__content">
-								<div class="blog-card__meta">
-									<span class="blog-card__category">{post.data.category}</span>
-									<p class="blog-card__date">
+							<div class="blog-card__content blog-card__content--compact">
+								<div class="blog-card__main">
+									<h2 title={post.data.title}>{post.data.title}</h2>
+									<p class="blog-card__date blog-card__date--compact">
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M7 3v3M17 3v3M4.5 9.5h15M5.5 5.5h13a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1Z" />
+										</svg>
 										<FormattedDate date={post.data.pubDate} />
 									</p>
 								</div>
-								<h2>{post.data.title}</h2>
-								<p class="blog-card__description">{post.data.description}</p>
-								{
-									post.data.tags.length > 0 && (
-										<div class="blog-card__tags" aria-label="文章标签">
-											{
-												post.data.tags.map((tag) => (
-													<span class="blog-card__tag" style={getTagColorStyle(tag)}>
-														{tag}
-													</span>
-												))
-											}
-										</div>
-									)
-								}
+								<span class="blog-card__category blog-card__category--compact" title={post.data.category}>
+									{post.data.category}
+								</span>
 							</div>
 						</a>
 					</article>
@@ -102,44 +92,29 @@ const postCards = posts.map((post) => ({
 			}
 		</section>
 
-		{
-			allTags.length > 0 && (
-				<aside class="blog-sidebar" aria-label="博客标签筛选">
-					<section class="blog-tag-filter" data-blog-tag-filter>
-						<div class="blog-tag-filter__toolbar">
-							<div class="blog-tag-filter__heading">
-								<strong>标签筛选</strong>
-								<span class="blog-tag-filter__summary" data-blog-tag-summary>全部标签</span>
-							</div>
-							<button type="button" class="blog-tag-filter__clear" data-blog-tag-clear hidden>
-								清空
-							</button>
-						</div>
-						<p class="blog-filter-status" data-blog-filter-status>当前显示本页全部文章。</p>
-						<div class="blog-tag-filter__selected" data-blog-selected-tags hidden></div>
-						<div class="blog-tag-picker" id="blog-tag-picker" data-blog-tag-picker>
-							<div class="blog-tag-picker__list" data-blog-tag-options>
-								{
-									allTags.map(({ tag, count }) => (
-										<label
-											class="blog-tag-option"
-											data-blog-tag-option
-											data-tag-option={tag}
-											style={getTagColorStyle(tag)}
-										>
-											<input type="checkbox" value={tag} data-blog-tag-checkbox />
-											<span class="blog-tag-option__swatch" aria-hidden="true"></span>
-											<span class="blog-tag-option__name">{tag}</span>
-											<span class="blog-tag-option__count">{count}</span>
-										</label>
-									))
-								}
-							</div>
-						</div>
-					</section>
-				</aside>
-			)
-		}
+		<aside class="blog-sidebar" aria-label="博客类型筛选">
+			<nav class="blog-category-filter" aria-label="按类型筛选文章">
+				<div class="blog-category-filter__heading">
+					<strong>文章类型</strong>
+					<span>筛选全部 {allPostCount} 篇内容</span>
+				</div>
+				<a class:list={['blog-category-filter__option', { active: !activeCategory }]} href="/blog/">
+					<span>全部内容</span>
+					<small>{allPostCount}</small>
+				</a>
+				{
+					categoryCounts.filter(({ count }) => count > 0).map(({ category, count }) => (
+						<a
+							class:list={['blog-category-filter__option', { active: category === activeCategory }]}
+							href={getBlogCategoryPath(category)}
+						>
+							<span>{category}</span>
+							<small>{count}</small>
+						</a>
+					))
+				}
+			</nav>
+		</aside>
 	</div>
 
 	<PaginationNav
@@ -149,10 +124,4 @@ const postCards = posts.map((post) => ({
 		totalItems={totalItems}
 		itemLabel="篇文章"
 	/>
-
-	<p class="blog-empty" data-blog-empty hidden>当前筛选条件下，本页还没有文章。</p>
 </main>
-
-<script>
-	import '../../scripts/blog-index-page';
-</script>

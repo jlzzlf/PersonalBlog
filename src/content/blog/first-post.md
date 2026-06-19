@@ -2,10 +2,6 @@
 title: '第一篇博客'
 description: '这是博客正式开张前的第一条记录。'
 category: '随想随笔'
-tags:
-  - Astro
-  - 建站记录
-  - 随想
 pubDate: '2026-3-30'
 ---
 
