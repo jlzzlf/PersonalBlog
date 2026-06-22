@@ -1,0 +1,23 @@
+### YamlMime:ManagedReference
+items:
+- uid: JLZFramework.Toolkits.存档系统
+  commentId: N:JLZFramework.Toolkits.存档系统
+  id: JLZFramework.Toolkits.存档系统
+  children:
+  - JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr
+  langs:
+  - csharp
+  - vb
+  name: JLZFramework.Toolkits.存档系统
+  nameWithType: JLZFramework.Toolkits.存档系统
+  fullName: JLZFramework.Toolkits.存档系统
+  type: Namespace
+  assemblies:
+  - SaveSystemAssembly
+references:
+- uid: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr
+  commentId: T:JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr
+  href: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.html
+  name: PlayerPrefsDataMgr
+  nameWithType: PlayerPrefsDataMgr
+  fullName: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr

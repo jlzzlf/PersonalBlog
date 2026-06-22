@@ -16,6 +16,7 @@ export interface HomeSiteStat {
 	label: string;
 	value: string;
 	href?: string;
+	animate?: boolean;
 }
 
 export interface HomeArchiveEntryStat {
@@ -97,7 +98,27 @@ const formatArchiveDate = (date: Date) =>
 		day: 'numeric',
 	}).format(date);
 
-export const buildHomePageViewModel = (posts: BlogPost[]) => {
+const formatWebsiteUpdatedDate = (date: Date) =>
+	new Intl.DateTimeFormat('zh-CN', {
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	}).format(date);
+
+type DatedContent = {
+	data: {
+		pubDate: Date;
+		updatedDate?: Date;
+	};
+};
+
+export const getLatestContentUpdatedDate = (entries: DatedContent[]) =>
+	entries.reduce<Date | null>((latest, entry) => {
+		const candidate = entry.data.updatedDate ?? entry.data.pubDate;
+		return !latest || candidate > latest ? candidate : latest;
+	}, null);
+
+export const buildHomePageViewModel = (posts: BlogPost[], latestContentUpdatedDate: Date | null) => {
 	const archiveGroups = Array.from(
 		posts.reduce((groups, post) => {
 			const year = String(post.data.pubDate.getFullYear());
@@ -123,11 +144,6 @@ export const buildHomePageViewModel = (posts: BlogPost[]) => {
 
 	const launchPost = posts.find((post) => post.id === 'first-post') ?? posts[posts.length - 1];
 	const siteLaunchDate = launchPost?.data.pubDate ?? new Date();
-	const latestUpdatedDate = posts.reduce((latest, post) => {
-		const candidate = post.data.updatedDate ?? post.data.pubDate;
-		return candidate > latest ? candidate : latest;
-	}, siteLaunchDate);
-
 	const siteStats: HomeSiteStat[] = [
 		{
 			label: '文章总数',
@@ -138,9 +154,9 @@ export const buildHomePageViewModel = (posts: BlogPost[]) => {
 			value: `${Math.max(1, Math.floor((Date.now() - siteLaunchDate.getTime()) / ONE_DAY_IN_MS))} 天`,
 		},
 		{
-			label: '面试归档',
-			value: '查看入口',
-			href: '/interviews/',
+			label: '网站更新日期',
+			value: formatWebsiteUpdatedDate(latestContentUpdatedDate ?? siteLaunchDate),
+			animate: false,
 		},
 		{
 			label: '全站字数',
@@ -151,7 +167,7 @@ export const buildHomePageViewModel = (posts: BlogPost[]) => {
 	const archiveEntryStats: HomeArchiveEntryStat[] = [
 		{ label: '文章', value: `${posts.length} 篇` },
 		{ label: '年份', value: `${archiveGroups.length} 年` },
-		{ label: '最近更新', value: formatRelativeTime(latestUpdatedDate) },
+		{ label: '最近更新', value: formatRelativeTime(latestContentUpdatedDate ?? siteLaunchDate) },
 	];
 
 	return {

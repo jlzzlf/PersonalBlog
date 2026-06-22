@@ -1,0 +1,900 @@
+### YamlMime:ManagedReference
+items:
+- uid: JLZFramework.Toolkits.PriorityQueue`2
+  commentId: T:JLZFramework.Toolkits.PriorityQueue`2
+  id: PriorityQueue`2
+  parent: JLZFramework.Toolkits
+  children:
+  - JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  - JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  - JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32)
+  - JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  - JLZFramework.Toolkits.PriorityQueue`2.Clear
+  - JLZFramework.Toolkits.PriorityQueue`2.Count
+  - JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  - JLZFramework.Toolkits.PriorityQueue`2.Enqueue(`0,`1)
+  - JLZFramework.Toolkits.PriorityQueue`2.Peek
+  - JLZFramework.Toolkits.PriorityQueue`2.TryDequeue(`0@,`1@)
+  - JLZFramework.Toolkits.PriorityQueue`2.TryPeek(`0@,`1@)
+  langs:
+  - csharp
+  - vb
+  name: PriorityQueue<TElement, TPriority>
+  nameWithType: PriorityQueue<TElement, TPriority>
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>
+  type: Class
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: PriorityQueue
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 11
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: >-
+    最小优先级队列：Priority 数值越小，越优先出队。
+
+    相同优先级时不保证先进先出。
+  example: []
+  syntax:
+    content: public sealed class PriorityQueue<TElement, TPriority>
+    typeParameters:
+    - id: TElement
+      description: 队列中存储的元素类型。
+    - id: TPriority
+      description: 用于排序的优先级类型。
+    content.vb: Public NotInheritable Class PriorityQueue(Of TElement, TPriority)
+  inheritance:
+  - System.Object
+  inheritedMembers:
+  - System.Object.Equals(System.Object)
+  - System.Object.Equals(System.Object,System.Object)
+  - System.Object.GetHashCode
+  - System.Object.GetType
+  - System.Object.ReferenceEquals(System.Object,System.Object)
+  - System.Object.ToString
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority)
+  name.vb: PriorityQueue(Of TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Count
+  commentId: P:JLZFramework.Toolkits.PriorityQueue`2.Count
+  id: Count
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: Count
+  nameWithType: PriorityQueue<TElement, TPriority>.Count
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Count
+  type: Property
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: Count
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 31
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 获取当前队列中的元素数量。
+  example: []
+  syntax:
+    content: public int Count { get; }
+    parameters: []
+    return:
+      type: System.Int32
+    content.vb: Public ReadOnly Property Count As Integer
+  overload: JLZFramework.Toolkits.PriorityQueue`2.Count*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Count
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Count
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  id: '#ctor'
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: PriorityQueue()
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue()
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue()
+  type: Constructor
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: .ctor
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 36
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 创建一个使用默认优先级比较器的空队列。
+  example: []
+  syntax:
+    content: public PriorityQueue()
+    content.vb: Public Sub New()
+  overload: JLZFramework.Toolkits.PriorityQueue`2.#ctor*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New()
+  name.vb: New()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32)
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32)
+  id: '#ctor(System.Int32)'
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: PriorityQueue(int)
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(int)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue(int)
+  type: Constructor
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: .ctor
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 45
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 创建一个带初始容量的空队列。
+  example: []
+  syntax:
+    content: public PriorityQueue(int capacity)
+    parameters:
+    - id: capacity
+      type: System.Int32
+      description: 内部堆的初始容量。
+    content.vb: Public Sub New(capacity As Integer)
+  overload: JLZFramework.Toolkits.PriorityQueue`2.#ctor*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(Integer)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New(Integer)
+  name.vb: New(Integer)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  id: '#ctor(System.Collections.Generic.IComparer{`1})'
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: PriorityQueue(IComparer<TPriority>)
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(IComparer<TPriority>)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue(System.Collections.Generic.IComparer<TPriority>)
+  type: Constructor
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: .ctor
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 54
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 创建一个使用指定优先级比较器的空队列。
+  example: []
+  syntax:
+    content: public PriorityQueue(IComparer<TPriority> comparer)
+    parameters:
+    - id: comparer
+      type: System.Collections.Generic.IComparer{{TPriority}}
+      description: 用于排序优先级的比较器。比较结果更小的优先出队。
+    content.vb: Public Sub New(comparer As IComparer(Of TPriority))
+  overload: JLZFramework.Toolkits.PriorityQueue`2.#ctor*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(IComparer(Of TPriority))
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New(System.Collections.Generic.IComparer(Of TPriority))
+  name.vb: New(IComparer(Of TPriority))
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  id: '#ctor(System.Int32,System.Collections.Generic.IComparer{`1})'
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: PriorityQueue(int, IComparer<TPriority>)
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(int, IComparer<TPriority>)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue(int, System.Collections.Generic.IComparer<TPriority>)
+  type: Constructor
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: .ctor
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 64
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 创建一个带初始容量和指定优先级比较器的空队列。
+  example: []
+  syntax:
+    content: public PriorityQueue(int capacity, IComparer<TPriority> comparer)
+    parameters:
+    - id: capacity
+      type: System.Int32
+      description: 内部堆的初始容量。
+    - id: comparer
+      type: System.Collections.Generic.IComparer{{TPriority}}
+      description: 用于排序优先级的比较器。为空时使用默认比较器。
+    content.vb: Public Sub New(capacity As Integer, comparer As IComparer(Of TPriority))
+  overload: JLZFramework.Toolkits.PriorityQueue`2.#ctor*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(Integer, IComparer(Of TPriority))
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New(Integer, System.Collections.Generic.IComparer(Of TPriority))
+  name.vb: New(Integer, IComparer(Of TPriority))
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Enqueue(`0,`1)
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Enqueue(`0,`1)
+  id: Enqueue(`0,`1)
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: Enqueue(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.Enqueue(TElement, TPriority)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Enqueue(TElement, TPriority)
+  type: Method
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: Enqueue
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 75
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 按指定优先级加入一个元素。
+  example: []
+  syntax:
+    content: public void Enqueue(TElement element, TPriority priority)
+    parameters:
+    - id: element
+      type: '{TElement}'
+      description: 要加入队列的元素。
+    - id: priority
+      type: '{TPriority}'
+      description: 用于排序的优先级。比较结果更小的优先出队。
+    content.vb: Public Sub Enqueue(element As TElement, priority As TPriority)
+  overload: JLZFramework.Toolkits.PriorityQueue`2.Enqueue*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Enqueue(TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Enqueue(TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  id: Dequeue
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: Dequeue()
+  nameWithType: PriorityQueue<TElement, TPriority>.Dequeue()
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Dequeue()
+  type: Method
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: Dequeue
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 86
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 移除并返回优先级最小的元素。
+  example: []
+  syntax:
+    content: public TElement Dequeue()
+    return:
+      type: '{TElement}'
+      description: 队首元素。
+    content.vb: Public Function Dequeue() As TElement
+  overload: JLZFramework.Toolkits.PriorityQueue`2.Dequeue*
+  exceptions:
+  - type: System.InvalidOperationException
+    commentId: T:System.InvalidOperationException
+    description: 队列为空时抛出。
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Dequeue()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Dequeue()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryDequeue(`0@,`1@)
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.TryDequeue(`0@,`1@)
+  id: TryDequeue(`0@,`1@)
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: TryDequeue(out TElement, out TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.TryDequeue(out TElement, out TPriority)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryDequeue(out TElement, out TPriority)
+  type: Method
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: TryDequeue
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 102
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 尝试移除优先级最小的元素。
+  example: []
+  syntax:
+    content: public bool TryDequeue(out TElement element, out TPriority priority)
+    parameters:
+    - id: element
+      type: '{TElement}'
+      description: 成功时返回出队元素；失败时为默认值。
+    - id: priority
+      type: '{TPriority}'
+      description: 成功时返回出队优先级；失败时为默认值。
+    return:
+      type: System.Boolean
+      description: 成功出队返回 true；队列为空返回 false。
+    content.vb: Public Function TryDequeue(element As TElement, priority As TPriority) As Boolean
+  overload: JLZFramework.Toolkits.PriorityQueue`2.TryDequeue*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryDequeue(TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryDequeue(TElement, TPriority)
+  name.vb: TryDequeue(TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Peek
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Peek
+  id: Peek
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: Peek()
+  nameWithType: PriorityQueue<TElement, TPriority>.Peek()
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Peek()
+  type: Method
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: Peek
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 135
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 返回优先级最小的元素，但不将其移除。
+  example: []
+  syntax:
+    content: public TElement Peek()
+    return:
+      type: '{TElement}'
+      description: 队首元素。
+    content.vb: Public Function Peek() As TElement
+  overload: JLZFramework.Toolkits.PriorityQueue`2.Peek*
+  exceptions:
+  - type: System.InvalidOperationException
+    commentId: T:System.InvalidOperationException
+    description: 队列为空时抛出。
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Peek()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Peek()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryPeek(`0@,`1@)
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.TryPeek(`0@,`1@)
+  id: TryPeek(`0@,`1@)
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: TryPeek(out TElement, out TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.TryPeek(out TElement, out TPriority)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryPeek(out TElement, out TPriority)
+  type: Method
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: TryPeek
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 151
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 尝试读取优先级最小的元素，但不将其移除。
+  example: []
+  syntax:
+    content: public bool TryPeek(out TElement element, out TPriority priority)
+    parameters:
+    - id: element
+      type: '{TElement}'
+      description: 成功时返回队首元素；失败时为默认值。
+    - id: priority
+      type: '{TPriority}'
+      description: 成功时返回队首优先级；失败时为默认值。
+    return:
+      type: System.Boolean
+      description: 成功读取返回 true；队列为空返回 false。
+    content.vb: Public Function TryPeek(element As TElement, priority As TPriority) As Boolean
+  overload: JLZFramework.Toolkits.PriorityQueue`2.TryPeek*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryPeek(TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryPeek(TElement, TPriority)
+  name.vb: TryPeek(TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Clear
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Clear
+  id: Clear
+  parent: JLZFramework.Toolkits.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: Clear()
+  nameWithType: PriorityQueue<TElement, TPriority>.Clear()
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Clear()
+  type: Method
+  source:
+    remote:
+      path: Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+      branch: master
+      repo: git@git.code.tencent.com:JLZZLF/ButtonDefense2D.git
+    id: Clear
+    path: F:/Projects/ButtonDefense2D/Assets/JLZFramework/Toolkits/优先级队列/PriorityQueue.cs
+    startLine: 168
+  assemblies:
+  - PriorityQueue
+  namespace: JLZFramework.Toolkits
+  summary: 清空队列中的所有元素。
+  example: []
+  syntax:
+    content: public void Clear()
+    content.vb: Public Sub Clear()
+  overload: JLZFramework.Toolkits.PriorityQueue`2.Clear*
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Clear()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Clear()
+references:
+- uid: JLZFramework.Toolkits
+  commentId: N:JLZFramework.Toolkits
+  href: JLZFramework.html
+  name: JLZFramework.Toolkits
+  nameWithType: JLZFramework.Toolkits
+  fullName: JLZFramework.Toolkits
+  spec.csharp:
+  - uid: JLZFramework
+    name: JLZFramework
+    href: JLZFramework.html
+  - name: .
+  - uid: JLZFramework.Toolkits
+    name: Toolkits
+    href: JLZFramework.Toolkits.html
+  spec.vb:
+  - uid: JLZFramework
+    name: JLZFramework
+    href: JLZFramework.html
+  - name: .
+  - uid: JLZFramework.Toolkits
+    name: Toolkits
+    href: JLZFramework.Toolkits.html
+- uid: System.Object
+  commentId: T:System.Object
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object
+  name: object
+  nameWithType: object
+  fullName: object
+  nameWithType.vb: Object
+  fullName.vb: Object
+  name.vb: Object
+- uid: System.Object.Equals(System.Object)
+  commentId: M:System.Object.Equals(System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  name: Equals(object)
+  nameWithType: object.Equals(object)
+  fullName: object.Equals(object)
+  nameWithType.vb: Object.Equals(Object)
+  fullName.vb: Object.Equals(Object)
+  name.vb: Equals(Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.Equals(System.Object,System.Object)
+  commentId: M:System.Object.Equals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  name: Equals(object, object)
+  nameWithType: object.Equals(object, object)
+  fullName: object.Equals(object, object)
+  nameWithType.vb: Object.Equals(Object, Object)
+  fullName.vb: Object.Equals(Object, Object)
+  name.vb: Equals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.Equals(System.Object,System.Object)
+    name: Equals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.GetHashCode
+  commentId: M:System.Object.GetHashCode
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  name: GetHashCode()
+  nameWithType: object.GetHashCode()
+  fullName: object.GetHashCode()
+  nameWithType.vb: Object.GetHashCode()
+  fullName.vb: Object.GetHashCode()
+  spec.csharp:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetHashCode
+    name: GetHashCode
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gethashcode
+  - name: (
+  - name: )
+- uid: System.Object.GetType
+  commentId: M:System.Object.GetType
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  name: GetType()
+  nameWithType: object.GetType()
+  fullName: object.GetType()
+  nameWithType.vb: Object.GetType()
+  fullName.vb: Object.GetType()
+  spec.csharp:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.GetType
+    name: GetType
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.gettype
+  - name: (
+  - name: )
+- uid: System.Object.ReferenceEquals(System.Object,System.Object)
+  commentId: M:System.Object.ReferenceEquals(System.Object,System.Object)
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  name: ReferenceEquals(object, object)
+  nameWithType: object.ReferenceEquals(object, object)
+  fullName: object.ReferenceEquals(object, object)
+  nameWithType.vb: Object.ReferenceEquals(Object, Object)
+  fullName.vb: Object.ReferenceEquals(Object, Object)
+  name.vb: ReferenceEquals(Object, Object)
+  spec.csharp:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+  spec.vb:
+  - uid: System.Object.ReferenceEquals(System.Object,System.Object)
+    name: ReferenceEquals
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.referenceequals
+  - name: (
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: ','
+  - name: " "
+  - uid: System.Object
+    name: Object
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object
+  - name: )
+- uid: System.Object.ToString
+  commentId: M:System.Object.ToString
+  parent: System.Object
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  name: ToString()
+  nameWithType: object.ToString()
+  fullName: object.ToString()
+  nameWithType.vb: Object.ToString()
+  fullName.vb: Object.ToString()
+  spec.csharp:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+  spec.vb:
+  - uid: System.Object.ToString
+    name: ToString
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.object.tostring
+  - name: (
+  - name: )
+- uid: System
+  commentId: N:System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System
+  nameWithType: System
+  fullName: System
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Count*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Count
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Count
+  name: Count
+  nameWithType: PriorityQueue<TElement, TPriority>.Count
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Count
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Count
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Count
+- uid: System.Int32
+  commentId: T:System.Int32
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.int32
+  name: int
+  nameWithType: int
+  fullName: int
+  nameWithType.vb: Integer
+  fullName.vb: Integer
+  name.vb: Integer
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2__ctor
+  name: PriorityQueue
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New
+  name.vb: New
+- uid: System.Collections.Generic.IComparer{{TPriority}}
+  commentId: T:System.Collections.Generic.IComparer{`1}
+  parent: System.Collections.Generic
+  definition: System.Collections.Generic.IComparer`1
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+  name: IComparer<TPriority>
+  nameWithType: IComparer<TPriority>
+  fullName: System.Collections.Generic.IComparer<TPriority>
+  nameWithType.vb: IComparer(Of TPriority)
+  fullName.vb: System.Collections.Generic.IComparer(Of TPriority)
+  name.vb: IComparer(Of TPriority)
+  spec.csharp:
+  - uid: System.Collections.Generic.IComparer`1
+    name: IComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+  - name: <
+  - name: TPriority
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IComparer`1
+    name: IComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TPriority
+  - name: )
+- uid: System.Collections.Generic.IComparer`1
+  commentId: T:System.Collections.Generic.IComparer`1
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+  name: IComparer<T>
+  nameWithType: IComparer<T>
+  fullName: System.Collections.Generic.IComparer<T>
+  nameWithType.vb: IComparer(Of T)
+  fullName.vb: System.Collections.Generic.IComparer(Of T)
+  name.vb: IComparer(Of T)
+  spec.csharp:
+  - uid: System.Collections.Generic.IComparer`1
+    name: IComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: System.Collections.Generic.IComparer`1
+    name: IComparer
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: System.Collections.Generic
+  commentId: N:System.Collections.Generic
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system
+  name: System.Collections.Generic
+  nameWithType: System.Collections.Generic
+  fullName: System.Collections.Generic
+  spec.csharp:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+  spec.vb:
+  - uid: System
+    name: System
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system
+  - name: .
+  - uid: System.Collections
+    name: Collections
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections
+  - name: .
+  - uid: System.Collections.Generic
+    name: Generic
+    isExternal: true
+    href: https://learn.microsoft.com/dotnet/api/system.collections.generic
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Enqueue*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Enqueue
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Enqueue__0__1_
+  name: Enqueue
+  nameWithType: PriorityQueue<TElement, TPriority>.Enqueue
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Enqueue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Enqueue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Enqueue
+- uid: '{TElement}'
+  commentId: '!:TElement'
+  definition: TElement
+  name: TElement
+  nameWithType: TElement
+  fullName: TElement
+- uid: '{TPriority}'
+  commentId: '!:TPriority'
+  definition: TPriority
+  name: TPriority
+  nameWithType: TPriority
+  fullName: TPriority
+- uid: TElement
+  name: TElement
+  nameWithType: TElement
+  fullName: TElement
+- uid: TPriority
+  name: TPriority
+  nameWithType: TPriority
+  fullName: TPriority
+- uid: System.InvalidOperationException
+  commentId: T:System.InvalidOperationException
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.invalidoperationexception
+  name: InvalidOperationException
+  nameWithType: InvalidOperationException
+  fullName: System.InvalidOperationException
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Dequeue*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Dequeue
+  name: Dequeue
+  nameWithType: PriorityQueue<TElement, TPriority>.Dequeue
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Dequeue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Dequeue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Dequeue
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryDequeue*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.TryDequeue
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_TryDequeue__0___1__
+  name: TryDequeue
+  nameWithType: PriorityQueue<TElement, TPriority>.TryDequeue
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryDequeue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryDequeue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryDequeue
+- uid: System.Boolean
+  commentId: T:System.Boolean
+  parent: System
+  isExternal: true
+  href: https://learn.microsoft.com/dotnet/api/system.boolean
+  name: bool
+  nameWithType: bool
+  fullName: bool
+  nameWithType.vb: Boolean
+  fullName.vb: Boolean
+  name.vb: Boolean
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Peek*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Peek
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Peek
+  name: Peek
+  nameWithType: PriorityQueue<TElement, TPriority>.Peek
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Peek
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Peek
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Peek
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryPeek*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.TryPeek
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_TryPeek__0___1__
+  name: TryPeek
+  nameWithType: PriorityQueue<TElement, TPriority>.TryPeek
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryPeek
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryPeek
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryPeek
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Clear*
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Clear
+  href: JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Clear
+  name: Clear
+  nameWithType: PriorityQueue<TElement, TPriority>.Clear
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Clear
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Clear
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Clear

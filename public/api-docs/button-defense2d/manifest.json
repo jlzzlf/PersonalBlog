@@ -1,0 +1,1004 @@
+{
+  "source_base_path": "E:/Web/Personal_Blog/docfx/sites/button-defense2d",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "source_relative_path": "../../shared/styles/main.css",
+      "output": {
+        "resource": {
+          "relative_path": "styles/main.css"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Architecture.GameArchitecture.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Architecture.GameArchitecture.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Architecture.GameArchitecture",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Architecture.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Architecture.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Architecture",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.GameBoot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.GameBoot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.GameBoot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.GameFlowSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.GameFlowSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.GameFlowSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.GameRuntimeModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.GameRuntimeModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.GameRuntimeModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.GameSceneContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.GameSceneContext.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.GameSceneContext",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.GameState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.GameState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.GameState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.GameStateModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.GameStateModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.GameStateModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.QueryGameState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.QueryGameState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot.QueryGameState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.GameBoot.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.GameBoot.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.GameBoot",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.BuildingBase.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.BuildingBase.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.BuildingBase",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.BuildingLayer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.BuildingLayer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.BuildingLayer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.Cell.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.Cell.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.Cell",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.Event.GridEventService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.Event.GridEventService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.Event.GridEventService",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.Event.GridWalkabilityChangedEvent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.Event.GridWalkabilityChangedEvent.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.Event.GridWalkabilityChangedEvent",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.Event.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.Event.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.Event",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.FlowField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.FlowField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.FlowField",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.FlowFieldBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.FlowFieldBuilder.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.FlowFieldBuilder",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.FlowFieldDestinationKind.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.FlowFieldDestinationKind.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.FlowFieldDestinationKind",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.FlowFieldKey.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.FlowFieldKey.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.FlowFieldKey",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.FlowFieldPathProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.FlowFieldPathProvider.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.FlowFieldPathProvider",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.FlowFieldService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.FlowFieldService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.FlowFieldService",
+      "Summary": "<p sourcefile=\"api/Project.Runtime.Core.Grid.FlowFieldService.yml\" sourcestartlinenumber=\"1\">流场缓存与刷新调度</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridCellFlags.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridCellFlags.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridCellFlags",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridCellRecord.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridCellRecord.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridCellRecord",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridCellState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridCellState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridCellState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridChangedNotifier.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridChangedNotifier.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridChangedNotifier",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridGizmoLayer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridGizmoLayer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridGizmoLayer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridGizmosDrawer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridGizmosDrawer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridGizmosDrawer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridMap.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridMap.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridMap",
+      "Summary": "<p sourcefile=\"api/Project.Runtime.Core.Grid.GridMap.yml\" sourcestartlinenumber=\"1\">负责提供网格的范围和索引</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridMapper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridMapper.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridMapper",
+      "Summary": "<p sourcefile=\"api/Project.Runtime.Core.Grid.GridMapper.yml\" sourcestartlinenumber=\"1\">网格坐标映射类</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.GridQueryService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.GridQueryService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.GridQueryService",
+      "Summary": "<p sourcefile=\"api/Project.Runtime.Core.Grid.GridQueryService.yml\" sourcestartlinenumber=\"1\">给外部提供的查询接口</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.IFlowField.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.IFlowField.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.IFlowField",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.IGridPathQuery.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.IGridPathQuery.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.IGridPathQuery",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.LogicGridMap.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.LogicGridMap.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.LogicGridMap",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.TerrainLayer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.TerrainLayer.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.TerrainLayer",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.TerrainType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.TerrainType.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.TerrainType",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.TilemapGridMapper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.TilemapGridMapper.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid.TilemapGridMapper",
+      "Summary": "<p sourcefile=\"api/Project.Runtime.Core.Grid.TilemapGridMapper.yml\" sourcestartlinenumber=\"1\">负责提供瓦片网格的坐标转换</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.Grid.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.Grid.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.Grid",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.LevelPoint.LevelPointSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.LevelPoint.LevelPointSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.LevelPoint.LevelPointSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Core.LevelPoint.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Core.LevelPoint.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Core.LevelPoint",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Development.DeveloperRuntimeTools.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Development.DeveloperRuntimeTools.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Development.DeveloperRuntimeTools",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Development.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Development.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Development",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.DontTouchButton.DontTouchButtonView.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.DontTouchButton.DontTouchButtonView.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.DontTouchButton.DontTouchButtonView",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.DontTouchButton.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.DontTouchButton.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.DontTouchButton",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.奖励系统.RewardSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.奖励系统.RewardSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.奖励系统.RewardSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.奖励系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.奖励系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.奖励系统",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.建造系统.BuildRuntimeModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.建造系统.BuildRuntimeModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.建造系统.BuildRuntimeModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.建造系统.BuildSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.建造系统.BuildSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.建造系统.BuildSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.建造系统.PrototypeObstacleBuilding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.建造系统.PrototypeObstacleBuilding.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.建造系统.PrototypeObstacleBuilding",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.建造系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.建造系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.建造系统",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.按钮系统.ButtonSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.按钮系统.ButtonSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.按钮系统.ButtonSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.按钮系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.按钮系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.按钮系统",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.波次系统.WaveSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.波次系统.WaveSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.波次系统.WaveSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.波次系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.波次系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.波次系统",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.CharacterModelChangeFlags.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.CharacterModelChangeFlags.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色.CharacterModelChangeFlags",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.CharacterMover.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.CharacterMover.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色.CharacterMover",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.CharacterRuntimeModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.CharacterRuntimeModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色.CharacterRuntimeModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.CharacterRuntimeState.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.CharacterRuntimeState.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色.CharacterRuntimeState",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.CharacterSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.CharacterSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色.CharacterSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.LittleManController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.LittleManController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色.LittleManController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.角色.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.角色.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.角色",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.资源系统.ResourceModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.资源系统.ResourceModel.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.资源系统.ResourceModel",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.资源系统.ResourceSystem.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.资源系统.ResourceSystem.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.资源系统.ResourceSystem",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.资源系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.资源系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.资源系统",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.输入系统.CursorInputController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.输入系统.CursorInputController.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.输入系统.CursorInputController",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Project.Runtime.Modules.输入系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Project.Runtime.Modules.输入系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "Project.Runtime.Modules.输入系统",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/grid-system.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/grid-system.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "manual/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "manual/toc.html"
+        },
+        ".json": {
+          "relative_path": "manual/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

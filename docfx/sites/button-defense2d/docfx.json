@@ -1,0 +1,55 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "F:/Projects/ButtonDefense2D",
+          "files": [
+            "Game.csproj"
+          ]
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "toc.yml"
+        ],
+        "src": "."
+      },
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "src": "manual",
+        "dest": "manual"
+      },
+      {
+        "files": [
+          "**/*.yml"
+        ],
+        "src": "api",
+        "dest": "api"
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "**/*.css"
+        ],
+        "src": "../../shared/styles",
+        "dest": "styles"
+      }
+    ],
+    "dest": "../../../public/api-docs/button-defense2d",
+    "globalMetadata": {
+      "_appTitle": "个人代码文档 · ButtonDefense2D",
+      "_appName": "个人代码文档",
+      "_disableContribution": true
+    }
+  }
+}

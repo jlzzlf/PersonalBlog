@@ -1,0 +1,177 @@
+### YamlMime:ManagedReference
+items:
+- uid: JLZFramework.Toolkits
+  commentId: N:JLZFramework.Toolkits
+  id: JLZFramework.Toolkits
+  children:
+  - JLZFramework.Toolkits.EventBus
+  - JLZFramework.Toolkits.InputConfig
+  - JLZFramework.Toolkits.InputService
+  - JLZFramework.Toolkits.MonoSingletonBase`1
+  - JLZFramework.Toolkits.PlayerPrefsDataMgr
+  - JLZFramework.Toolkits.PriorityQueue`2
+  - JLZFramework.Toolkits.SingletonBase`1
+  - JLZFramework.Toolkits.SingletonLazy`1
+  langs:
+  - csharp
+  - vb
+  name: JLZFramework.Toolkits
+  nameWithType: JLZFramework.Toolkits
+  fullName: JLZFramework.Toolkits
+  type: Namespace
+  assemblies:
+  - EventBus
+references:
+- uid: JLZFramework.Toolkits.EventBus
+  commentId: T:JLZFramework.Toolkits.EventBus
+  href: JLZFramework.Toolkits.EventBus.html
+  name: EventBus
+  nameWithType: EventBus
+  fullName: JLZFramework.Toolkits.EventBus
+- uid: JLZFramework.Toolkits.InputConfig
+  commentId: T:JLZFramework.Toolkits.InputConfig
+  href: JLZFramework.Toolkits.InputConfig.html
+  name: InputConfig
+  nameWithType: InputConfig
+  fullName: JLZFramework.Toolkits.InputConfig
+- uid: JLZFramework.Toolkits.InputService
+  commentId: T:JLZFramework.Toolkits.InputService
+  parent: JLZFramework.Toolkits
+  href: JLZFramework.Toolkits.InputService.html
+  name: InputService
+  nameWithType: InputService
+  fullName: JLZFramework.Toolkits.InputService
+- uid: JLZFramework.Toolkits.PriorityQueue`2
+  commentId: T:JLZFramework.Toolkits.PriorityQueue`2
+  href: JLZFramework.Toolkits.PriorityQueue-2.html
+  name: PriorityQueue<TElement, TPriority>
+  nameWithType: PriorityQueue<TElement, TPriority>
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority)
+  name.vb: PriorityQueue(Of TElement, TPriority)
+  spec.csharp:
+  - uid: JLZFramework.Toolkits.PriorityQueue`2
+    name: PriorityQueue
+    href: JLZFramework.Toolkits.PriorityQueue-2.html
+  - name: <
+  - name: TElement
+  - name: ','
+  - name: " "
+  - name: TPriority
+  - name: '>'
+  spec.vb:
+  - uid: JLZFramework.Toolkits.PriorityQueue`2
+    name: PriorityQueue
+    href: JLZFramework.Toolkits.PriorityQueue-2.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TElement
+  - name: ','
+  - name: " "
+  - name: TPriority
+  - name: )
+- uid: JLZFramework.Toolkits.PlayerPrefsDataMgr
+  commentId: T:JLZFramework.Toolkits.PlayerPrefsDataMgr
+  href: JLZFramework.Toolkits.PlayerPrefsDataMgr.html
+  name: PlayerPrefsDataMgr
+  nameWithType: PlayerPrefsDataMgr
+  fullName: JLZFramework.Toolkits.PlayerPrefsDataMgr
+- uid: JLZFramework.Toolkits.SingletonLazy`1
+  commentId: T:JLZFramework.Toolkits.SingletonLazy`1
+  href: JLZFramework.Toolkits.SingletonLazy-1.html
+  name: SingletonLazy<T>
+  nameWithType: SingletonLazy<T>
+  fullName: JLZFramework.Toolkits.SingletonLazy<T>
+  nameWithType.vb: SingletonLazy(Of T)
+  fullName.vb: JLZFramework.Toolkits.SingletonLazy(Of T)
+  name.vb: SingletonLazy(Of T)
+  spec.csharp:
+  - uid: JLZFramework.Toolkits.SingletonLazy`1
+    name: SingletonLazy
+    href: JLZFramework.Toolkits.SingletonLazy-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: JLZFramework.Toolkits.SingletonLazy`1
+    name: SingletonLazy
+    href: JLZFramework.Toolkits.SingletonLazy-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: JLZFramework.Toolkits.SingletonBase`1
+  commentId: T:JLZFramework.Toolkits.SingletonBase`1
+  href: JLZFramework.Toolkits.SingletonBase-1.html
+  name: SingletonBase<T>
+  nameWithType: SingletonBase<T>
+  fullName: JLZFramework.Toolkits.SingletonBase<T>
+  nameWithType.vb: SingletonBase(Of T)
+  fullName.vb: JLZFramework.Toolkits.SingletonBase(Of T)
+  name.vb: SingletonBase(Of T)
+  spec.csharp:
+  - uid: JLZFramework.Toolkits.SingletonBase`1
+    name: SingletonBase
+    href: JLZFramework.Toolkits.SingletonBase-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: JLZFramework.Toolkits.SingletonBase`1
+    name: SingletonBase
+    href: JLZFramework.Toolkits.SingletonBase-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1
+  commentId: T:JLZFramework.Toolkits.MonoSingletonBase`1
+  href: JLZFramework.Toolkits.MonoSingletonBase-1.html
+  name: MonoSingletonBase<T>
+  nameWithType: MonoSingletonBase<T>
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>
+  nameWithType.vb: MonoSingletonBase(Of T)
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T)
+  name.vb: MonoSingletonBase(Of T)
+  spec.csharp:
+  - uid: JLZFramework.Toolkits.MonoSingletonBase`1
+    name: MonoSingletonBase
+    href: JLZFramework.Toolkits.MonoSingletonBase-1.html
+  - name: <
+  - name: T
+  - name: '>'
+  spec.vb:
+  - uid: JLZFramework.Toolkits.MonoSingletonBase`1
+    name: MonoSingletonBase
+    href: JLZFramework.Toolkits.MonoSingletonBase-1.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: T
+  - name: )
+- uid: JLZFramework.Toolkits
+  commentId: N:JLZFramework.Toolkits
+  href: JLZFramework.html
+  name: JLZFramework.Toolkits
+  nameWithType: JLZFramework.Toolkits
+  fullName: JLZFramework.Toolkits
+  spec.csharp:
+  - uid: JLZFramework
+    name: JLZFramework
+    href: JLZFramework.html
+  - name: .
+  - uid: JLZFramework.Toolkits
+    name: Toolkits
+    href: JLZFramework.Toolkits.html
+  spec.vb:
+  - uid: JLZFramework
+    name: JLZFramework
+    href: JLZFramework.html
+  - name: .
+  - uid: JLZFramework.Toolkits
+    name: Toolkits
+    href: JLZFramework.Toolkits.html

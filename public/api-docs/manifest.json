@@ -1,0 +1,380 @@
+{
+  "source_base_path": "E:/Web/Personal_Blog/docfx",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.EventBus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.EventBus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.EventBus",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.EventBus.yml\" sourcestartlinenumber=\"1\">简单事件总线，用事件类型作为键管理订阅者，并在发布事件时同步调用对应回调。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.InputConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.InputConfig.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.InputConfig",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.InputConfig.yml\" sourcestartlinenumber=\"1\">InputService 使用的输入系统配置资产。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.InputService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.InputService.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.InputService",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.InputService.yml\" sourcestartlinenumber=\"1\">场景里只放一个InputService，拖入你的InputConfig\nMap默认Player/UI\n支持：启用/禁用Map、只启用某个Map、生成C#输入类访问、Move/Look缓存、Jump/Interact事件</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.MonoSingletonBase<T>",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.yml\" sourcestartlinenumber=\"1\">Mono单例模式基类\n重写 OnSingletonAwake 方法实现初始化逻辑</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.PlayerPrefsDataMgr",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.yml\" sourcestartlinenumber=\"1\">PlayerPrefs数据管理类</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.yml\" sourcestartlinenumber=\"1\">最小优先级队列：Priority 数值越小，越优先出队。\n相同优先级时不保证先进先出。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.SingletonBase-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.SingletonBase-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.SingletonBase<T>",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.SingletonBase-1.yml\" sourcestartlinenumber=\"1\">不继承Mono behaviour的单例模式基类\n抽象类防止外部实例化</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.SingletonLazy-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.SingletonLazy-1.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.SingletonLazy<T>",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.SingletonLazy-1.yml\" sourcestartlinenumber=\"1\">懒加载的非 MonoBehaviour 单例基类。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.事件中心.EventBus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.事件中心.EventBus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.事件中心.EventBus",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.事件中心.EventBus.yml\" sourcestartlinenumber=\"1\">简单事件总线，用事件类型作为键管理订阅者，并在发布事件时同步调用对应回调。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.事件中心.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.事件中心.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.事件中心",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.优先级队列.PriorityQueue-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.优先级队列.PriorityQueue-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.优先级队列.PriorityQueue-2.yml\" sourcestartlinenumber=\"1\">最小优先级队列：Priority 数值越小，越优先出队。\n相同优先级时不保证先进先出。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.优先级队列.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.优先级队列.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.优先级队列",
+      "Summary": null
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.yml\" sourcestartlinenumber=\"1\">PlayerPrefs数据管理类</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.存档系统.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.存档系统.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.存档系统",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toolkits/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toolkits/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "styles/main.css",
+      "output": {
+        "resource": {
+          "relative_path": "styles/main.css"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/custom-gui.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/custom-gui.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/event-bus.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/event-bus.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/input-system.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/input-system.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/module-template.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/module-template.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/mono-behaviour-project-badge.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/mono-behaviour-project-badge.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/player-prefs.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/player-prefs.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/priority-queue.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/priority-queue.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/project-structure-generator.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/project-structure-generator.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "toolkits/singleton-base.md",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/singleton-base.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toolkits/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toolkits/toc.html"
+        },
+        ".json": {
+          "relative_path": "toolkits/toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

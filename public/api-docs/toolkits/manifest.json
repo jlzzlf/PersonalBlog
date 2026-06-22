@@ -1,0 +1,216 @@
+{
+  "source_base_path": "E:/Web/Personal_Blog/docfx/sites/toolkits",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Resource",
+      "source_relative_path": "../../shared/styles/main.css",
+      "output": {
+        "resource": {
+          "relative_path": "styles/main.css"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.EventBus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.EventBus.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.EventBus",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.EventBus.yml\" sourcestartlinenumber=\"1\">简单事件总线，用事件类型作为键管理订阅者，并在发布事件时同步调用对应回调。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.PlayerPrefsDataMgr",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.yml\" sourcestartlinenumber=\"1\">PlayerPrefs数据管理类</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>",
+      "Summary": "<p sourcefile=\"api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.yml\" sourcestartlinenumber=\"1\">最小优先级队列：Priority 数值越小，越优先出队。\n相同优先级时不保证先进先出。</p>\n"
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/toolkits/JLZFramework.Toolkits.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/JLZFramework.Toolkits.html"
+        }
+      },
+      "version": "",
+      "Uid": null,
+      "IsMRef": true,
+      "Title": "JLZFramework.Toolkits",
+      "Summary": null
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toolkits/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toolkits/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toolkits/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/custom-gui.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/custom-gui.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/event-bus.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/event-bus.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/input-system.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/input-system.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/module-template.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/module-template.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/mono-behaviour-project-badge.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/mono-behaviour-project-badge.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/player-prefs.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/player-prefs.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/priority-queue.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/priority-queue.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/project-structure-generator.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/project-structure-generator.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/singleton-base.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/singleton-base.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "manual/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "manual/toc.html"
+        },
+        ".json": {
+          "relative_path": "manual/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

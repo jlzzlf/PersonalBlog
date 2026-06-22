@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>Class FlowFieldService | 个人代码文档 &#183; ButtonDefense2D </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="Class FlowFieldService | 个人代码文档 &#183; ButtonDefense2D ">
+    
+    <meta name="description" content="流场缓存与刷新调度">
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="个人代码文档">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Project.Runtime.Core.Grid.FlowFieldService">
+
+
+
+  <h1 id="Project_Runtime_Core_Grid_FlowFieldService" data-uid="Project.Runtime.Core.Grid.FlowFieldService" class="text-break">Class FlowFieldService</h1>
+  <div class="markdown level0 summary"><p>流场缓存与刷新调度</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><span class="xref">FlowFieldService</span></div>
+  </div>
+  <div class="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+    <div><span class="xref">IUtility</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Project.html">Project</a>.<a class="xref" href="Project.Runtime.html">Runtime</a>.<a class="xref" href="Project.Runtime.Core.html">Core</a>.<a class="xref" href="Project.Runtime.Core.Grid.html">Grid</a></h6>
+  <h6><strong>Assembly</strong>: Game.dll</h6>
+  <h5 id="Project_Runtime_Core_Grid_FlowFieldService_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public class FlowFieldService : IDisposable, IUtility</code></pre>
+  </div>
+  <h3 id="constructors">Constructors
+</h3>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService__ctor_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.#ctor*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService__ctor_Project_Runtime_Core_Grid_FlowFieldBuilder_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.#ctor(Project.Runtime.Core.Grid.FlowFieldBuilder)">FlowFieldService(FlowFieldBuilder)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public FlowFieldService(FlowFieldBuilder builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Project.Runtime.Core.Grid.FlowFieldBuilder.html">FlowFieldBuilder</a></td>
+        <td><span class="parametername">builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_ClearFields_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.ClearFields*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_ClearFields" data-uid="Project.Runtime.Core.Grid.FlowFieldService.ClearFields">ClearFields()</h4>
+  <div class="markdown level1 summary"><p>清空当前场景全部流场缓存。
+适合场景卸载时调用。</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void ClearFields()</code></pre>
+  </div>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_Dispose_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.Dispose*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_Dispose" data-uid="Project.Runtime.Core.Grid.FlowFieldService.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void Dispose()</code></pre>
+  </div>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_GetOrCreateFlowField_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.GetOrCreateFlowField*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_GetOrCreateFlowField_Project_Runtime_Core_Grid_FlowFieldKey_System_Collections_Generic_IReadOnlyList_Project_Runtime_Core_Grid_Cell__" data-uid="Project.Runtime.Core.Grid.FlowFieldService.GetOrCreateFlowField(Project.Runtime.Core.Grid.FlowFieldKey,System.Collections.Generic.IReadOnlyList{Project.Runtime.Core.Grid.Cell})">GetOrCreateFlowField(FlowFieldKey, IReadOnlyList&lt;Cell&gt;)</h4>
+  <div class="markdown level1 summary"><p>获取或者创建目标对应流场</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public IFlowField GetOrCreateFlowField(FlowFieldKey key, IReadOnlyList&lt;Cell&gt; arrivalCells)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Project.Runtime.Core.Grid.FlowFieldKey.html">FlowFieldKey</a></td>
+        <td><span class="parametername">key</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Project.Runtime.Core.Grid.Cell.html">Cell</a>&gt;</td>
+        <td><span class="parametername">arrivalCells</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Project.Runtime.Core.Grid.IFlowField.html">IFlowField</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_GiveBuilderQuery_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.GiveBuilderQuery*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_GiveBuilderQuery_Project_Runtime_Core_Grid_GridQueryService_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.GiveBuilderQuery(Project.Runtime.Core.Grid.GridQueryService)">GiveBuilderQuery(GridQueryService)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void GiveBuilderQuery(GridQueryService gridQueryService)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Project.Runtime.Core.Grid.GridQueryService.html">GridQueryService</a></td>
+        <td><span class="parametername">gridQueryService</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_RebuildDirtyFields_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.RebuildDirtyFields*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_RebuildDirtyFields" data-uid="Project.Runtime.Core.Grid.FlowFieldService.RebuildDirtyFields">RebuildDirtyFields()</h4>
+  <div class="markdown level1 summary"><p>统一重建本帧所有脏流场。
+在 GridChangeNotifier.Flush() 之后调用。</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void RebuildDirtyFields()</code></pre>
+  </div>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_Remove_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.Remove*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_Remove_Project_Runtime_Core_Grid_FlowFieldKey_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.Remove(Project.Runtime.Core.Grid.FlowFieldKey)">Remove(FlowFieldKey)</h4>
+  <div class="markdown level1 summary"><p>移除一个目标对应的流场缓存。
+调用前应确保没有单位仍绑定这张流场。</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public bool Remove(FlowFieldKey key)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Project.Runtime.Core.Grid.FlowFieldKey.html">FlowFieldKey</a></td>
+        <td><span class="parametername">key</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Project_Runtime_Core_Grid_FlowFieldService_UpdateArrivalCells_" data-uid="Project.Runtime.Core.Grid.FlowFieldService.UpdateArrivalCells*"></a>
+  <h4 id="Project_Runtime_Core_Grid_FlowFieldService_UpdateArrivalCells_Project_Runtime_Core_Grid_FlowFieldKey_System_Collections_Generic_IReadOnlyList_Project_Runtime_Core_Grid_Cell__" data-uid="Project.Runtime.Core.Grid.FlowFieldService.UpdateArrivalCells(Project.Runtime.Core.Grid.FlowFieldKey,System.Collections.Generic.IReadOnlyList{Project.Runtime.Core.Grid.Cell})">UpdateArrivalCells(FlowFieldKey, IReadOnlyList&lt;Cell&gt;)</h4>
+  <div class="markdown level1 summary"><p>更新某个导航目标的终点候选格。
+例如建筑移动、建筑尺寸变化、可交互位置规则变化。</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="declaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public void UpdateArrivalCells(FlowFieldKey key, IReadOnlyList&lt;Cell&gt; arrivalCells)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Project.Runtime.Core.Grid.FlowFieldKey.html">FlowFieldKey</a></td>
+        <td><span class="parametername">key</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="Project.Runtime.Core.Grid.Cell.html">Cell</a>&gt;</td>
+        <td><span class="parametername">arrivalCells</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+  <div>
+      <span class="xref">JLZFramework.IUtility</span>
+  </div>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

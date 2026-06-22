@@ -1,0 +1,870 @@
+### YamlMime:XRefMap
+sorted: true
+references:
+- uid: JLZFramework.Toolkits
+  name: JLZFramework.Toolkits
+  href: api/toolkits/JLZFramework.Toolkits.html
+  commentId: N:JLZFramework.Toolkits
+  fullName: JLZFramework.Toolkits
+  nameWithType: JLZFramework.Toolkits
+- uid: JLZFramework.Toolkits.EventBus
+  name: EventBus
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html
+  commentId: T:JLZFramework.Toolkits.EventBus
+  fullName: JLZFramework.Toolkits.EventBus
+  nameWithType: EventBus
+- uid: JLZFramework.Toolkits.EventBus.Clear
+  name: Clear()
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html#JLZFramework_Toolkits_EventBus_Clear
+  commentId: M:JLZFramework.Toolkits.EventBus.Clear
+  fullName: JLZFramework.Toolkits.EventBus.Clear()
+  nameWithType: EventBus.Clear()
+- uid: JLZFramework.Toolkits.EventBus.Clear*
+  name: Clear
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html#JLZFramework_Toolkits_EventBus_Clear_
+  commentId: Overload:JLZFramework.Toolkits.EventBus.Clear
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.EventBus.Clear
+  nameWithType: EventBus.Clear
+- uid: JLZFramework.Toolkits.EventBus.Publish*
+  name: Publish
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html#JLZFramework_Toolkits_EventBus_Publish_
+  commentId: Overload:JLZFramework.Toolkits.EventBus.Publish
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.EventBus.Publish
+  nameWithType: EventBus.Publish
+- uid: JLZFramework.Toolkits.EventBus.Publish``1(``0)
+  name: Publish<TEvent>(TEvent)
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html#JLZFramework_Toolkits_EventBus_Publish__1___0_
+  commentId: M:JLZFramework.Toolkits.EventBus.Publish``1(``0)
+  name.vb: Publish(Of TEvent)(TEvent)
+  fullName: JLZFramework.Toolkits.EventBus.Publish<TEvent>(TEvent)
+  fullName.vb: JLZFramework.Toolkits.EventBus.Publish(Of TEvent)(TEvent)
+  nameWithType: EventBus.Publish<TEvent>(TEvent)
+  nameWithType.vb: EventBus.Publish(Of TEvent)(TEvent)
+- uid: JLZFramework.Toolkits.EventBus.Subscribe*
+  name: Subscribe
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html#JLZFramework_Toolkits_EventBus_Subscribe_
+  commentId: Overload:JLZFramework.Toolkits.EventBus.Subscribe
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.EventBus.Subscribe
+  nameWithType: EventBus.Subscribe
+- uid: JLZFramework.Toolkits.EventBus.Subscribe``1(System.Action{``0})
+  name: Subscribe<TEvent>(Action<TEvent>)
+  href: api/toolkits/JLZFramework.Toolkits.EventBus.html#JLZFramework_Toolkits_EventBus_Subscribe__1_System_Action___0__
+  commentId: M:JLZFramework.Toolkits.EventBus.Subscribe``1(System.Action{``0})
+  name.vb: Subscribe(Of TEvent)(Action(Of TEvent))
+  fullName: JLZFramework.Toolkits.EventBus.Subscribe<TEvent>(System.Action<TEvent>)
+  fullName.vb: JLZFramework.Toolkits.EventBus.Subscribe(Of TEvent)(System.Action(Of TEvent))
+  nameWithType: EventBus.Subscribe<TEvent>(Action<TEvent>)
+  nameWithType.vb: EventBus.Subscribe(Of TEvent)(Action(Of TEvent))
+- uid: JLZFramework.Toolkits.InputConfig
+  name: InputConfig
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html
+  commentId: T:JLZFramework.Toolkits.InputConfig
+  fullName: JLZFramework.Toolkits.InputConfig
+  nameWithType: InputConfig
+- uid: JLZFramework.Toolkits.InputConfig.actions
+  name: actions
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_actions
+  commentId: F:JLZFramework.Toolkits.InputConfig.actions
+  fullName: JLZFramework.Toolkits.InputConfig.actions
+  nameWithType: InputConfig.actions
+- uid: JLZFramework.Toolkits.InputConfig.cancelBindingPathGamepad
+  name: cancelBindingPathGamepad
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_cancelBindingPathGamepad
+  commentId: F:JLZFramework.Toolkits.InputConfig.cancelBindingPathGamepad
+  fullName: JLZFramework.Toolkits.InputConfig.cancelBindingPathGamepad
+  nameWithType: InputConfig.cancelBindingPathGamepad
+- uid: JLZFramework.Toolkits.InputConfig.cancelBindingPathKeyboard
+  name: cancelBindingPathKeyboard
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_cancelBindingPathKeyboard
+  commentId: F:JLZFramework.Toolkits.InputConfig.cancelBindingPathKeyboard
+  fullName: JLZFramework.Toolkits.InputConfig.cancelBindingPathKeyboard
+  nameWithType: InputConfig.cancelBindingPathKeyboard
+- uid: JLZFramework.Toolkits.InputConfig.enableActionMapsOnstart
+  name: enableActionMapsOnstart
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_enableActionMapsOnstart
+  commentId: F:JLZFramework.Toolkits.InputConfig.enableActionMapsOnstart
+  fullName: JLZFramework.Toolkits.InputConfig.enableActionMapsOnstart
+  nameWithType: InputConfig.enableActionMapsOnstart
+- uid: JLZFramework.Toolkits.InputConfig.excludeMousePositionAndDelta
+  name: excludeMousePositionAndDelta
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_excludeMousePositionAndDelta
+  commentId: F:JLZFramework.Toolkits.InputConfig.excludeMousePositionAndDelta
+  fullName: JLZFramework.Toolkits.InputConfig.excludeMousePositionAndDelta
+  nameWithType: InputConfig.excludeMousePositionAndDelta
+- uid: JLZFramework.Toolkits.InputConfig.interactActionPath
+  name: interactActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_interactActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.interactActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.interactActionPath
+  nameWithType: InputConfig.interactActionPath
+- uid: JLZFramework.Toolkits.InputConfig.jumpActionPath
+  name: jumpActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_jumpActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.jumpActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.jumpActionPath
+  nameWithType: InputConfig.jumpActionPath
+- uid: JLZFramework.Toolkits.InputConfig.lookActionPath
+  name: lookActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_lookActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.lookActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.lookActionPath
+  nameWithType: InputConfig.lookActionPath
+- uid: JLZFramework.Toolkits.InputConfig.moveActionPath
+  name: moveActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_moveActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.moveActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.moveActionPath
+  nameWithType: InputConfig.moveActionPath
+- uid: JLZFramework.Toolkits.InputConfig.throwIfActionNotFound
+  name: throwIfActionNotFound
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_throwIfActionNotFound
+  commentId: F:JLZFramework.Toolkits.InputConfig.throwIfActionNotFound
+  fullName: JLZFramework.Toolkits.InputConfig.throwIfActionNotFound
+  nameWithType: InputConfig.throwIfActionNotFound
+- uid: JLZFramework.Toolkits.InputConfig.uiCancelActionPath
+  name: uiCancelActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_uiCancelActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.uiCancelActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.uiCancelActionPath
+  nameWithType: InputConfig.uiCancelActionPath
+- uid: JLZFramework.Toolkits.InputConfig.uiNavigateActionPath
+  name: uiNavigateActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_uiNavigateActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.uiNavigateActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.uiNavigateActionPath
+  nameWithType: InputConfig.uiNavigateActionPath
+- uid: JLZFramework.Toolkits.InputConfig.uiSubmitActionPath
+  name: uiSubmitActionPath
+  href: api/toolkits/JLZFramework.Toolkits.InputConfig.html#JLZFramework_Toolkits_InputConfig_uiSubmitActionPath
+  commentId: F:JLZFramework.Toolkits.InputConfig.uiSubmitActionPath
+  fullName: JLZFramework.Toolkits.InputConfig.uiSubmitActionPath
+  nameWithType: InputConfig.uiSubmitActionPath
+- uid: JLZFramework.Toolkits.InputService
+  name: InputService
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html
+  commentId: T:JLZFramework.Toolkits.InputService
+  fullName: JLZFramework.Toolkits.InputService
+  nameWithType: InputService
+- uid: JLZFramework.Toolkits.InputService.Asset
+  name: Asset
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Asset
+  commentId: P:JLZFramework.Toolkits.InputService.Asset
+  fullName: JLZFramework.Toolkits.InputService.Asset
+  nameWithType: InputService.Asset
+- uid: JLZFramework.Toolkits.InputService.Asset*
+  name: Asset
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Asset_
+  commentId: Overload:JLZFramework.Toolkits.InputService.Asset
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.InputService.Asset
+  nameWithType: InputService.Asset
+- uid: JLZFramework.Toolkits.InputService.Awake
+  name: Awake()
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Awake
+  commentId: M:JLZFramework.Toolkits.InputService.Awake
+  fullName: JLZFramework.Toolkits.InputService.Awake()
+  nameWithType: InputService.Awake()
+- uid: JLZFramework.Toolkits.InputService.Awake*
+  name: Awake
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Awake_
+  commentId: Overload:JLZFramework.Toolkits.InputService.Awake
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.InputService.Awake
+  nameWithType: InputService.Awake
+- uid: JLZFramework.Toolkits.InputService.Instance
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Instance
+  commentId: P:JLZFramework.Toolkits.InputService.Instance
+  fullName: JLZFramework.Toolkits.InputService.Instance
+  nameWithType: InputService.Instance
+- uid: JLZFramework.Toolkits.InputService.Instance*
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Instance_
+  commentId: Overload:JLZFramework.Toolkits.InputService.Instance
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.InputService.Instance
+  nameWithType: InputService.Instance
+- uid: JLZFramework.Toolkits.InputService.InteractPerformed
+  name: InteractPerformed
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_InteractPerformed
+  commentId: E:JLZFramework.Toolkits.InputService.InteractPerformed
+  fullName: JLZFramework.Toolkits.InputService.InteractPerformed
+  nameWithType: InputService.InteractPerformed
+- uid: JLZFramework.Toolkits.InputService.JumpPerformed
+  name: JumpPerformed
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_JumpPerformed
+  commentId: E:JLZFramework.Toolkits.InputService.JumpPerformed
+  fullName: JLZFramework.Toolkits.InputService.JumpPerformed
+  nameWithType: InputService.JumpPerformed
+- uid: JLZFramework.Toolkits.InputService.Look
+  name: Look
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Look
+  commentId: P:JLZFramework.Toolkits.InputService.Look
+  fullName: JLZFramework.Toolkits.InputService.Look
+  nameWithType: InputService.Look
+- uid: JLZFramework.Toolkits.InputService.Look*
+  name: Look
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Look_
+  commentId: Overload:JLZFramework.Toolkits.InputService.Look
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.InputService.Look
+  nameWithType: InputService.Look
+- uid: JLZFramework.Toolkits.InputService.Move
+  name: Move
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Move
+  commentId: P:JLZFramework.Toolkits.InputService.Move
+  fullName: JLZFramework.Toolkits.InputService.Move
+  nameWithType: InputService.Move
+- uid: JLZFramework.Toolkits.InputService.Move*
+  name: Move
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_Move_
+  commentId: Overload:JLZFramework.Toolkits.InputService.Move
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.InputService.Move
+  nameWithType: InputService.Move
+- uid: JLZFramework.Toolkits.InputService.SwitchToOnlyMap(System.String)
+  name: SwitchToOnlyMap(string)
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_SwitchToOnlyMap_System_String_
+  commentId: M:JLZFramework.Toolkits.InputService.SwitchToOnlyMap(System.String)
+  name.vb: SwitchToOnlyMap(String)
+  fullName: JLZFramework.Toolkits.InputService.SwitchToOnlyMap(string)
+  fullName.vb: JLZFramework.Toolkits.InputService.SwitchToOnlyMap(String)
+  nameWithType: InputService.SwitchToOnlyMap(string)
+  nameWithType.vb: InputService.SwitchToOnlyMap(String)
+- uid: JLZFramework.Toolkits.InputService.SwitchToOnlyMap*
+  name: SwitchToOnlyMap
+  href: api/toolkits/JLZFramework.Toolkits.InputService.html#JLZFramework_Toolkits_InputService_SwitchToOnlyMap_
+  commentId: Overload:JLZFramework.Toolkits.InputService.SwitchToOnlyMap
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.InputService.SwitchToOnlyMap
+  nameWithType: InputService.SwitchToOnlyMap
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1
+  name: MonoSingletonBase<T>
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html
+  commentId: T:JLZFramework.Toolkits.MonoSingletonBase`1
+  name.vb: MonoSingletonBase(Of T)
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T)
+  nameWithType: MonoSingletonBase<T>
+  nameWithType.vb: MonoSingletonBase(Of T)
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.Awake
+  name: Awake()
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_Awake
+  commentId: M:JLZFramework.Toolkits.MonoSingletonBase`1.Awake
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.Awake()
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).Awake()
+  nameWithType: MonoSingletonBase<T>.Awake()
+  nameWithType.vb: MonoSingletonBase(Of T).Awake()
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.Awake*
+  name: Awake
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_Awake_
+  commentId: Overload:JLZFramework.Toolkits.MonoSingletonBase`1.Awake
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.Awake
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).Awake
+  nameWithType: MonoSingletonBase<T>.Awake
+  nameWithType.vb: MonoSingletonBase(Of T).Awake
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.Instance
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_Instance
+  commentId: P:JLZFramework.Toolkits.MonoSingletonBase`1.Instance
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.Instance
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).Instance
+  nameWithType: MonoSingletonBase<T>.Instance
+  nameWithType.vb: MonoSingletonBase(Of T).Instance
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.Instance*
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_Instance_
+  commentId: Overload:JLZFramework.Toolkits.MonoSingletonBase`1.Instance
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.Instance
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).Instance
+  nameWithType: MonoSingletonBase<T>.Instance
+  nameWithType.vb: MonoSingletonBase(Of T).Instance
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.OnSingletonAwake
+  name: OnSingletonAwake()
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_OnSingletonAwake
+  commentId: M:JLZFramework.Toolkits.MonoSingletonBase`1.OnSingletonAwake
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.OnSingletonAwake()
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).OnSingletonAwake()
+  nameWithType: MonoSingletonBase<T>.OnSingletonAwake()
+  nameWithType.vb: MonoSingletonBase(Of T).OnSingletonAwake()
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.OnSingletonAwake*
+  name: OnSingletonAwake
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_OnSingletonAwake_
+  commentId: Overload:JLZFramework.Toolkits.MonoSingletonBase`1.OnSingletonAwake
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.OnSingletonAwake
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).OnSingletonAwake
+  nameWithType: MonoSingletonBase<T>.OnSingletonAwake
+  nameWithType.vb: MonoSingletonBase(Of T).OnSingletonAwake
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.SetGlobalSingleton(System.Boolean)
+  name: SetGlobalSingleton(bool)
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_SetGlobalSingleton_System_Boolean_
+  commentId: M:JLZFramework.Toolkits.MonoSingletonBase`1.SetGlobalSingleton(System.Boolean)
+  name.vb: SetGlobalSingleton(Boolean)
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.SetGlobalSingleton(bool)
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).SetGlobalSingleton(Boolean)
+  nameWithType: MonoSingletonBase<T>.SetGlobalSingleton(bool)
+  nameWithType.vb: MonoSingletonBase(Of T).SetGlobalSingleton(Boolean)
+- uid: JLZFramework.Toolkits.MonoSingletonBase`1.SetGlobalSingleton*
+  name: SetGlobalSingleton
+  href: api/toolkits/JLZFramework.Toolkits.MonoSingletonBase-1.html#JLZFramework_Toolkits_MonoSingletonBase_1_SetGlobalSingleton_
+  commentId: Overload:JLZFramework.Toolkits.MonoSingletonBase`1.SetGlobalSingleton
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.MonoSingletonBase<T>.SetGlobalSingleton
+  fullName.vb: JLZFramework.Toolkits.MonoSingletonBase(Of T).SetGlobalSingleton
+  nameWithType: MonoSingletonBase<T>.SetGlobalSingleton
+  nameWithType.vb: MonoSingletonBase(Of T).SetGlobalSingleton
+- uid: JLZFramework.Toolkits.PlayerPrefsDataMgr
+  name: PlayerPrefsDataMgr
+  href: api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html
+  commentId: T:JLZFramework.Toolkits.PlayerPrefsDataMgr
+  fullName: JLZFramework.Toolkits.PlayerPrefsDataMgr
+  nameWithType: PlayerPrefsDataMgr
+- uid: JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData*
+  name: LoadData
+  href: api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html#JLZFramework_Toolkits_PlayerPrefsDataMgr_LoadData_
+  commentId: Overload:JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData
+  nameWithType: PlayerPrefsDataMgr.LoadData
+- uid: JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData``1(System.String)
+  name: LoadData<T>(string)
+  href: api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html#JLZFramework_Toolkits_PlayerPrefsDataMgr_LoadData__1_System_String_
+  commentId: M:JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData``1(System.String)
+  name.vb: LoadData(Of T)(String)
+  fullName: JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData<T>(string)
+  fullName.vb: JLZFramework.Toolkits.PlayerPrefsDataMgr.LoadData(Of T)(String)
+  nameWithType: PlayerPrefsDataMgr.LoadData<T>(string)
+  nameWithType.vb: PlayerPrefsDataMgr.LoadData(Of T)(String)
+- uid: JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData(System.Object,System.String)
+  name: SaveData(object, string)
+  href: api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html#JLZFramework_Toolkits_PlayerPrefsDataMgr_SaveData_System_Object_System_String_
+  commentId: M:JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData(System.Object,System.String)
+  name.vb: SaveData(Object, String)
+  fullName: JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData(object, string)
+  fullName.vb: JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData(Object, String)
+  nameWithType: PlayerPrefsDataMgr.SaveData(object, string)
+  nameWithType.vb: PlayerPrefsDataMgr.SaveData(Object, String)
+- uid: JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData*
+  name: SaveData
+  href: api/toolkits/JLZFramework.Toolkits.PlayerPrefsDataMgr.html#JLZFramework_Toolkits_PlayerPrefsDataMgr_SaveData_
+  commentId: Overload:JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PlayerPrefsDataMgr.SaveData
+  nameWithType: PlayerPrefsDataMgr.SaveData
+- uid: JLZFramework.Toolkits.PriorityQueue`2
+  name: PriorityQueue<TElement, TPriority>
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html
+  commentId: T:JLZFramework.Toolkits.PriorityQueue`2
+  name.vb: PriorityQueue(Of TElement, TPriority)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  name: PriorityQueue()
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2__ctor
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  name.vb: New()
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New()
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  name: PriorityQueue(IComparer<TPriority>)
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2__ctor_System_Collections_Generic_IComparer__1__
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  name.vb: New(IComparer(Of TPriority))
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue(System.Collections.Generic.IComparer<TPriority>)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New(System.Collections.Generic.IComparer(Of TPriority))
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(IComparer<TPriority>)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(IComparer(Of TPriority))
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32)
+  name: PriorityQueue(int)
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2__ctor_System_Int32_
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32)
+  name.vb: New(Integer)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue(int)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New(Integer)
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(int)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(Integer)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  name: PriorityQueue(int, IComparer<TPriority>)
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2__ctor_System_Int32_System_Collections_Generic_IComparer__1__
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  name.vb: New(Integer, IComparer(Of TPriority))
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue(int, System.Collections.Generic.IComparer<TPriority>)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New(Integer, System.Collections.Generic.IComparer(Of TPriority))
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(int, IComparer<TPriority>)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(Integer, IComparer(Of TPriority))
+- uid: JLZFramework.Toolkits.PriorityQueue`2.#ctor*
+  name: PriorityQueue
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2__ctor_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.PriorityQueue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).New
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Clear
+  name: Clear()
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Clear
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Clear
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Clear()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Clear()
+  nameWithType: PriorityQueue<TElement, TPriority>.Clear()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Clear()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Clear*
+  name: Clear
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Clear_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Clear
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Clear
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Clear
+  nameWithType: PriorityQueue<TElement, TPriority>.Clear
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Clear
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Count
+  name: Count
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Count
+  commentId: P:JLZFramework.Toolkits.PriorityQueue`2.Count
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Count
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Count
+  nameWithType: PriorityQueue<TElement, TPriority>.Count
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Count
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Count*
+  name: Count
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Count_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Count
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Count
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Count
+  nameWithType: PriorityQueue<TElement, TPriority>.Count
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Count
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  name: Dequeue()
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Dequeue
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Dequeue()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Dequeue()
+  nameWithType: PriorityQueue<TElement, TPriority>.Dequeue()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Dequeue()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Dequeue*
+  name: Dequeue
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Dequeue_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Dequeue
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Dequeue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Dequeue
+  nameWithType: PriorityQueue<TElement, TPriority>.Dequeue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Dequeue
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Enqueue(`0,`1)
+  name: Enqueue(TElement, TPriority)
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Enqueue__0__1_
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Enqueue(`0,`1)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Enqueue(TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Enqueue(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.Enqueue(TElement, TPriority)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Enqueue(TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Enqueue*
+  name: Enqueue
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Enqueue_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Enqueue
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Enqueue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Enqueue
+  nameWithType: PriorityQueue<TElement, TPriority>.Enqueue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Enqueue
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Peek
+  name: Peek()
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Peek
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.Peek
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Peek()
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Peek()
+  nameWithType: PriorityQueue<TElement, TPriority>.Peek()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Peek()
+- uid: JLZFramework.Toolkits.PriorityQueue`2.Peek*
+  name: Peek
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_Peek_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.Peek
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.Peek
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).Peek
+  nameWithType: PriorityQueue<TElement, TPriority>.Peek
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Peek
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryDequeue(`0@,`1@)
+  name: TryDequeue(out TElement, out TPriority)
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_TryDequeue__0___1__
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.TryDequeue(`0@,`1@)
+  name.vb: TryDequeue(TElement, TPriority)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryDequeue(out TElement, out TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryDequeue(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.TryDequeue(out TElement, out TPriority)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryDequeue(TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryDequeue*
+  name: TryDequeue
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_TryDequeue_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.TryDequeue
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryDequeue
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryDequeue
+  nameWithType: PriorityQueue<TElement, TPriority>.TryDequeue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryDequeue
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryPeek(`0@,`1@)
+  name: TryPeek(out TElement, out TPriority)
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_TryPeek__0___1__
+  commentId: M:JLZFramework.Toolkits.PriorityQueue`2.TryPeek(`0@,`1@)
+  name.vb: TryPeek(TElement, TPriority)
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryPeek(out TElement, out TPriority)
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryPeek(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.TryPeek(out TElement, out TPriority)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryPeek(TElement, TPriority)
+- uid: JLZFramework.Toolkits.PriorityQueue`2.TryPeek*
+  name: TryPeek
+  href: api/toolkits/JLZFramework.Toolkits.PriorityQueue-2.html#JLZFramework_Toolkits_PriorityQueue_2_TryPeek_
+  commentId: Overload:JLZFramework.Toolkits.PriorityQueue`2.TryPeek
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.PriorityQueue<TElement, TPriority>.TryPeek
+  fullName.vb: JLZFramework.Toolkits.PriorityQueue(Of TElement, TPriority).TryPeek
+  nameWithType: PriorityQueue<TElement, TPriority>.TryPeek
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryPeek
+- uid: JLZFramework.Toolkits.SingletonBase`1
+  name: SingletonBase<T>
+  href: api/toolkits/JLZFramework.Toolkits.SingletonBase-1.html
+  commentId: T:JLZFramework.Toolkits.SingletonBase`1
+  name.vb: SingletonBase(Of T)
+  fullName: JLZFramework.Toolkits.SingletonBase<T>
+  fullName.vb: JLZFramework.Toolkits.SingletonBase(Of T)
+  nameWithType: SingletonBase<T>
+  nameWithType.vb: SingletonBase(Of T)
+- uid: JLZFramework.Toolkits.SingletonBase`1.Instance
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.SingletonBase-1.html#JLZFramework_Toolkits_SingletonBase_1_Instance
+  commentId: P:JLZFramework.Toolkits.SingletonBase`1.Instance
+  fullName: JLZFramework.Toolkits.SingletonBase<T>.Instance
+  fullName.vb: JLZFramework.Toolkits.SingletonBase(Of T).Instance
+  nameWithType: SingletonBase<T>.Instance
+  nameWithType.vb: SingletonBase(Of T).Instance
+- uid: JLZFramework.Toolkits.SingletonBase`1.Instance*
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.SingletonBase-1.html#JLZFramework_Toolkits_SingletonBase_1_Instance_
+  commentId: Overload:JLZFramework.Toolkits.SingletonBase`1.Instance
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.SingletonBase<T>.Instance
+  fullName.vb: JLZFramework.Toolkits.SingletonBase(Of T).Instance
+  nameWithType: SingletonBase<T>.Instance
+  nameWithType.vb: SingletonBase(Of T).Instance
+- uid: JLZFramework.Toolkits.SingletonLazy`1
+  name: SingletonLazy<T>
+  href: api/toolkits/JLZFramework.Toolkits.SingletonLazy-1.html
+  commentId: T:JLZFramework.Toolkits.SingletonLazy`1
+  name.vb: SingletonLazy(Of T)
+  fullName: JLZFramework.Toolkits.SingletonLazy<T>
+  fullName.vb: JLZFramework.Toolkits.SingletonLazy(Of T)
+  nameWithType: SingletonLazy<T>
+  nameWithType.vb: SingletonLazy(Of T)
+- uid: JLZFramework.Toolkits.SingletonLazy`1.Instance
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.SingletonLazy-1.html#JLZFramework_Toolkits_SingletonLazy_1_Instance
+  commentId: P:JLZFramework.Toolkits.SingletonLazy`1.Instance
+  fullName: JLZFramework.Toolkits.SingletonLazy<T>.Instance
+  fullName.vb: JLZFramework.Toolkits.SingletonLazy(Of T).Instance
+  nameWithType: SingletonLazy<T>.Instance
+  nameWithType.vb: SingletonLazy(Of T).Instance
+- uid: JLZFramework.Toolkits.SingletonLazy`1.Instance*
+  name: Instance
+  href: api/toolkits/JLZFramework.Toolkits.SingletonLazy-1.html#JLZFramework_Toolkits_SingletonLazy_1_Instance_
+  commentId: Overload:JLZFramework.Toolkits.SingletonLazy`1.Instance
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.SingletonLazy<T>.Instance
+  fullName.vb: JLZFramework.Toolkits.SingletonLazy(Of T).Instance
+  nameWithType: SingletonLazy<T>.Instance
+  nameWithType.vb: SingletonLazy(Of T).Instance
+- uid: JLZFramework.Toolkits.事件中心
+  name: JLZFramework.Toolkits.事件中心
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.html
+  commentId: N:JLZFramework.Toolkits.事件中心
+  fullName: JLZFramework.Toolkits.事件中心
+  nameWithType: JLZFramework.Toolkits.事件中心
+- uid: JLZFramework.Toolkits.事件中心.EventBus
+  name: EventBus
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html
+  commentId: T:JLZFramework.Toolkits.事件中心.EventBus
+  fullName: JLZFramework.Toolkits.事件中心.EventBus
+  nameWithType: EventBus
+- uid: JLZFramework.Toolkits.事件中心.EventBus.Clear
+  name: Clear()
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html#JLZFramework_Toolkits______EventBus_Clear
+  commentId: M:JLZFramework.Toolkits.事件中心.EventBus.Clear
+  fullName: JLZFramework.Toolkits.事件中心.EventBus.Clear()
+  nameWithType: EventBus.Clear()
+- uid: JLZFramework.Toolkits.事件中心.EventBus.Clear*
+  name: Clear
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html#JLZFramework_Toolkits______EventBus_Clear_
+  commentId: Overload:JLZFramework.Toolkits.事件中心.EventBus.Clear
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.事件中心.EventBus.Clear
+  nameWithType: EventBus.Clear
+- uid: JLZFramework.Toolkits.事件中心.EventBus.Publish*
+  name: Publish
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html#JLZFramework_Toolkits______EventBus_Publish_
+  commentId: Overload:JLZFramework.Toolkits.事件中心.EventBus.Publish
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.事件中心.EventBus.Publish
+  nameWithType: EventBus.Publish
+- uid: JLZFramework.Toolkits.事件中心.EventBus.Publish``1(``0)
+  name: Publish<TEvent>(TEvent)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html#JLZFramework_Toolkits______EventBus_Publish__1___0_
+  commentId: M:JLZFramework.Toolkits.事件中心.EventBus.Publish``1(``0)
+  name.vb: Publish(Of TEvent)(TEvent)
+  fullName: JLZFramework.Toolkits.事件中心.EventBus.Publish<TEvent>(TEvent)
+  fullName.vb: JLZFramework.Toolkits.事件中心.EventBus.Publish(Of TEvent)(TEvent)
+  nameWithType: EventBus.Publish<TEvent>(TEvent)
+  nameWithType.vb: EventBus.Publish(Of TEvent)(TEvent)
+- uid: JLZFramework.Toolkits.事件中心.EventBus.Subscribe*
+  name: Subscribe
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html#JLZFramework_Toolkits______EventBus_Subscribe_
+  commentId: Overload:JLZFramework.Toolkits.事件中心.EventBus.Subscribe
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.事件中心.EventBus.Subscribe
+  nameWithType: EventBus.Subscribe
+- uid: JLZFramework.Toolkits.事件中心.EventBus.Subscribe``1(System.Action{``0})
+  name: Subscribe<TEvent>(Action<TEvent>)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BA%8B%E4%BB%B6%E4%B8%AD%E5%BF%83.EventBus.html#JLZFramework_Toolkits______EventBus_Subscribe__1_System_Action___0__
+  commentId: M:JLZFramework.Toolkits.事件中心.EventBus.Subscribe``1(System.Action{``0})
+  name.vb: Subscribe(Of TEvent)(Action(Of TEvent))
+  fullName: JLZFramework.Toolkits.事件中心.EventBus.Subscribe<TEvent>(System.Action<TEvent>)
+  fullName.vb: JLZFramework.Toolkits.事件中心.EventBus.Subscribe(Of TEvent)(System.Action(Of TEvent))
+  nameWithType: EventBus.Subscribe<TEvent>(Action<TEvent>)
+  nameWithType.vb: EventBus.Subscribe(Of TEvent)(Action(Of TEvent))
+- uid: JLZFramework.Toolkits.优先级队列
+  name: JLZFramework.Toolkits.优先级队列
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.html
+  commentId: N:JLZFramework.Toolkits.优先级队列
+  fullName: JLZFramework.Toolkits.优先级队列
+  nameWithType: JLZFramework.Toolkits.优先级队列
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+  name: PriorityQueue<TElement, TPriority>
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html
+  commentId: T:JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+  name.vb: PriorityQueue(Of TElement, TPriority)
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority)
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor
+  name: PriorityQueue()
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2__ctor
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor
+  name.vb: New()
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.PriorityQueue()
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).New()
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New()
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  name: PriorityQueue(IComparer<TPriority>)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2__ctor_System_Collections_Generic_IComparer__1__
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor(System.Collections.Generic.IComparer{`1})
+  name.vb: New(IComparer(Of TPriority))
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.PriorityQueue(System.Collections.Generic.IComparer<TPriority>)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).New(System.Collections.Generic.IComparer(Of TPriority))
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(IComparer<TPriority>)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(IComparer(Of TPriority))
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor(System.Int32)
+  name: PriorityQueue(int)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2__ctor_System_Int32_
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor(System.Int32)
+  name.vb: New(Integer)
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.PriorityQueue(int)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).New(Integer)
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(int)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(Integer)
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  name: PriorityQueue(int, IComparer<TPriority>)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2__ctor_System_Int32_System_Collections_Generic_IComparer__1__
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor(System.Int32,System.Collections.Generic.IComparer{`1})
+  name.vb: New(Integer, IComparer(Of TPriority))
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.PriorityQueue(int, System.Collections.Generic.IComparer<TPriority>)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).New(Integer, System.Collections.Generic.IComparer(Of TPriority))
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue(int, IComparer<TPriority>)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New(Integer, IComparer(Of TPriority))
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor*
+  name: PriorityQueue
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2__ctor_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.#ctor
+  isSpec: "True"
+  name.vb: New
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.PriorityQueue
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).New
+  nameWithType: PriorityQueue<TElement, TPriority>.PriorityQueue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).New
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Clear
+  name: Clear()
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Clear
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Clear
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Clear()
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Clear()
+  nameWithType: PriorityQueue<TElement, TPriority>.Clear()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Clear()
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Clear*
+  name: Clear
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Clear_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Clear
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Clear
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Clear
+  nameWithType: PriorityQueue<TElement, TPriority>.Clear
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Clear
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Count
+  name: Count
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Count
+  commentId: P:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Count
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Count
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Count
+  nameWithType: PriorityQueue<TElement, TPriority>.Count
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Count
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Count*
+  name: Count
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Count_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Count
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Count
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Count
+  nameWithType: PriorityQueue<TElement, TPriority>.Count
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Count
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Dequeue
+  name: Dequeue()
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Dequeue
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Dequeue
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Dequeue()
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Dequeue()
+  nameWithType: PriorityQueue<TElement, TPriority>.Dequeue()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Dequeue()
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Dequeue*
+  name: Dequeue
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Dequeue_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Dequeue
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Dequeue
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Dequeue
+  nameWithType: PriorityQueue<TElement, TPriority>.Dequeue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Dequeue
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Enqueue(`0,`1)
+  name: Enqueue(TElement, TPriority)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Enqueue__0__1_
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Enqueue(`0,`1)
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Enqueue(TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Enqueue(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.Enqueue(TElement, TPriority)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Enqueue(TElement, TPriority)
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Enqueue*
+  name: Enqueue
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Enqueue_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Enqueue
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Enqueue
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Enqueue
+  nameWithType: PriorityQueue<TElement, TPriority>.Enqueue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Enqueue
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Peek
+  name: Peek()
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Peek
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Peek
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Peek()
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Peek()
+  nameWithType: PriorityQueue<TElement, TPriority>.Peek()
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Peek()
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Peek*
+  name: Peek
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_Peek_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.Peek
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.Peek
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).Peek
+  nameWithType: PriorityQueue<TElement, TPriority>.Peek
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).Peek
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryDequeue(`0@,`1@)
+  name: TryDequeue(out TElement, out TPriority)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_TryDequeue__0___1__
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryDequeue(`0@,`1@)
+  name.vb: TryDequeue(TElement, TPriority)
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.TryDequeue(out TElement, out TPriority)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).TryDequeue(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.TryDequeue(out TElement, out TPriority)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryDequeue(TElement, TPriority)
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryDequeue*
+  name: TryDequeue
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_TryDequeue_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryDequeue
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.TryDequeue
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).TryDequeue
+  nameWithType: PriorityQueue<TElement, TPriority>.TryDequeue
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryDequeue
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryPeek(`0@,`1@)
+  name: TryPeek(out TElement, out TPriority)
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_TryPeek__0___1__
+  commentId: M:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryPeek(`0@,`1@)
+  name.vb: TryPeek(TElement, TPriority)
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.TryPeek(out TElement, out TPriority)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).TryPeek(TElement, TPriority)
+  nameWithType: PriorityQueue<TElement, TPriority>.TryPeek(out TElement, out TPriority)
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryPeek(TElement, TPriority)
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryPeek*
+  name: TryPeek
+  href: api/toolkits/JLZFramework.Toolkits.%E4%BC%98%E5%85%88%E7%BA%A7%E9%98%9F%E5%88%97.PriorityQueue-2.html#JLZFramework_Toolkits_______PriorityQueue_2_TryPeek_
+  commentId: Overload:JLZFramework.Toolkits.优先级队列.PriorityQueue`2.TryPeek
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>.TryPeek
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority).TryPeek
+  nameWithType: PriorityQueue<TElement, TPriority>.TryPeek
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority).TryPeek
+- uid: JLZFramework.Toolkits.存档系统
+  name: JLZFramework.Toolkits.存档系统
+  href: api/toolkits/JLZFramework.Toolkits.%E5%AD%98%E6%A1%A3%E7%B3%BB%E7%BB%9F.html
+  commentId: N:JLZFramework.Toolkits.存档系统
+  fullName: JLZFramework.Toolkits.存档系统
+  nameWithType: JLZFramework.Toolkits.存档系统
+- uid: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr
+  name: PlayerPrefsDataMgr
+  href: api/toolkits/JLZFramework.Toolkits.%E5%AD%98%E6%A1%A3%E7%B3%BB%E7%BB%9F.PlayerPrefsDataMgr.html
+  commentId: T:JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr
+  fullName: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr
+  nameWithType: PlayerPrefsDataMgr
+- uid: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData*
+  name: LoadData
+  href: api/toolkits/JLZFramework.Toolkits.%E5%AD%98%E6%A1%A3%E7%B3%BB%E7%BB%9F.PlayerPrefsDataMgr.html#JLZFramework_Toolkits______PlayerPrefsDataMgr_LoadData_
+  commentId: Overload:JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData
+  nameWithType: PlayerPrefsDataMgr.LoadData
+- uid: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData``1(System.String)
+  name: LoadData<T>(string)
+  href: api/toolkits/JLZFramework.Toolkits.%E5%AD%98%E6%A1%A3%E7%B3%BB%E7%BB%9F.PlayerPrefsDataMgr.html#JLZFramework_Toolkits______PlayerPrefsDataMgr_LoadData__1_System_String_
+  commentId: M:JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData``1(System.String)
+  name.vb: LoadData(Of T)(String)
+  fullName: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData<T>(string)
+  fullName.vb: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.LoadData(Of T)(String)
+  nameWithType: PlayerPrefsDataMgr.LoadData<T>(string)
+  nameWithType.vb: PlayerPrefsDataMgr.LoadData(Of T)(String)
+- uid: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData(System.Object,System.String)
+  name: SaveData(object, string)
+  href: api/toolkits/JLZFramework.Toolkits.%E5%AD%98%E6%A1%A3%E7%B3%BB%E7%BB%9F.PlayerPrefsDataMgr.html#JLZFramework_Toolkits______PlayerPrefsDataMgr_SaveData_System_Object_System_String_
+  commentId: M:JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData(System.Object,System.String)
+  name.vb: SaveData(Object, String)
+  fullName: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData(object, string)
+  fullName.vb: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData(Object, String)
+  nameWithType: PlayerPrefsDataMgr.SaveData(object, string)
+  nameWithType.vb: PlayerPrefsDataMgr.SaveData(Object, String)
+- uid: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData*
+  name: SaveData
+  href: api/toolkits/JLZFramework.Toolkits.%E5%AD%98%E6%A1%A3%E7%B3%BB%E7%BB%9F.PlayerPrefsDataMgr.html#JLZFramework_Toolkits______PlayerPrefsDataMgr_SaveData_
+  commentId: Overload:JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData
+  isSpec: "True"
+  fullName: JLZFramework.Toolkits.存档系统.PlayerPrefsDataMgr.SaveData
+  nameWithType: PlayerPrefsDataMgr.SaveData

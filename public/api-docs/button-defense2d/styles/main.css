@@ -1,0 +1,9 @@
+/*
+ * Every project is built as an independent DocFX site. The shared toc is
+ * intentionally flat: the legacy DocFX v2 header expands nested items
+ * vertically and can overlap the article area.
+ */
+#navbar .level2,
+#navbar .expand-stub {
+  display: none;
+}

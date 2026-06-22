@@ -1,0 +1,48 @@
+### YamlMime:ManagedReference
+items:
+- uid: JLZFramework.Toolkits.优先级队列
+  commentId: N:JLZFramework.Toolkits.优先级队列
+  id: JLZFramework.Toolkits.优先级队列
+  children:
+  - JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+  langs:
+  - csharp
+  - vb
+  name: JLZFramework.Toolkits.优先级队列
+  nameWithType: JLZFramework.Toolkits.优先级队列
+  fullName: JLZFramework.Toolkits.优先级队列
+  type: Namespace
+  assemblies:
+  - PriorityQueue
+references:
+- uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+  commentId: T:JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+  href: JLZFramework.Toolkits.优先级队列.PriorityQueue-2.html
+  name: PriorityQueue<TElement, TPriority>
+  nameWithType: PriorityQueue<TElement, TPriority>
+  fullName: JLZFramework.Toolkits.优先级队列.PriorityQueue<TElement, TPriority>
+  nameWithType.vb: PriorityQueue(Of TElement, TPriority)
+  fullName.vb: JLZFramework.Toolkits.优先级队列.PriorityQueue(Of TElement, TPriority)
+  name.vb: PriorityQueue(Of TElement, TPriority)
+  spec.csharp:
+  - uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+    name: PriorityQueue
+    href: JLZFramework.Toolkits.优先级队列.PriorityQueue-2.html
+  - name: <
+  - name: TElement
+  - name: ','
+  - name: " "
+  - name: TPriority
+  - name: '>'
+  spec.vb:
+  - uid: JLZFramework.Toolkits.优先级队列.PriorityQueue`2
+    name: PriorityQueue
+    href: JLZFramework.Toolkits.优先级队列.PriorityQueue-2.html
+  - name: (
+  - name: Of
+  - name: " "
+  - name: TElement
+  - name: ','
+  - name: " "
+  - name: TPriority
+  - name: )

@@ -1,0 +1,12 @@
+/*
+ * DocFX uses this same toc.yml both for the desktop header and for the
+ * left-hand documentation tree.  The default v2 template renders nested
+ * items directly inside the header, which makes a two-level category grow
+ * vertically and overlap the document area.  Keep the hierarchy in the
+ * side navigation, but show only the useful top-level category in the
+ * header.  The category itself links to its guide page.
+ */
+#navbar .level2,
+#navbar .expand-stub {
+  display: none;
+}

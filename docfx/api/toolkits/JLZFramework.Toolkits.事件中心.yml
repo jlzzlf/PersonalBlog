@@ -1,0 +1,23 @@
+### YamlMime:ManagedReference
+items:
+- uid: JLZFramework.Toolkits.事件中心
+  commentId: N:JLZFramework.Toolkits.事件中心
+  id: JLZFramework.Toolkits.事件中心
+  children:
+  - JLZFramework.Toolkits.事件中心.EventBus
+  langs:
+  - csharp
+  - vb
+  name: JLZFramework.Toolkits.事件中心
+  nameWithType: JLZFramework.Toolkits.事件中心
+  fullName: JLZFramework.Toolkits.事件中心
+  type: Namespace
+  assemblies:
+  - EventBus
+references:
+- uid: JLZFramework.Toolkits.事件中心.EventBus
+  commentId: T:JLZFramework.Toolkits.事件中心.EventBus
+  href: JLZFramework.Toolkits.事件中心.EventBus.html
+  name: EventBus
+  nameWithType: EventBus
+  fullName: JLZFramework.Toolkits.事件中心.EventBus

@@ -1,0 +1,61 @@
+---
+import { Image } from 'astro:assets';
+import HomeAvatar from '../../assets/home-avatar.jpg';
+import { profileContent } from '../../data/home/profile';
+
+const entries = [
+	{
+		badge: 'API',
+		title: '接口文档',
+		description: '个人代码 API Reference · DocFX',
+		href: '/api-docs/toolkits/manual/index.html',
+	},
+	{
+		badge: 'Q&A',
+		title: '面试归档',
+		description: 'Unity、C# 面试题与复盘笔记',
+		href: '/interviews/',
+	},
+] as const;
+---
+
+<article class="home-card resource-card home-reveal" data-reveal-card>
+	<div class="recent-card__avatar resource-card__avatar">
+		<div class="recent-card__avatar-frame">
+			<Image
+				src={HomeAvatar}
+				alt="头像"
+				class="recent-card__avatar-image"
+				width={160}
+				loading="eager"
+				decoding="async"
+				quality={72}
+			/>
+		</div>
+		<div>
+			<p>{profileContent.note}</p>
+			<span>{profileContent.role}</span>
+		</div>
+	</div>
+
+	<div class="resource-card__header">
+		<p class="section-kicker">Knowledge Base</p>
+		<h2>资料入口</h2>
+		<p>将个人代码文档与可持续整理的面试笔记放在这里。</p>
+	</div>
+
+	<nav class="resource-card__entries" aria-label="资料入口">
+		{
+			entries.map((entry) => (
+				<a class="resource-entry" href={entry.href}>
+					<span class="resource-entry__badge" aria-hidden="true">{entry.badge}</span>
+					<span class="resource-entry__copy">
+						<strong>{entry.title}</strong>
+						<small>{entry.description}</small>
+					</span>
+					<span class="resource-entry__arrow" aria-hidden="true">→</span>
+				</a>
+			))
+		}
+	</nav>
+</article>

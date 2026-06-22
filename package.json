@@ -5,9 +5,12 @@
   "engines": {
     "node": ">=22.12.0"
   },
-  "scripts": {
+	"scripts": {
 		"dev": "astro dev",
 		"build": "astro build",
+		"docs:toolkits": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-toolkits-docs.ps1",
+		"docs:button-defense": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-button-defense-docs.ps1",
+		"docs:all": "npm run docs:toolkits && npm run docs:button-defense",
     "preview": "astro preview",
     "astro": "astro"
   },

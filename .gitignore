@@ -5,6 +5,13 @@ dist/
 
 # dependencies
 node_modules/
+.tools/
+tools/docfx/
+tools/docfx-*/
+tools/*.zip
+docfx/sites/*/api/
+docfx/sites/*/manual/
+docfx/sites/*/toc.yml
 
 # logs
 npm-debug.log*

@@ -39,7 +39,7 @@ const splitStatValue = (value: string) => {
 				>
 					<dt>
 						<span class="stat-card__icon" aria-hidden="true">{iconLabels[index] ?? '数'}</span>
-						<span>{stat.label}</span>
+						<span class="stat-card__label">{stat.label}</span>
 					</dt>
 					<dd>
 						{
@@ -47,6 +47,8 @@ const splitStatValue = (value: string) => {
 								<a class="stat-card__link" href={stat.href}>
 									{stat.value}<span aria-hidden="true">→</span>
 								</a>
+							) : stat.animate === false ? (
+								<span>{stat.value}</span>
 							) : (
 								<>
 									<span
