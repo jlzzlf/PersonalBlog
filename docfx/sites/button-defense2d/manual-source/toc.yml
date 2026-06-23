@@ -2,5 +2,17 @@
   href: index.md
 - name: Grid 系统
   href: grid-system.md
+- name: 场景启动与游戏流程
+  href: scene-flow.md
+- name: 资源、按钮与奖励
+  href: resources-button-reward.md
+- name: 建造系统
+  href: build.md
+- name: 角色系统
+  href: characters.md
+- name: 波次系统
+  href: waves.md
+- name: 输入与表现组件
+  href: input-view.md
 - name: API Reference
   href: ../api/

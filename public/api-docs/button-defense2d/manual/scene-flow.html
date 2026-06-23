@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>场景启动与游戏流程 | 个人代码文档 &#183; ButtonDefense2D </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="场景启动与游戏流程 | 个人代码文档 &#183; ButtonDefense2D ">
+    
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="个人代码文档">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="场景启动与游戏流程">场景启动与游戏流程</h1>
+
+<h2 id="模块职责">模块职责</h2>
+<p>流程模块是 Game 内部运行时的主编排层。它把场景配置、资源、按钮、建造、波次、角色、奖励和寻路缓存连接成一局游戏。</p>
+<p>其他模块应把“开始游戏、开波、暂停、继续、失败、胜利、奖励后进入下一波”等流程动作交给 <code>GameFlowSystem</code>，不要各自直接改多个子系统。</p>
+<h2 id="模块间接口">模块间接口</h2>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>作为被调用方时提供的接口</th>
+<th>主要调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameSceneContext</code></td>
+<td>提供本场景配置数据和 <code>TryValidate</code></td>
+<td><code>GameBoot</code>、<code>GameFlowSystem</code>、<code>LevelPointSystem</code>、<code>BuildSystem</code>、<code>WaveSystem</code></td>
+</tr>
+<tr>
+<td><code>GameBoot</code></td>
+<td>Unity 生命周期入口，公开场景引用</td>
+<td>场景对象，不作为业务模块调用入口</td>
+</tr>
+<tr>
+<td><code>GameFlowSystem</code></td>
+<td>游戏流程动作入口</td>
+<td>UI、输入、调试工具、其他流程脚本</td>
+</tr>
+<tr>
+<td><code>GameStateModel</code></td>
+<td>游戏状态读写和状态变化事件</td>
+<td><code>GameFlowSystem</code> 写入，UI/输入/表现读取或监听</td>
+</tr>
+<tr>
+<td><code>GameRuntimeModel</code></td>
+<td>当前波次和最大波次</td>
+<td><code>GameFlowSystem</code> 写入，UI/调试读取</td>
+</tr>
+<tr>
+<td><code>LevelPointSystem</code></td>
+<td>运行时出生点和按钮目标点</td>
+<td><code>GameFlowSystem</code> 初始化，<code>WaveSystem</code> 和寻路逻辑读取</td>
+</tr>
+</tbody>
+</table>
+<h2 id="启动顺序">启动顺序</h2>
+<p><code>GameBoot</code> 在场景中负责串联启动：</p>
+<ol>
+<li><code>Awake</code> 中获取 <code>GameFlowSystem</code> 和 <code>FlowFieldService</code>。</li>
+<li>调用 <code>GameFlowSystem.ConfigureScene(sceneContext)</code>。</li>
+<li>调用 <code>FlowFieldService.GiveBuilderQuery(gridQueryService)</code>。</li>
+<li><code>Start</code> 中调用 <code>GameFlowSystem.StartGame()</code>。</li>
+<li><code>Update</code> 中调用 <code>FlowFieldService.RebuildDirtyFields()</code>，统一刷新脏流场。</li>
+</ol>
+<p>这意味着大多数运行时模块不需要主动初始化自己，只需要在 <code>GameFlowSystem.StartGame()</code> 的流程里被调度。</p>
+<h2 id="gamescenecontext"><code>GameSceneContext</code></h2>
+<p>跨模块使用的公开成员：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+<th>调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GridQueryService GridQueryService</code></td>
+<td>当前场景网格查询服务</td>
+<td><code>GameFlowSystem</code>、<code>BuildSystem</code>、<code>WaveSystem</code>、<code>LevelPointSystem</code></td>
+</tr>
+<tr>
+<td><code>int MaxWave</code></td>
+<td>本局最大波次</td>
+<td><code>GameRuntimeModel.BeginNewRun</code></td>
+</tr>
+<tr>
+<td><code>int InitialPower</code></td>
+<td>初始电量</td>
+<td><code>ResourceSystem.BeginRun</code></td>
+</tr>
+<tr>
+<td><code>int ButtonHp</code></td>
+<td>按钮初始血量</td>
+<td><code>ButtonSystem.BeginRun</code></td>
+</tr>
+<tr>
+<td><code>List&lt;Vector2Int&gt; SpawnCells</code></td>
+<td>出生格配置</td>
+<td><code>LevelPointSystem</code>、<code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>List&lt;Vector2Int&gt; ButtonArrivalCells</code></td>
+<td>按钮目标格配置</td>
+<td><code>LevelPointSystem</code>、<code>BuildSystem</code>、<code>FlowFieldService</code></td>
+</tr>
+<tr>
+<td><code>TryValidate(out string error)</code></td>
+<td>启动前校验关键引用和点位</td>
+<td><code>GameFlowSystem.StartGame</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li><code>GameSceneContext</code> 是场景配置源，不负责运行时逻辑。</li>
+<li><code>SpawnCells</code> 和 <code>ButtonArrivalCells</code> 在一局开始后会被复制到 <code>LevelPointSystem</code>，运行中不要直接修改它们来驱动逻辑。</li>
+<li>运行中如果关卡目标格发生变化，应通过对应运行时系统同步更新，而不是只改 <code>GameSceneContext</code>。</li>
+</ul>
+<h2 id="gameflowsystem"><code>GameFlowSystem</code></h2>
+<p>跨模块调用入口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>作用</th>
+<th>状态约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ConfigureScene(GameSceneContext sceneContext)</code></td>
+<td>绑定当前场景配置</td>
+<td><code>StartGame</code> 前调用</td>
+</tr>
+<tr>
+<td><code>StartGame()</code></td>
+<td>开始新一局并初始化所有核心系统</td>
+<td>需要有效 <code>GameSceneContext</code></td>
+</tr>
+<tr>
+<td><code>StartCurrentWave()</code></td>
+<td>从备战进入当前波次</td>
+<td>仅 <code>Preparing</code> 生效</td>
+</tr>
+<tr>
+<td><code>PauseGame()</code></td>
+<td>暂停并允许建造编辑</td>
+<td>仅 <code>Playing</code> 生效</td>
+</tr>
+<tr>
+<td><code>ResumeGame()</code></td>
+<td>继续游戏并刷新脏流场</td>
+<td>仅 <code>Paused</code> 生效</td>
+</tr>
+<tr>
+<td><code>SelectReward(string rewardId)</code></td>
+<td>应用奖励并推进下一阶段</td>
+<td>仅 <code>RewardSelecting</code> 生效</td>
+</tr>
+<tr>
+<td><code>EndGame()</code></td>
+<td>进入失败状态</td>
+<td><code>Victory</code> 或 <code>GameOver</code> 后不重复执行</td>
+</tr>
+</tbody>
+</table>
+<p><code>StartGame()</code> 内部协作顺序：</p>
+<ol>
+<li>校验 <code>GameSceneContext</code>。</li>
+<li>设置状态为 <code>Booting</code>。</li>
+<li>停止旧波次、清理角色、取消奖励选择、清空流场缓存。</li>
+<li>重置建造、波次、资源、按钮和运行时模型。</li>
+<li>用场景点位初始化 <code>LevelPointSystem</code>。</li>
+<li>初始化关卡建造保留格。</li>
+<li>为按钮目标创建或获取流场。</li>
+<li>初始化 <code>WaveSystem</code> 和 <code>RewardSystem</code>。</li>
+<li>进入 <code>Preparing</code> 并允许建造。</li>
+</ol>
+<p>内部约束：</p>
+<ul>
+<li><code>GameFlowSystem</code> 是状态机边界。其他模块不应直接把状态从 <code>Playing</code> 改到 <code>Preparing</code>。</li>
+<li><code>StartCurrentWave()</code> 会在开波前统一刷新流场，确保备战期间的建筑变化生效。</li>
+<li><code>PauseGame()</code> 会设置 <code>Time.timeScale = 0</code>，同时允许编辑建造。</li>
+<li><code>ResumeGame()</code> 会先刷新流场，再恢复 <code>Playing</code> 和时间。</li>
+</ul>
+<h2 id="gamestatemodel"><code>GameStateModel</code></h2>
+<p>跨模块使用成员：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+<th>写入方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameState CurrentState</code></td>
+<td>当前状态</td>
+<td><code>GameFlowSystem</code></td>
+</tr>
+<tr>
+<td><code>GameState PreviousState</code></td>
+<td>上一个状态</td>
+<td><code>GameFlowSystem</code></td>
+</tr>
+<tr>
+<td><code>event Action&lt;GameState, GameState&gt; StateChanged</code></td>
+<td>状态变化通知</td>
+<td><code>GameStateModel.SetState</code></td>
+</tr>
+<tr>
+<td><code>SetState(GameState state)</code></td>
+<td>设置状态并触发通知</td>
+<td>原则上仅 <code>GameFlowSystem</code></td>
+</tr>
+</tbody>
+</table>
+<p>状态语义：</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>None</code></td>
+<td>尚未进入运行流程</td>
+</tr>
+<tr>
+<td><code>Booting</code></td>
+<td>本局启动中</td>
+</tr>
+<tr>
+<td><code>Preparing</code></td>
+<td>备战，可建造</td>
+</tr>
+<tr>
+<td><code>Playing</code></td>
+<td>波次进行中</td>
+</tr>
+<tr>
+<td><code>Paused</code></td>
+<td>暂停，可建造</td>
+</tr>
+<tr>
+<td><code>RewardSelecting</code></td>
+<td>等待奖励选择</td>
+</tr>
+<tr>
+<td><code>Victory</code></td>
+<td>胜利</td>
+</tr>
+<tr>
+<td><code>GameOver</code></td>
+<td>失败</td>
+</tr>
+</tbody>
+</table>
+<p>调用约定：</p>
+<ul>
+<li>输入、UI、表现组件应监听 <code>StateChanged</code> 或读取 <code>CurrentState</code>。</li>
+<li>只有流程主控需要调用 <code>SetState</code>。如果新增系统必须改变大流程，应先通过 <code>GameFlowSystem</code> 增加明确方法。</li>
+</ul>
+<h2 id="gameruntimemodel"><code>GameRuntimeModel</code></h2>
+<p>跨模块使用成员：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+<th>调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CurrentWave</code></td>
+<td>当前波次</td>
+<td>UI、调试、<code>GameFlowSystem</code></td>
+</tr>
+<tr>
+<td><code>MaxWave</code></td>
+<td>最大波次</td>
+<td>UI、调试、<code>GameFlowSystem</code></td>
+</tr>
+<tr>
+<td><code>IsFinalWave</code></td>
+<td>是否最后一波</td>
+<td><code>GameFlowSystem</code></td>
+</tr>
+<tr>
+<td><code>BeginNewRun(int maxWave)</code></td>
+<td>初始化本局波次计数</td>
+<td><code>GameFlowSystem.StartGame</code></td>
+</tr>
+<tr>
+<td><code>TryAdvanceToNextWave()</code></td>
+<td>尝试推进到下一波</td>
+<td><code>GameFlowSystem</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>波次推进由 <code>GameFlowSystem</code> 调用 <code>TryAdvanceToNextWave()</code>。</li>
+<li><code>WaveSystem.CurrentWave</code> 表示波次系统正在运行的波次，<code>GameRuntimeModel.CurrentWave</code> 表示流程层当前应该启动的波次。</li>
+</ul>
+<h2 id="levelpointsystem"><code>LevelPointSystem</code></h2>
+<p>跨模块使用成员：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+<th>调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SpawnCells</code></td>
+<td>运行时出生格列表</td>
+<td><code>WaveSystem</code>、调试工具</td>
+</tr>
+<tr>
+<td><code>ButtonArrivalCells</code></td>
+<td>运行时按钮目标格列表</td>
+<td><code>GameFlowSystem</code>、<code>FlowFieldService</code></td>
+</tr>
+<tr>
+<td><code>BeginRun(GameSceneContext context)</code></td>
+<td>从场景配置复制并校验点位</td>
+<td><code>GameFlowSystem.StartGame</code></td>
+</tr>
+<tr>
+<td><code>GetSpawnCell(int index)</code></td>
+<td>按索引循环获取出生格</td>
+<td><code>WaveSystem</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>该系统只负责点位转换和读取，不负责生成角色。</li>
+<li><code>GetSpawnCell</code> 会按出生点数量取模，适合批量生成时轮询多个出生点。</li>
+<li>如果没有出生点会抛出异常，因此必须先通过 <code>GameSceneContext.TryValidate</code> 和 <code>BeginRun</code>。</li>
+</ul>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

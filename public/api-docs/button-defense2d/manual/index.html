@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-      <title>Grid 系统文档样例 | 个人代码文档 &#183; ButtonDefense2D </title>
+      <title>Game 程序集内部接口文档 | 个人代码文档 &#183; ButtonDefense2D </title>
       <meta name="viewport" content="width=device-width">
-      <meta name="title" content="Grid 系统文档样例 | 个人代码文档 &#183; ButtonDefense2D ">
+      <meta name="title" content="Game 程序集内部接口文档 | 个人代码文档 &#183; ButtonDefense2D ">
     
     
       <link rel="shortcut icon" href="../favicon.ico">
@@ -67,19 +67,81 @@
         <div class="article row grid-right">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="grid-系统文档样例">Grid 系统文档样例</h1>
+<h1 id="game-程序集内部接口文档">Game 程序集内部接口文档</h1>
 
-<p>这是 ButtonDefense2D 的第一份项目文档。它以 <code>Assets/Project/Runtime/Core/Grid</code> 为范围，说明项目手册与 API Reference 如何配合。</p>
-<h2 id="从哪里开始">从哪里开始</h2>
-<p>对外查询网格、建造和移动规则时，优先通过 <code>GridQueryService.Instance</code>。它聚合了网格大小、坐标转换、可通行性与建筑放置查询，避免调用方直接依赖各个内部 Layer。</p>
-<h2 id="文档结构">文档结构</h2>
+<h2 id="文档定位">文档定位</h2>
+<p>这里记录 <code>Game</code> 程序集内部各运行时模块之间的调用接口和使用约定。</p>
+<p>不展开的内容：</p>
 <ul>
-<li><a href="grid-system.html">Grid 系统</a>：解释职责、坐标规则和最小调用方式。</li>
-<li>左侧目录的 API Reference：由 <code>Game.csproj</code> 中的 XML 注释自动生成。</li>
+<li>私有方法、内部算法和具体实现过程。</li>
+<li>JLZFramework 本身的框架机制。</li>
+<li>Grid 模块的完整文档。其他模块依赖 <code>Cell</code>、<code>GridQueryService</code>、<code>IFlowField</code> 时，只说明协作边界。</li>
+<li>Gizmos、开发者调试面板、过时目录里的旧接口。</li>
 </ul>
-<blockquote>
-<p>当前 API Reference 会包含 <code>Game</code> 程序集的公开类型；这只是项目文档的起点。以后项目拆分出更细的程序集时，每个程序集都可以按需单独生成和归档。</p>
-</blockquote>
+<h2 id="模块协作总览">模块协作总览</h2>
+<table>
+<thead>
+<tr>
+<th>调用方</th>
+<th>主要被调用接口</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameBoot</code></td>
+<td><code>GameFlowSystem.ConfigureScene</code>、<code>GameFlowSystem.StartGame</code>、<code>FlowFieldService.GiveBuilderQuery</code>、<code>FlowFieldService.RebuildDirtyFields</code></td>
+<td>连接场景引用并启动/维护运行时</td>
+</tr>
+<tr>
+<td><code>GameFlowSystem</code></td>
+<td><code>GameRuntimeModel</code>、<code>GameStateModel</code>、<code>LevelPointSystem</code>、<code>BuildSystem</code>、<code>FlowFieldService</code>、<code>WaveSystem</code>、<code>RewardSystem</code>、<code>CharacterSystem</code>、<code>ResourceSystem</code>、<code>ButtonSystem</code></td>
+<td>游戏主流程编排</td>
+</tr>
+<tr>
+<td><code>BuildSystem</code></td>
+<td><code>GridQueryService</code>、<code>GridEventService</code>、<code>BuildRuntimeModel</code></td>
+<td>放置/拆除建筑并通知网格可行走性变化</td>
+</tr>
+<tr>
+<td><code>WaveSystem</code></td>
+<td><code>LevelPointSystem</code>、<code>CharacterSystem</code>、<code>GameSceneContext</code>、<code>IFlowField</code></td>
+<td>开波、生成角色、统计波次结束</td>
+</tr>
+<tr>
+<td><code>CharacterSystem</code></td>
+<td><code>LittleManController.Initialize</code>、<code>LittleManController.Removed</code></td>
+<td>生成角色并维护活跃角色集合</td>
+</tr>
+<tr>
+<td><code>LittleManController</code></td>
+<td><code>FlowFieldPathProvider</code>、<code>GridQueryService</code>、<code>ButtonSystem</code>、<code>CharacterRuntimeModel</code></td>
+<td>单个角色移动、阻挡建造、按压按钮并离场</td>
+</tr>
+<tr>
+<td><code>CursorInputController</code></td>
+<td><code>InputService</code>、<code>GameStateModel</code>、<code>GridQueryService</code></td>
+<td>根据游戏状态显示网格光标</td>
+</tr>
+</tbody>
+</table>
+<h2 id="文档列表">文档列表</h2>
+<ul>
+<li><a href="scene-flow.html">场景启动与游戏流程</a></li>
+<li><a href="resources-button-reward.html">资源、按钮与奖励</a></li>
+<li><a href="build.html">建造系统</a></li>
+<li><a href="characters.html">角色系统</a></li>
+<li><a href="waves.html">波次系统</a></li>
+<li><a href="input-view.html">输入与表现组件</a></li>
+</ul>
+<h2 id="内部调用约定">内部调用约定</h2>
+<ul>
+<li>流程推进优先通过 <code>GameFlowSystem</code>，不要让 UI、输入或角色脚本各自修改多个系统状态。</li>
+<li>运行时状态由 Model 保存；跨模块读取可以读 Model，跨模块写入优先走对应 System。</li>
+<li>会影响可行走性或可建造性的操作必须通过 <code>BuildSystem</code> 或 <code>GridQueryService</code> 的约定接口，并触发布局变化通知。</li>
+<li>角色生成优先走 <code>WaveSystem</code> 或 <code>CharacterSystem</code>，角色移除优先调用 <code>LittleManController.Despawn()</code>。</li>
+<li><code>RewardSystem</code> 当前仍是占位实现，流程文档按现有返回行为描述，不把未来计划写成已完成接口。</li>
+</ul>
 
 </article>
           </div>

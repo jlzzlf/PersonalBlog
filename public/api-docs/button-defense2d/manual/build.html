@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>建造系统 | 个人代码文档 &#183; ButtonDefense2D </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="建造系统 | 个人代码文档 &#183; ButtonDefense2D ">
+    
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="个人代码文档">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="建造系统">建造系统</h1>
+
+<h2 id="模块职责">模块职责</h2>
+<p>建造系统是 Game 内部所有“改变关卡布局”的业务入口。它负责判断能否建造、生成建筑、拆除建筑、维护运行时建筑集合，并通知依赖网格可行走性的模块刷新。</p>
+<p>影响角色路径、出生点、按钮目标点和可建造性的操作，都应通过 <code>BuildSystem</code> 或它约定调用的 <code>GridQueryService</code> 完成。</p>
+<h2 id="协作关系">协作关系</h2>
+<table>
+<thead>
+<tr>
+<th>调用方</th>
+<th>调用接口</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameFlowSystem.StartGame</code></td>
+<td><code>ResetForNewRun()</code>、<code>InitializeLevelLayout(context)</code>、<code>SetEditingEnabled(...)</code></td>
+<td>新局初始化建造状态</td>
+</tr>
+<tr>
+<td><code>GameFlowSystem.PauseGame</code> / <code>ResumeGame</code></td>
+<td><code>SetEditingEnabled(...)</code></td>
+<td>暂停/继续时控制是否允许编辑</td>
+</tr>
+<tr>
+<td>输入或调试工具</td>
+<td><code>TryBuildSingleCellObstacle</code>、<code>TryRemoveBuilding</code></td>
+<td>玩家或测试建造操作</td>
+</tr>
+<tr>
+<td><code>BuildSystem</code></td>
+<td><code>GridQueryService.PlaceBuilding</code>、<code>RemoveBuilding</code>、<code>SetBuildBlocker</code></td>
+<td>同步网格层状态</td>
+</tr>
+<tr>
+<td><code>FlowFieldService</code></td>
+<td>监听 <code>GridWalkabilityChangedEvent</code></td>
+<td>布局变化后标记流场为脏</td>
+</tr>
+<tr>
+<td>UI</td>
+<td><code>BuildRuntimeModel</code>、<code>BuildSystem.IsEditingEnabled</code></td>
+<td>展示编辑状态和建筑数量</td>
+</tr>
+</tbody>
+</table>
+<h2 id="buildsystem"><code>BuildSystem</code></h2>
+<p>跨模块接口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>模块间用途</th>
+<th>调用约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event Action GridLayoutChanged</code></td>
+<td>通知建造布局变化</td>
+<td>建筑变动或保留阻挡格变动后触发</td>
+</tr>
+<tr>
+<td><code>bool IsEditingEnabled</code></td>
+<td>查询当前是否允许建造编辑</td>
+<td>由流程层设置</td>
+</tr>
+<tr>
+<td><code>ResetForNewRun()</code></td>
+<td>清理运行时建筑并重置模型</td>
+<td>新局开始</td>
+</tr>
+<tr>
+<td><code>InitializeLevelLayout(GameSceneContext context)</code></td>
+<td>绑定 <code>GridQueryService</code>，并把出生点/按钮目标点注册为不可建造格</td>
+<td><code>LevelPointSystem.BeginRun</code> 后、流场创建前</td>
+</tr>
+<tr>
+<td><code>SetEditingEnabled(bool enabled)</code></td>
+<td>设置编辑开关</td>
+<td>流程层调用</td>
+</tr>
+<tr>
+<td><code>TryBuildSingleCellObstacle(Cell cell, BuildingBase buildingPrefab, Transform parent, out BuildingBase placedBuilding)</code></td>
+<td>在格子上生成建筑实例</td>
+<td>仅编辑开启、网格服务已初始化、Prefab 可放置时成功</td>
+</tr>
+<tr>
+<td><code>TryRemoveBuilding(Cell cell)</code></td>
+<td>拆除格子上的建筑</td>
+<td>仅编辑开启且该格有建筑时成功</td>
+</tr>
+<tr>
+<td><code>NotifyGridLayoutChanged()</code></td>
+<td>主动广播布局变化</td>
+<td>自定义建筑规则改变可行走性后调用</td>
+</tr>
+</tbody>
+</table>
+<p>调用后效果：</p>
+<ul>
+<li>成功建造会实例化 Prefab、设置世界坐标、写入 <code>GridQueryService</code> 的建筑层、注册到 <code>BuildRuntimeModel</code>，然后触发布局变化。</li>
+<li>成功拆除会从 <code>GridQueryService</code> 和 <code>BuildRuntimeModel</code> 移除建筑，销毁 GameObject，然后触发布局变化。</li>
+<li><code>NotifyGridLayoutChanged</code> 会触发 <code>GridLayoutChanged</code>，并发布 <code>GridWalkabilityChangedEvent</code>，使流场缓存变脏。</li>
+</ul>
+<p>推荐调用顺序：</p>
+<pre><code class="lang-csharp">BuildSystem buildSystem = this.GetSystem&lt;BuildSystem&gt;();
+
+if (!buildSystem.IsEditingEnabled)
+{
+    return;
+}
+
+buildSystem.TryBuildSingleCellObstacle(
+    cell,
+    obstaclePrefab,
+    buildRoot,
+    out BuildingBase placedBuilding);
+</code></pre>
+<h2 id="buildruntimemodel"><code>BuildRuntimeModel</code></h2>
+<p>跨模块接口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+<th>主要调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IsEditingEnabled</code></td>
+<td>当前编辑开关</td>
+<td>UI、输入、<code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>GridRevision</code></td>
+<td>布局修订号</td>
+<td>调试、缓存判断</td>
+</tr>
+<tr>
+<td><code>RuntimeBuildingCount</code></td>
+<td>当前运行时建筑数量</td>
+<td>UI、调试</td>
+</tr>
+<tr>
+<td><code>ResetForNewRun()</code></td>
+<td>重置编辑状态、建筑集合和修订号</td>
+<td><code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>SetEditingEnabled(bool enabled)</code></td>
+<td>写入编辑开关</td>
+<td><code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>RegisterRuntimeBuilding(BuildingBase building)</code></td>
+<td>注册建筑实例</td>
+<td><code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>UnregisterRuntimeBuilding(BuildingBase building)</code></td>
+<td>注销建筑实例</td>
+<td><code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>SnapshotRuntimeBuildings()</code></td>
+<td>获取建筑快照</td>
+<td><code>BuildSystem</code> 清理时使用</td>
+</tr>
+<tr>
+<td><code>ClearRuntimeBuildings()</code></td>
+<td>清空建筑集合</td>
+<td><code>BuildSystem</code></td>
+</tr>
+<tr>
+<td><code>AdvanceGridRevision()</code></td>
+<td>推进布局修订号</td>
+<td><code>BuildSystem.NotifyGridLayoutChanged</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>其他模块读取模型即可，不要直接注册或清理建筑。</li>
+<li>修订号只表示布局发生过变化，不携带变化详情。</li>
+</ul>
+<h2 id="buildingbase"><code>BuildingBase</code></h2>
+<p>建筑 Prefab 之间共用的协作接口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>bool blocksMovement</code></td>
+<td>是否阻挡角色移动和流场通行</td>
+</tr>
+<tr>
+<td><code>bool blocksBuilding</code></td>
+<td>是否阻止继续在占用格建造</td>
+</tr>
+<tr>
+<td><code>Init(Cell origin)</code></td>
+<td>写入建筑原点</td>
+</tr>
+<tr>
+<td><code>GetOccupiedCells()</code></td>
+<td>获取当前原点下占用格</td>
+</tr>
+<tr>
+<td><code>GetOccupiedCells(Cell origin)</code></td>
+<td>预检查某个原点下会占用哪些格</td>
+</tr>
+<tr>
+<td><code>virtual OnPlaced()</code></td>
+<td>建筑进入网格层后回调</td>
+</tr>
+<tr>
+<td><code>virtual OnRemoved()</code></td>
+<td>建筑从网格层移除后回调</td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>自定义建筑通过继承 <code>BuildingBase</code> 提供占格规则和放置/移除回调。</li>
+<li>建筑不要自己把自己写入网格层，必须由 <code>BuildSystem</code> 或 <code>GridQueryService</code> 执行放置。</li>
+<li>如果建筑在放置后动态改变 <code>blocksMovement</code> 或 <code>blocksBuilding</code>，调用方需要再调用 <code>BuildSystem.NotifyGridLayoutChanged()</code>。</li>
+</ul>
+<h2 id="prototypeobstaclebuilding"><code>PrototypeObstacleBuilding</code></h2>
+<p><code>PrototypeObstacleBuilding</code> 只是 <code>BuildingBase</code> 的空实现，用于原型阶段的障碍建筑 Prefab。正式建筑可以直接新建派生类。</p>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

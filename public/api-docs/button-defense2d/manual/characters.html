@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>角色系统 | 个人代码文档 &#183; ButtonDefense2D </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="角色系统 | 个人代码文档 &#183; ButtonDefense2D ">
+    
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="个人代码文档">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="角色系统">角色系统</h1>
+
+<h2 id="模块职责">模块职责</h2>
+<p>角色系统负责运行时角色的生成、初始化、活跃集合维护和清理。单个角色控制器负责移动、阻挡建造格、抵达按钮后造成按钮伤害，以及离场通知。</p>
+<p>波次系统不直接实例化角色 Prefab，而是通过 <code>CharacterSystem</code> 生成角色，这样活跃集合和离场事件才能保持一致。</p>
+<h2 id="协作关系">协作关系</h2>
+<table>
+<thead>
+<tr>
+<th>调用方</th>
+<th>调用接口</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameFlowSystem.StartGame</code></td>
+<td><code>CharacterSystem.BeginRun()</code></td>
+<td>新局清理旧角色</td>
+</tr>
+<tr>
+<td><code>WaveSystem</code></td>
+<td><code>CharacterSystem.Spawn(...)</code></td>
+<td>波次中生成角色</td>
+</tr>
+<tr>
+<td><code>CharacterSystem</code></td>
+<td><code>LittleManController.Initialize(flowField)</code></td>
+<td>生成后初始化角色导航</td>
+</tr>
+<tr>
+<td><code>CharacterSystem</code></td>
+<td>订阅 <code>LittleManController.Removed</code></td>
+<td>维护活跃集合并向波次系统转发移除</td>
+</tr>
+<tr>
+<td><code>WaveSystem</code></td>
+<td>订阅 <code>CharacterSystem.CharacterRemoved</code></td>
+<td>更新存活数量并判断波次结束</td>
+</tr>
+<tr>
+<td><code>LittleManController</code></td>
+<td><code>ButtonSystem.NotifyButtonPressed(...)</code></td>
+<td>抵达按钮后扣按钮血量</td>
+</tr>
+<tr>
+<td><code>LittleManController</code></td>
+<td><code>GridQueryService.SetBuildBlocker</code> / <code>ClearBuildBlocker</code></td>
+<td>占用当前格和目标格，阻止建造</td>
+</tr>
+<tr>
+<td>角色表现</td>
+<td><code>CharacterRuntimeModel.ModelChanged</code></td>
+<td>根据模型变化刷新表现</td>
+</tr>
+</tbody>
+</table>
+<h2 id="charactersystem"><code>CharacterSystem</code></h2>
+<p>跨模块接口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>模块间用途</th>
+<th>调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event Action&lt;LittleManController&gt; CharacterRemoved</code></td>
+<td>通知角色已离场</td>
+<td><code>WaveSystem</code></td>
+</tr>
+<tr>
+<td><code>int ActiveCharacterCount</code></td>
+<td>当前活跃角色数量</td>
+<td>UI、调试、流程判断</td>
+</tr>
+<tr>
+<td><code>BeginRun()</code></td>
+<td>新局开始前清理所有角色</td>
+<td><code>GameFlowSystem</code></td>
+</tr>
+<tr>
+<td><code>Spawn(LittleManController prefab, Vector3 worldPosition, IFlowField flowField)</code></td>
+<td>实例化角色、注册集合、绑定流场</td>
+<td><code>WaveSystem</code></td>
+</tr>
+<tr>
+<td><code>ClearAllCharacters()</code></td>
+<td>清理所有活跃角色</td>
+<td><code>BeginRun</code> 或重置逻辑</td>
+</tr>
+</tbody>
+</table>
+<p>调用后效果：</p>
+<ul>
+<li><code>Spawn</code> 会实例化 Prefab，把角色加入活跃集合，订阅角色 <code>Removed</code> 事件，然后调用 <code>Initialize(flowField)</code>。</li>
+<li><code>ClearAllCharacters</code> 会取消角色离场订阅、释放角色占用的建造阻挡格并销毁角色对象。</li>
+<li>角色离场时，<code>CharacterSystem</code> 会从集合移除并触发 <code>CharacterRemoved</code>。</li>
+</ul>
+<p>约定：</p>
+<ul>
+<li>波次中生成角色优先调用 <code>WaveSystem.TrySpawnCharacter(s)</code>，由波次系统同步统计数量。</li>
+<li>如果确实绕过波次直接生成，也必须调用 <code>CharacterSystem.Spawn</code>，不要直接 <code>Instantiate</code> 角色 Prefab。</li>
+<li>清理角色时优先调用 <code>CharacterSystem.ClearAllCharacters</code> 或 <code>LittleManController.Despawn()</code>。</li>
+</ul>
+<h2 id="littlemancontroller"><code>LittleManController</code></h2>
+<p>跨模块接口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+<th>调用方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event Action&lt;LittleManController&gt; Removed</code></td>
+<td>单个角色离场通知</td>
+<td><code>CharacterSystem</code></td>
+</tr>
+<tr>
+<td><code>CharacterRuntimeModel RuntimeModel</code></td>
+<td>读取或监听角色运行时状态</td>
+<td>角色表现、调试</td>
+</tr>
+<tr>
+<td><code>Initialize(IFlowField flowField)</code></td>
+<td>绑定流场并进入移动状态</td>
+<td><code>CharacterSystem.Spawn</code></td>
+</tr>
+<tr>
+<td><code>Despawn()</code></td>
+<td>释放阻挡格、通知离场并销毁对象</td>
+<td>战斗、陷阱、按钮抵达逻辑</td>
+</tr>
+<tr>
+<td><code>ReleaseBuildBlockCells()</code></td>
+<td>释放角色注册到网格服务的建造阻挡格</td>
+<td>清理、回收、销毁前</td>
+</tr>
+</tbody>
+</table>
+<p>运行时行为边界：</p>
+<ul>
+<li><code>Initialize</code> 之后角色会根据绑定的 <code>IFlowField</code> 移动。</li>
+<li>移动时角色会把当前格注册为建造阻挡格，并把下一个移动目标格也临时注册为建造阻挡格。</li>
+<li>到达 <code>FlowFieldDestinationKind.Primary</code> 目标时，会调用 <code>ButtonSystem.NotifyButtonPressed(config.buttonPressDamage)</code>，然后 <code>Despawn()</code>。</li>
+<li><code>OnDestroy</code> 会兜底调用离场通知，但主动移除仍建议调用 <code>Despawn()</code>，这样释放和通知顺序更明确。</li>
+</ul>
+<h2 id="characterconfigso"><code>CharacterConfigSO</code></h2>
+<p>角色 Prefab 和运行时模型之间的配置接口：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>用途</th>
+<th>读取方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxHp</code></td>
+<td>初始最大生命值</td>
+<td><code>CharacterRuntimeModel</code></td>
+</tr>
+<tr>
+<td><code>moveSpeed</code></td>
+<td>初始移动速度</td>
+<td><code>CharacterRuntimeModel</code></td>
+</tr>
+<tr>
+<td><code>moveTargetRandomOffsetRadius</code></td>
+<td>移动目标点随机偏移半径</td>
+<td><code>LittleManController</code></td>
+</tr>
+<tr>
+<td><code>buttonPressDamage</code></td>
+<td>抵达按钮后的按压伤害</td>
+<td><code>LittleManController</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>每个 <code>LittleManController</code> Prefab 必须绑定 <code>CharacterConfigSO</code>。</li>
+<li>配置变更只影响新创建的 <code>CharacterRuntimeModel</code>，不会自动改已有角色。</li>
+</ul>
+<h2 id="characterruntimemodel"><code>CharacterRuntimeModel</code></h2>
+<p>跨模块接口：</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event Action&lt;CharacterRuntimeModel, CharacterModelChangeFlags&gt; ModelChanged</code></td>
+<td>累计变化推送</td>
+</tr>
+<tr>
+<td><code>CurrentHp</code> / <code>MaxHp</code></td>
+<td>生命值读取</td>
+</tr>
+<tr>
+<td><code>MoveSpeed</code></td>
+<td>移动速度读取</td>
+</tr>
+<tr>
+<td><code>State</code></td>
+<td>当前角色状态</td>
+</tr>
+<tr>
+<td><code>ApplyDamage(int damage)</code></td>
+<td>扣生命值</td>
+</tr>
+<tr>
+<td><code>SetState(CharacterRuntimeState state)</code></td>
+<td>设置角色状态</td>
+</tr>
+<tr>
+<td><code>PushChanges()</code></td>
+<td>推送本帧累计变化</td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li><code>LittleManController</code> 在 <code>LateUpdate</code> 调用 <code>PushChanges()</code>。</li>
+<li>表现层监听 <code>ModelChanged</code> 时，应根据 <code>CharacterModelChangeFlags</code> 只刷新需要的部分。</li>
+<li>当前 <code>ApplyDamage</code> 只修改生命值，不自动执行死亡和离场；调用方需要根据生命值决定后续流程。</li>
+</ul>
+<h2 id="角色状态">角色状态</h2>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>语义</th>
+<th>当前主要使用情况</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MovingToButton</code></td>
+<td>向按钮移动</td>
+<td>当前主状态</td>
+</tr>
+<tr>
+<td><code>Attracted</code></td>
+<td>被吸引</td>
+<td>预留</td>
+</tr>
+<tr>
+<td><code>Captured</code></td>
+<td>被捕获</td>
+<td>预留</td>
+</tr>
+<tr>
+<td><code>Sleeping</code></td>
+<td>睡眠</td>
+<td>预留</td>
+</tr>
+<tr>
+<td><code>Dead</code></td>
+<td>死亡</td>
+<td>按钮抵达离场前设置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="charactermover"><code>CharacterMover</code></h2>
+<p><code>CharacterMover</code> 是无状态位移工具，供角色控制器内部复用。</p>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Move(Transform transform, Vector2 direction, float speed, float deltaTime)</code></td>
+<td>按方向直接移动</td>
+</tr>
+<tr>
+<td><code>MoveTowards(Transform transform, Vector3 targetPosition, float speed, float deltaTime, float arriveDistance)</code></td>
+<td>向目标点移动，抵达时返回 <code>true</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>它不处理寻路、碰撞、状态和事件，只移动 Transform。</li>
+<li>需要角色业务状态时由 <code>LittleManController</code> 或更高层系统处理。</li>
+</ul>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

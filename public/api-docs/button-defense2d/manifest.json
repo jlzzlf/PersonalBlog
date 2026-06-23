@@ -951,6 +951,26 @@
     },
     {
       "type": "Conceptual",
+      "source_relative_path": "manual/build.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/build.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/characters.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/characters.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
       "source_relative_path": "manual/grid-system.md",
       "output": {
         ".html": {
@@ -970,6 +990,36 @@
       "version": ""
     },
     {
+      "type": "Conceptual",
+      "source_relative_path": "manual/input-view.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/input-view.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/resources-button-reward.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/resources-button-reward.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/scene-flow.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/scene-flow.html"
+        }
+      },
+      "version": ""
+    },
+    {
       "type": "Toc",
       "source_relative_path": "manual/toc.yml",
       "output": {
@@ -978,6 +1028,16 @@
         },
         ".json": {
           "relative_path": "manual/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "manual/waves.md",
+      "output": {
+        ".html": {
+          "relative_path": "manual/waves.html"
         }
       },
       "version": ""

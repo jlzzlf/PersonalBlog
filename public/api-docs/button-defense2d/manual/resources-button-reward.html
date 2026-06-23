@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <title>资源、按钮与奖励 | 个人代码文档 &#183; ButtonDefense2D </title>
+      <meta name="viewport" content="width=device-width">
+      <meta name="title" content="资源、按钮与奖励 | 个人代码文档 &#183; ButtonDefense2D ">
+    
+    
+      <link rel="shortcut icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../styles/docfx.vendor.min.css">
+      <link rel="stylesheet" href="../styles/docfx.css">
+      <link rel="stylesheet" href="../styles/main.css">
+      <meta property="docfx:navrel" content="../toc.html">
+      <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="个人代码文档">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="">
+<h1 id="资源按钮与奖励">资源、按钮与奖励</h1>
+
+<h2 id="模块职责">模块职责</h2>
+<p>这三个模块为流程层提供数值和阶段接口：</p>
+<ul>
+<li><code>ResourceSystem</code> / <code>ResourceModel</code> 管理本局电量。</li>
+<li><code>ButtonSystem</code> 管理按钮剩余血量，并在耗尽时通知流程失败。</li>
+<li><code>RewardSystem</code> 预留奖励选择流程入口；当前仍是占位实现。</li>
+</ul>
+<p>它们都由 <code>GameFlowSystem</code> 在一局开始和波次结束时调度。</p>
+<h2 id="资源模块">资源模块</h2>
+<h3 id="协作关系">协作关系</h3>
+<table>
+<thead>
+<tr>
+<th>调用方</th>
+<th>调用接口</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameFlowSystem.StartGame</code></td>
+<td><code>ResourceSystem.BeginRun(context.InitialPower)</code></td>
+<td>新局初始化电量</td>
+</tr>
+<tr>
+<td>建造、技能、奖励等消耗模块</td>
+<td><code>ResourceModel.TrySpendPower</code></td>
+<td>尝试扣除电量</td>
+</tr>
+<tr>
+<td>奖励、拾取、结算等产出模块</td>
+<td><code>ResourceModel.AddPower</code></td>
+<td>增加电量</td>
+</tr>
+<tr>
+<td>UI</td>
+<td><code>ResourceModel.Power</code></td>
+<td>显示当前电量</td>
+</tr>
+</tbody>
+</table>
+<h3 id="resourcesystem"><code>ResourceSystem</code></h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>模块内用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BeginRun(int initialPower)</code></td>
+<td>新局开始时把初始电量写入 <code>ResourceModel</code></td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li><code>BeginRun</code> 是流程初始化入口，不做具体消费逻辑。</li>
+<li>运行中修改电量应直接走 <code>ResourceModel</code>，或后续补充更明确的资源业务方法。</li>
+</ul>
+<h3 id="resourcemodel"><code>ResourceModel</code></h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>模块间用途</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int Power</code></td>
+<td>读取当前电量</td>
+<td>只读</td>
+</tr>
+<tr>
+<td><code>ResetPower(int initialPower)</code></td>
+<td>重置电量</td>
+<td>限制在 <code>0..999</code></td>
+</tr>
+<tr>
+<td><code>AddPower(int value)</code></td>
+<td>增加电量</td>
+<td>结果限制在 <code>0..999</code></td>
+</tr>
+<tr>
+<td><code>bool TrySpendPower(int value)</code></td>
+<td>尝试扣除电量</td>
+<td><code>value &lt; 0</code> 或余额不足时返回 <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p>建造模块消耗资源时的推荐形态：</p>
+<pre><code class="lang-csharp">ResourceModel resource = this.GetModel&lt;ResourceModel&gt;();
+
+if (!resource.TrySpendPower(cost))
+{
+    return false;
+}
+
+// 再执行具体建造逻辑
+</code></pre>
+<p>如果扣费后后续逻辑可能失败，需要调用方自己处理回滚或调整调用顺序。</p>
+<h2 id="按钮模块">按钮模块</h2>
+<h3 id="协作关系-1">协作关系</h3>
+<table>
+<thead>
+<tr>
+<th>调用方</th>
+<th>调用接口</th>
+<th>目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameFlowSystem.StartGame</code></td>
+<td><code>ButtonSystem.BeginRun(context.ButtonHp)</code></td>
+<td>新局初始化按钮血量</td>
+</tr>
+<tr>
+<td><code>LittleManController</code></td>
+<td><code>ButtonSystem.NotifyButtonPressed(config.buttonPressDamage)</code></td>
+<td>角色抵达按钮后造成伤害</td>
+</tr>
+<tr>
+<td><code>GameFlowSystem.OnButtonDepleted</code></td>
+<td>订阅 <code>ButtonDepleted</code></td>
+<td>按钮耗尽后进入失败</td>
+</tr>
+<tr>
+<td>UI</td>
+<td><code>RemainingButtonHp</code></td>
+<td>显示按钮剩余血量</td>
+</tr>
+</tbody>
+</table>
+<h3 id="buttonsystem"><code>ButtonSystem</code></h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>模块间用途</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>event Action ButtonDepleted</code></td>
+<td>通知按钮血量耗尽</td>
+<td>从正数降到 0 时触发</td>
+</tr>
+<tr>
+<td><code>int RemainingButtonHp</code></td>
+<td>读取剩余按钮血量</td>
+<td>只读</td>
+</tr>
+<tr>
+<td><code>BeginRun(int buttonHp)</code></td>
+<td>新局初始化按钮血量</td>
+<td>最小为 1</td>
+</tr>
+<tr>
+<td><code>NotifyButtonPressed(int damage = 1)</code></td>
+<td>按钮受到一次按压伤害</td>
+<td><code>damage &lt;= 0</code> 或已耗尽时无效果</td>
+</tr>
+</tbody>
+</table>
+<p>约定：</p>
+<ul>
+<li>角色、陷阱或调试逻辑需要造成按钮伤害时，只调用 <code>NotifyButtonPressed</code>。</li>
+<li><code>GameFlowSystem</code> 负责监听 <code>ButtonDepleted</code> 并调用 <code>EndGame()</code>，按钮模块不直接操作流程状态。</li>
+<li>如果后续按钮有护盾、免疫或特殊规则，应优先扩展 <code>ButtonSystem</code>，不要让角色脚本直接判断失败条件。</li>
+</ul>
+<h2 id="奖励模块">奖励模块</h2>
+<h3 id="协作关系-2">协作关系</h3>
+<table>
+<thead>
+<tr>
+<th>调用方</th>
+<th>调用接口</th>
+<th>当前行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GameFlowSystem.StartGame</code></td>
+<td><code>RewardSystem.CancelSelection()</code>、<code>RewardSystem.BeginRun()</code></td>
+<td>清理/初始化奖励状态，目前为空实现</td>
+</tr>
+<tr>
+<td><code>GameFlowSystem.OnWaveCleared</code></td>
+<td><code>RewardSystem.TryBeginSelection(currentWave)</code></td>
+<td>当前固定返回 <code>false</code></td>
+</tr>
+<tr>
+<td><code>GameFlowSystem.SelectReward</code></td>
+<td><code>RewardSystem.TryApplySelection(rewardId)</code></td>
+<td>当前固定返回 <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="rewardsystem"><code>RewardSystem</code></h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>设计用途</th>
+<th>当前约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BeginRun()</code></td>
+<td>新局清理已获得奖励、候选奖励和随机池状态</td>
+<td>还未实现</td>
+</tr>
+<tr>
+<td><code>CancelSelection()</code></td>
+<td>取消当前奖励候选</td>
+<td>还未实现</td>
+</tr>
+<tr>
+<td><code>bool TryBeginSelection(int completedWave)</code></td>
+<td>波次结束后尝试生成奖励候选</td>
+<td>当前固定返回 <code>false</code></td>
+</tr>
+<tr>
+<td><code>bool TryApplySelection(string rewardId)</code></td>
+<td>应用玩家选择的奖励</td>
+<td>当前固定返回 <code>false</code></td>
+</tr>
+</tbody>
+</table>
+<p>流程约定：</p>
+<ul>
+<li><code>GameFlowSystem</code> 根据 <code>TryBeginSelection</code> 返回值决定是否进入 <code>RewardSelecting</code>。</li>
+<li>当前版本奖励不会中断波次流程，波次结束后会直接进入下一波备战。</li>
+<li>后续实现奖励 UI 时，UI 应通过 <code>GameFlowSystem.SelectReward(rewardId)</code> 回到流程层，不要直接调用 <code>RewardSystem.TryApplySelection</code> 后自行推进状态。</li>
+</ul>
+
+</article>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In this article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.min.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
