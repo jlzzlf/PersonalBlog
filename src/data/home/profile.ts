@@ -3,7 +3,7 @@ export const profileContent = {
 	name: '章立夫',
 	role: 'Unity Developer',
 	tags: ['#Unity开发', '#项目实践', '#生活记录'],
-	introLines: ['我以事实校正立场，以代价衡量选择。不以标签代替判断，不把宏大目标的代价推给具体的人。'],
+	introLines: ['游戏开发好玩捏'],
 	note: '努力成为全栈开发者中...',
 } as const;
 
