@@ -10,5 +10,7 @@ export async function getStaticPaths() {
 }
 
 const { redirectTo } = Astro.props;
-return Astro.redirect(redirectTo, 301);
+// Project log IDs can contain Chinese characters. Redirect URLs become HTTP headers,
+// so they must be percent-encoded before Astro creates the response.
+return Astro.redirect(encodeURI(redirectTo), 301);
 ---
