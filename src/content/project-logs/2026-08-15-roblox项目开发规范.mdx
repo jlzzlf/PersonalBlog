@@ -1,0 +1,338 @@
+---
+title: Roblox项目开发规范
+description: 本文规定了一些Roblox开发过程中的规范。不一定严格要求参照此规范，可作主要参考。
+project: Roblox
+pubDate: 2026-08-15
+updatedDate: 2026-08-15
+---
+# Roblox 工程规范
+
+## 1. 文件与资源存放规则
+
+### 基础概念与团队术语
+
+| 团队术语 | 定义 | Roblox 官方术语 / 边界 |
+|---|---|---|
+| 工程 | 团队开发、发布和维护的最高边界；一个工程对应一个 Roblox Experience（官方发布文档有时也称 Game）。 | 一个工程可以包含一个或多个 Place；不要把当前打开的单个 `.rbxl` 或 Place 误称为整个工程。 |
+| Place | 工程内可独立加载、发布和传送的地点单位。 | 官方称 Place；一个 Experience / Game 从一个 Place 开始，也可包含多个 Place。 |
+| 场景 | 当前 Place 中 `Workspace` 所承载的 3D 世界内容，即 Studio 3D 视图中的地图、角色、模型、Part、地形和运行中世界内容。 | 官方称 `Workspace` 为该 Place 的 **3D world**。`Lighting`、`SoundService` 等会影响场景效果，但不属于 `Workspace`。ScreenGui 等屏幕界面不属于场景，称为 UI。 |
+| 实例 | Explorer / DataModel 树中的一个独立 Roblox `Instance`，例如 Service、Folder、Model、Part、GuiButton、Script、ModuleScript、RemoteEvent。 | 官方将 DataModel 中的这类内容称为 object；`Instance` 是可进入 DataModel 树的 Roblox 类的基类。代码与文档一律优先称“实例”，不笼统称“对象”。 |
+| 实体 | 仅在 ECS 语境使用：一个被一个或多个行为 Tag 组合处理的场景实例或 UI 实例。 | Entity 不是 Luau 面向对象的“对象”，也不是一种新的 Roblox Instance 类型。 |
+| UI | 玩家屏幕上的界面实例及其布局、交互和表现，例如 ScreenGui、Frame、GuiButton。 | UI 与场景分开表述；即使两者都能被玩家看见，UI 不属于 `Workspace` 的 3D world。 |
+
+### 资源与版本管理的三个位置/机制
+
+| 层级 | 存放内容 | 当前职责 | 不允许存放 |
+|---|---|---|---|
+| Studio 资源管理器（Explorer） | Place 中实际运行或作为运行时模板的 Instance | 决定运行时层级、复制范围和权限边界 | `.blend`、`.psd`、原始 `.png`/`.fbx`、代码历史备份 |
+| Studio 素材管理器（Asset Manager） | 需要导入、审核、授权或跨 Place 复用的美术资产：图片、音频、动画、视频、完整 3D Model（含其 Mesh/贴图/骨骼层级）及 Package | 为资产分配 Group 归属、Asset ID、审核状态和复用入口 | 当前场景摆放结果、业务代码、Remotes、配置数据 |
+| Roblox Version History / Package Versions | 已发布 Place 的版本、已发布 Package 的版本 | 分别回滚 Place 与 Package，并保留可追溯的发布版本链 | 日常代码备份副本、未发布的临时修改 |
+
+### Explorer 服务归属
+
+| 服务 | 可以存放 | 禁止存放 | 说明 |
+|---|---|---|---|
+| `Workspace` | 当前地图、玩家角色、已生成 NPC、当前交互物、运行中的世界特效 | 未使用模板、完整资源库、备用地图、业务模块 | 这里只放玩家当前可能看见或交互到的运行时世界。 |
+| `ReplicatedStorage` | `Remotes`、共享 ModuleScript、共享配置、客户端需要 Clone 的轻量 VFX 模板、UI 预览模型、公共动画/资源索引 | 存档密钥、服务端规则、完整地图、大量不常用高模、未授权奖励模板 | 其中所有 Instance 都会复制到客户端；按需小而精。 |
+| `ServerStorage` | 服务端专用地图模板、NPC/敌人模板、奖励/掉落模板、服务端发放的 Tool 模板、大型按需生成模型 | 需要自动运行的 Script、客户端 UI、代码备份、源美术文件 | 客户端不可见；服务端验证后再 Clone 到 `Workspace`、`Backpack` 等位置。 |
+| `ServerScriptService` | 服务端 Bootstrap、Feature Action、World System、Coordinator、Repository、存档、经济、交易、权限、服务端测试辅助 | 模型、图片、音频、客户端 Controller、可被客户端 require 的共享模块 | 所有影响进度、货币、背包、奖励和存档的最终决定权在这里。 |
+| `StarterPlayer/StarterPlayerScripts` | 客户端 Bootstrap、页面 Controller、UI/World System、输入、相机、HUD 协调、客户端网络适配 | 服务端权威逻辑、大型模型模板、每个控件各自的 LocalScript | Client 代码按领域与独立 System 组织，而不是挂在 UI 控件下。 |
+| `StarterPlayer/StarterCharacterScripts` | 与角色生命周期强绑定的客户端脚本，如移动、输入、角色表现 | 全局 UI、存档、商城、可复用业务服务 | 只放“随每个 Character 重建”的代码。 |
+| `StarterGui` | ScreenGui、静态布局、控件、用于组合行为的 Tag 与声明性 Attribute、初始视觉资源引用 | 页面业务逻辑、DataStore/交易代码、数百个控件 LocalScript、大型预览模型 | 页面流程由 Controller 协调；通用表现由 `StarterPlayerScripts` 的独立 UI System 根据 Tag 绑定。 |
+| `ReplicatedFirst` | 极小的加载界面、加载流程和首屏必需资源 | 常规 UI、Feature Controller、重资源、永久逻辑 | 优先保证首屏速度，资源必须严格控制。 |
+| `StarterPack` | 每位玩家出生时默认拥有的 Tool 模板 | 可选奖励、商城物品库、服务端专用 Tool | 不是通用 Tool 仓库；按奖励/背包状态发放的 Tool 放 `ServerStorage`。 |
+| `Lighting` / `SoundService` | 全局环境配置、后处理、SoundGroup、全局音频策略 | 原始音频文件、业务代码、完整模型 | 音频文件本身仍由 Asset Manager 管理，只在此处引用 ID。 |
+| `MaterialService` | 已验收的自定义材质与 `MaterialVariant` | 原始贴图文件、业务代码、模型库 | 原始贴图先作为图片资产上传；材质效果在 Studio 中配置并统一命名。 |
+
+
+### Asset Manager（素材管理器） 文件上传流程
+
+根目录视为临时上传区；资源在上传后必须移动到预建目标文件夹。根目录中未归档的资源不能被程序或关卡正式引用。
+
+目录按“**谁拥有、与哪个玩法一起变化**”划分，而不是按文件格式划分。一级目录使用项目的业务语言；下例仅示范，实际以项目领域替换。目录通常为 2～4 层，资源类型放在最后一层：
+
+```text
+Shared/
+  CommonUI/
+    Icons/
+  CommonVFX/
+  CommonAudio/
+
+Player/
+  Avatar/
+    Models/
+    Animations/
+  ProfileUI/
+
+Economy/
+  Shop/
+    UI/
+      Icons/
+    Audio/
+  Rewards/
+    VFX/
+
+Collection/
+  Pets/
+    Models/
+    Animations/
+    UI/
+  Items/
+
+World/
+  Lobby/
+    Models/
+    Audio/
+  Restaurant/
+    Props/
+    VFX/
+    NPCs/
+
+_Archive/
+  Deprecated/
+```
+
+归类规则：
+
+- 一个资源只属于一个拥有领域。例如商城关闭图标在 `Economy/Shop/UI/Icons`，而不是全局 `UI/Icons`。
+- 被两个及以上领域共同使用、且不应由任何一个领域独占的资源才可放 `Shared`；不得把“暂时不知道归属”的资源塞进 `Shared`。
+- Package 跟随拥有它的领域，例如宠物 Package 位于 `Collection/Pets`，而不是单独的全局 `Packages` 根目录。
+- `_Archive/Deprecated` 是唯一的技术性例外目录，只用于确认不再引用的旧资源。
+
+美术资源上传步骤：
+
+1. 上传资源时先确定拥有领域、目标目录和规范资产名，例如 `Economy/Shop/UI/Icons` 与 `关闭按钮图标`。
+2. 本次只上传同一目标领域的一批资源，并在 Importer 中选择团队为 Creator；资产名使用中文，首个版本不加数字后缀，后续版本直接在名称后加数字，如 `关闭按钮图标`、`关闭按钮图标2`，便于根目录中快速筛选。
+3. 上传完成后，在 Asset Manager 选中整批资源，立即拖拽移入目标目录；需要新目录时先创建目录，再移动资源。
+
+### 明确禁止
+
+- 不在 `ServerStorage` 保存 `*_Backup`、`*_Before`、`Legacy` 等代码历史；Place 回滚只使用已发布版本的 Version History，Package 回滚只使用已发布的 Package Versions，未来再迁移到共享版本库。
+- 不把完整资源库、不常用地图或重型模型放入 `ReplicatedStorage`。
+- 不把原始美术文件伪装成 Instance 放入 Explorer。
+- 不通过 `InsertService:LoadAsset()` 临时加载核心玩法模型；核心资源必须经过白名单、导入、Package/模板和验收流程。
+- 不让客户端根据自己提交的 Asset ID、价格、奖励或模型路径决定服务端结果。
+
+## 2. 语言、类型与脚本约定
+
+### 严格模式与显式类型
+
+- 所有 `Script`、`LocalScript`、`ModuleScript` 的第一行必须为 `--!strict`；不允许为通过检查而降级为 `--!nonstrict` 或 `--!nocheck`。
+- 所有变量必须声明类型，包括局部变量、模块状态、表字段、函数参数、函数返回值和回调参数。不得只依赖类型推断隐藏业务数据的结构与可空性。
+- 业务 table 必须先定义具名类型；跨模块使用的类型以 `export type` 导出。禁止用无类型 table 充当玩家数据、配置、Remote payload 或页面状态。
+- 公共函数必须标注参数和返回值；私有函数同样必须标注，除非是无参数、无返回值且仅一行的局部回调。
+- Remote payload、存档快照、配置与错误结果必须有导出类型，发送前和接收后都按该类型验证。
+- 仅在适配无类型第三方代码的最小边界使用 `any`，并立即校验/收窄；未知的外部输入优先使用 `unknown`。
+- 使用 `unknown`/`any` 输入时，先验证类型、结构、长度、范围和所属关系，再进入领域逻辑。
+- 不把 `nil` 同时用作“未加载”“不存在”“失败”三种语义；失败使用 `(success, result)` 或显式 Result。
+
+示例：
+
+```luau
+--!strict
+
+export type EquipPetRequest = {
+    petId: string,
+}
+
+local function canEquipPet(player: Player, request: EquipPetRequest): (boolean, string?)
+    local petId: string = request.petId
+    -- 领域校验
+    return true, nil
+end
+```
+
+### 组合优先与轻量 ECS
+
+- 代码组织优先使用组合，不建立继承层级、基类或万能对象。一个业务 Action 由校验、计算、发放、存档等独立 ModuleScript 组合而成；一个模块只实现一个动作或规则。
+- 对需要反复组合的 UI 与世界表现，采用轻量 ECS：一个 `Instance` 是 Entity；CollectionService Tag 声明它具备某种行为组件；Attribute 提供该组件的静态配置；一个独立 System ModuleScript 只处理一种行为。
+- 同一 Entity 可以组合多个 Tag，例如购买按钮同时拥有 `ButtonBounce`、`ClickSound`、`PreventDoubleTap`。System 之间不得依赖执行顺序或修改对方的运行时状态。
+- Tag 只声明可复用行为的参与资格；Attribute 只保存该行为的非权威配置。业务进度、权限、货币、存档、交易结果和服务端权威状态不得写入 Tag 或 Attribute。
+- System 的临时状态、Tween、连接和绑定记录保存在它自己的显式类型 table 中，并以 Entity 为键；不得把运行时状态散落到 GUI 或世界对象的任意子对象中。
+- 每个 System 通过 `GetTagged()` 处理已有 Entity，并监听 Tag 的新增、移除与 `Destroying` 来绑定和清理。System 文件名使用 `{Behavior}System`，例如 `ButtonBounceSystem`、`ClickSoundSystem`。
+- 不引入通用 ECS 框架、全局 Entity Registry 或“万能 Binder”。Bootstrap 只启动明确列出的 System；每个 System 自己拥有其 Tag、绑定和 cleanup。
+
+### 脚本类型、存放与业务职责
+
+#### 总则
+
+- 项目约定 `Script` 只在服务端运行，`RunContext` 设为 `Server`；客户端代码一律使用 `LocalScript`，不使用 `Script` 的 `Client` RunContext。这样在 Explorer 中即可清楚审计代码的权限边界。
+- `Script` 与 `LocalScript` 是启动、生命周期适配和薄协调层；每个独立业务动作、规则或可复用行为默认写入单独的 ModuleScript。
+- 不把业务逻辑写在 UI 控件、Tool、NPC 或模型内的零散脚本中。需要跟随这些对象的脚本也只负责取得对象引用并调用所属领域模块。
+
+#### Script（服务端脚本）
+
+| 项目 | 规则 |
+|---|---|
+| 存放 | 默认仅放 `ServerScriptService`：一个项目级 `ServerBootstrap`，以及经批准的世界/Package 适配入口。`Workspace` 中只允许与该世界模型或 Package 强绑定的极薄适配 Script，且必须说明归属。 |
+| 职责 | 连接 Roblox 服务事件、按依赖顺序启动业务模块、注册 Remote 入口、处理玩家进出与关服。它不承载具体经济、背包、奖励或存档规则。 |
+| 生命周期 | 启用且位于有效服务端位置后，服务器启动时运行一次；服务器存在期间持续有效。`Enabled` 被关闭再开启会重新执行，故不得依赖未清理的模块级状态。 |
+| 禁止 | 不放入 `ReplicatedStorage`、`StarterGui`、`StarterPlayer` 或 `ServerStorage` 期待其自动运行；不直接操作某个玩家的 PlayerGui/PlayerScripts，也不直接调用客户端函数。 |
+
+#### LocalScript（客户端脚本）
+
+| 项目 | 规则 |
+|---|---|
+| 存放 | 默认放 `StarterPlayer/StarterPlayerScripts`，由一个 `ClientBootstrap` 启动 Client Controller。仅在确实绑定角色重生时放 `StarterPlayer/StarterCharacterScripts`；Tool 的本地输入适配可放 Tool 内。`StarterGui` 默认只放 View，不新增项目业务 LocalScript。 |
+| 职责 | 输入、相机、UI Controller、动画与音效表现、本地预测和把用户意图发送给服务端。它不保存权威状态、不裁决奖励/价格/命中，也不直接读写 DataStore。 |
+| 生命周期 | `StarterPlayerScripts` 会复制到每位玩家的 `PlayerScripts`，通常随该玩家客户端会话运行一次；`StarterCharacterScripts` 会在每次 Character 生成时复制并重新运行，必须处理重生与销毁。UI Controller 不依赖 `StarterGui` 内脚本的重复复制。 |
+| 禁止 | 不把每个按钮、列表项或页面各写一个 LocalScript；不假设 LocalScript 的本地状态可被服务器读取或持有。 |
+
+#### ModuleScript（模块脚本）
+
+| 模块类别 | 存放 | 可承担的业务 |
+|---|---|---|
+| 服务端私有模块 | `ServerScriptService/Server/<Domain>/` | 单一业务 Action、Policy、Repository、Store Adapter、服务端 World System、经济、交易、反作弊、存档迁移与服务端 Remote Handler；仅在需要协调多个 Action 时使用极薄 Coordinator。 |
+| 客户端私有模块 | `StarterPlayer/StarterPlayerScripts/Client/<Feature>/` | Controller、UI/World System、输入适配、本地状态、动画/音效/表现组件。 |
+| 显式共享模块 | `ReplicatedStorage/Shared/` | 导出类型、常量、静态配置、纯计算、序列化格式和可在两端执行的无权威副作用校验。所有内容默认对客户端可见。 |
+| 加载期模块 | `ReplicatedFirst/` | 仅加载界面与首屏资源清单所需的极小模块；加载结束后不作为常规 Feature 模块库。 |
+
+- ModuleScript 在每个 Luau 运行环境内首次 `require` 时执行一次，后续 `require` 复用该环境的返回值；服务端与每个客户端各自拥有独立缓存和状态，不能把它当作跨端共享内存。
+- ModuleScript 顶层只允许定义类型、常量、纯初始化和导出表；不得在 `require` 时连接事件、启动循环、等待资源或发起网络请求。
+- 有生命周期的模块与 System 导出 `Init()`、`Start()`、`Destroy()`；Bootstrap 按依赖顺序集中调用，`Destroy()` 释放连接、任务、临时 Instance 和 Entity 绑定。纯工具、Config、Type 模块不强制这三个方法。
+- 不允许循环 `require`。模块之间通过明确的依赖方向调用，跨领域协作由 Coordinator/Controller 的公开 API 或 Remote 合约完成。
+
+#### 业务逻辑分配
+
+| 层 | 应放内容 | 不应放内容 |
+|---|---|---|
+| ServerBootstrap / ClientBootstrap | 组装依赖、调用 `Init`/`Start`、连接 Roblox 生命周期入口 | 领域规则、UI 细节、存档读写实现 |
+| Server Action / Policy | 一个独立业务动作的权威状态、规则裁决、奖励、交易、权限、反作弊或 Remote 请求处理 | UI、客户端动画、直接散落的 DataStore 调用、其他不相关动作 |
+| Domain Coordinator（可选） | 组装同一领域的多个 Action，提供稳定入口和生命周期协调 | 承载具体业务实现、成为所有领域逻辑的汇总文件 |
+| Repository / Store Adapter | 数据读写、Schema Normalize、保存协调、外部服务适配 | 玩法裁决、页面逻辑 |
+| Client Controller | 页面流程、输入意图、订阅服务端快照/增量、提供显示数据 | 权威价格/奖励计算、DataStore、直接修改服务端状态、通用控件表现 |
+| UI / World System | 根据一种 Tag 及其 Attribute 为 Entity 绑定一项通用表现或交互，并管理该绑定的运行时状态与 cleanup | 页面业务流程、领域规则、网络协议决定、跨 System 协调 |
+| Shared 模块 | 两端一致的类型、静态配置和纯函数 | 密钥、服务端规则、玩家私有数据、可被客户端利用的裁决逻辑 |
+
+建议依赖方向为：`Bootstrap → Coordinator/Controller/System → Action/Policy/Repository → Shared`。低层不得反向 require Bootstrap；System 不直接调用服务端 Action，客户端与服务端的跨端边界只通过 Remote 合约。
+
+### 命名矩阵
+
+| 对象 | 规则 | 示例 |
+|---|---|---|
+| ModuleScript / 导出类型 | PascalCase | `EquipPet`, `PlayerSnapshot` |
+| 协调器（确有需要时） | `{Domain}Coordinator` | `PetCoordinator` |
+| ECS System | `{Behavior}System` | `ButtonBounceSystem` |
+| Controller | `{Feature}Controller` | `PetPageController` |
+| Repository | `{Entity}Repository` | `PlayerDataRepository` |
+| 配置模块 | `{Domain}Config` | `RewardConfig` |
+| 局部变量 / 函数 | camelCase | `playerData`, `calculateReward` |
+| 私有成员 | `_camelCase` | `_connections` |
+| 常量 | LOUD_SNAKE_CASE | `MAX_PET_COUNT` |
+| Remote 请求 | 动词短语 | `RequestEquipPet` |
+| 服务端推送 | 过去式/状态变化 | `PetEquipped`, `InventoryChanged` |
+| CollectionService Tag | PascalCase 行为能力名 | `ButtonBounce`, `ClickSound` |
+| Attribute | PascalCase 配置名 | `HoverScale`, `HoverDuration` |
+| 测试 | `{Subject}.spec.luau` | `PetPolicy.spec.luau` |
+
+补充规则：
+
+- 技术名称使用完整英文，禁止 `caidan`、`xinxi`、`btn1`、`ScreenGui1`、`Script`。
+- 玩家可见中文放入 Text/LocalizationTable，不进入 API 名和目录名。
+- 缩写按普通单词处理：`HttpClient`、`JsonCodec`、`userId`。
+- 文件名匹配导出的对象名。
+- 不使用 `Legacy`、`New`、`V2` 作为永久命名；迁移版本放在数据 schema 或短期适配目录，并注明删除日期。
+
+### 文件结构
+
+每个文件按以下顺序：
+
+1. 可选的“为什么存在”说明。
+2. `game:GetService`。
+3. `require`，按模块名排序。
+4. 类型。
+5. 常量。
+6. 模块级状态。
+7. 私有函数。
+8. 公共 API。
+9. 单一 `return`。
+
+所有 require 保持在文件顶部且静态可见。ModuleScript 顶层不得产生长期副作用。
+
+### 规模与职责
+
+- 建议单文件不超过 300 行；超过 500 行必须在评审中解释拆分方案。
+- 一个模块只拥有一个可用一句话描述的职责。
+- 一个独立业务动作默认对应一个 ModuleScript，例如 `EquipPet`、`HatchEgg`、`ClaimDailyReward`、`PurchaseProduct`；不得以 `PetService`、`GameService` 等总管模块汇集不相关动作。
+- 同一领域需要统一入口时，使用极薄 Coordinator 做装配和路由；业务实现仍留在各个 Action 模块中。
+- 一个可重复组合的 UI 或世界行为默认对应一个 System，例如 `ButtonBounceSystem`、`ClickSoundSystem`；不得建立处理所有 Tag 的大杂烩 System。
+- 同一段代码出现第二次时先记录；第三次出现且差异可参数化时抽象。
+- 禁止以大段章节注释掩盖多职责文件。
+- 禁止保留整段注释掉的旧实现；历史通过 Place Version History、Package Versions 或未来的共享版本库保存。
+
+## 3. Remote 合约与安全
+
+每个 Client → Server 入口必须具备：
+
+1. 类型验证：`typeof`、table shape、Instance ClassName。
+2. 结构边界：数组长度、字符串长度、递归深度、键集合。
+3. 值边界：finite number、范围、枚举成员、合法 ID。
+4. 上下文/权限：距离、所有权、玩家状态、物品存在、功能状态。
+5. 服务端限流：按玩家和动作设置 token bucket/cooldown。
+6. 服务端权威：客户端不能指定价格、奖励数量、成功结果或存档内容。
+7. 稳定失败语义：错误码供 UI 映射，不把内部错误栈返回客户端。
+
+RemoteFunction 仅用于确实需要同步响应的短操作；可能等待 DataStore、HTTP 或长动画的流程使用 RemoteEvent + requestId 回执。
+
+## 4. 数据与存档
+
+### 所有权与存储结构
+
+- 每位玩家只有一个逻辑根存档：使用稳定的 store 名 `PlayerData` 与 key `player:<userId>`。根存档包含 `schemaVersion`、进度、货币、背包、装备、任务等领域数据；不得按功能建立互不协调的玩家主存档。
+- 根存档的字段按领域分组，但不重复拥有同一字段。一个字段只能有一个明确的领域所有者；例如装备状态不能同时存在于背包数据、宠物数据和活动数据中。
+- 只有确有必要时才拆分为子 key：数据体积接近限制、更新极频繁且可独立保存，或具有独立生命周期。拆分后仍由同一个 `PlayerDataCoordinator` 统一加载、保存、迁移和失败处理；跨 key 的变更必须有明确顺序和可恢复策略。
+- 开发、测试和正式环境使用隔离的 store 名或 scope；不得用无限增加 `PlayerDataV2`、`PlayerDataV3` 的方式替代数据迁移。
+
+推荐的根存档形状：
+
+```luau
+export type PlayerData = {
+    schemaVersion: number,
+    progress: ProgressData,
+    economy: EconomyData,
+    inventory: InventoryData,
+    equipment: EquipmentData,
+    activities: ActivitiesData,
+}
+```
+
+### 服务端数据生命周期
+
+- `PlayerDataCoordinator` 是玩家数据的唯一服务端入口；每位在线玩家只维护一份服务端内存会话数据。Feature Action 通过其公开 API 读取或更新数据，不能直接调用 DataStore API，也不能取得可任意修改的原始 table 引用。
+- 只有 `PlayerDataRepository` / Store Adapter 可以直接调用 DataStore API。Repository 只负责读写与外部服务适配，不裁决玩法规则。
+- 玩家加入时按 `NotLoaded → Loading → Ready` 加载：读取原始数据、执行 `Schema.Normalize(rawData)`、补默认值、迁移旧版本、校验并修复非法值，随后才允许依赖该数据的玩法开始。读取失败时不得用空默认档覆盖旧档；有限重试后拒绝进入，或进入明确标记为不可存档的降级状态。
+- 领域代码通过受控 API 修改会话数据，例如 `Update`、`Grant`、`Equip`，并标记 dirty；禁止散落模块直接改 table 字段或每次货币变化都写 DataStore。
+- 所有保存走同一保存协调器：定时合并保存、`PlayerRemoving`、`BindToClose` 和手动保存串行执行，避免同一玩家并发写入。保存失败保留 dirty 状态并重试，记录结构化日志、指标和玩家标识。
+- 写入优先 `UpdateAsync` 处理并发语义；`SetAsync` 需要明确证明不会覆盖并发数据。`UpdateAsync` 的 transform 必须是无副作用、无 yield、可重复执行的纯函数，不得在其中发奖、发 Remote 或修改内存状态。
+
+### 客户端边界与事务
+
+- 客户端不持有权威存档，也不能提交完整存档 table。服务端在玩家数据 Ready 后发送首屏所需的最小数据投影；背包详情、任务详情等按页面或功能需要发送，并以增量同步状态变化。
+- 不向客户端发送收据记录、反作弊状态、内部冷却、保存状态、密钥或其他非展示数据。
+- 交易、购买与收据处理要求服务端幂等键和可恢复事务状态机。已处理记录应独立于玩家主档并有保留策略，不能无限增长；奖励发放与“已处理”标记必须能在服务器重启后安全恢复。
+- 记录每次 Schema 迁移的来源版本、目标版本和迁移窗口；旧字段只能在明确窗口内保留，迁移完成后删除。
+
+## 5. UI
+
+- ScreenGui 只包含视图对象、布局、行为 Tag 和少量声明性 Attribute，不承载数百个 LocalScript。
+- 每个 `GuiObject` 可作为轻量 ECS Entity：Tag 组合通用能力，Attribute 配置该能力；例如 `ButtonBounce` + `ClickSound` + `PreventDoubleTap`。不为这些表现复制脚本，也不创建按钮继承层级。
+- 每种通用 UI 行为由一个独立 UI System 处理。System 启动时处理已有 Tag，随后监听 Tag 的新增和移除；它只负责自己的 Tween、音效、连接和 cleanup。
+- 页面由一个 Controller 管理业务流程、数据投影和用户意图；Controller 不实现通用控件表现，UI System 不实现页面业务流程。
+- 动画、音效、数字格式化、红点、弹窗队列和导航按可复用行为分别拆为 ModuleScript / System，不汇集进一个 UI Manager。
+- View 不直接调用 DataStore/Marketplace 领域逻辑；通过 Controller → Remote 合约表达用户意图。Tag 和 Attribute 不是业务状态、权限或网络协议。
+- 控件名称描述角色而不是形状或序号：`ClaimButton`，不是 `GreenButton2`。
+
+## 6. 事件和任务生命周期
+
+- 每个长生命周期对象拥有 cleanup 容器；`:Connect`、task、临时 Instance 都必须登记释放。
+- 优先 `task.spawn`、`task.defer`、`task.wait`，禁止新增 `spawn`、`delay`、`wait`。
+- 循环必须有取消条件；不要在 ModuleScript require 时启动无限循环。
+- 玩家离开、角色重生、页面关闭、服务销毁都要有对应 cleanup。
+- System 必须在 Tag 移除、Entity 销毁和自身 `Destroy()` 时解除该 Entity 的全部连接、Tween、任务和临时 Instance；动态 Clone 的 Entity 与初始 Entity 使用同一绑定路径。
+
+## 7. 日志
+
+- 通过 `Logger(scope)` 记录，级别为 Debug/Info/Warn/Error。
+- 生产默认关闭 Debug；禁止无 Scope 的 `print`。
+- 日志包含必要上下文，如 `userId`、feature、requestId，但不得输出完整存档或敏感数据。
+- 预期业务失败返回错误码，不使用 `warn`；真正异常、降级或数据修复才记录 Warn/Error。
